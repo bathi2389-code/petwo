@@ -3,10 +3,9 @@ import { z } from 'zod';
 import { getAuth, getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate } from '../../middleware/auth.middleware';
 import { normalizePhoneNumber, isValidIndianPhone } from '../../utils/helpers';
-import { OTP } from '../../../shared/constants/index';
+import { OTP, UserRole } from '@petco/shared';
 import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
-import type { UserRole } from '@petco/shared';
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 

@@ -156,13 +156,13 @@ export async function buildApp(): Promise<FastifyInstance> {
   app.setErrorHandler((error, _request, reply) => {
     app.log.error(error);
 
-    if (error.validation) {
+    if (error.name === 'ZodError' || error.validation) {
       return reply.status(422).send({
         success: false,
         error: {
           code: 'VAL_001',
           message: 'Validation failed',
-          details: error.validation,
+          details: (error as any).errors || error.validation,
         },
       });
     }

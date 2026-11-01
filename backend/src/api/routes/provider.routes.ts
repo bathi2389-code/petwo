@@ -313,7 +313,7 @@ export default async function providerRoutes(app: FastifyInstance): Promise<void
     // Check subscription limit
     const providerDoc = await db.collection(COLLECTIONS.PROVIDERS).doc(request.user!.uid).get();
     const provider = providerDoc.data() as Provider;
-    const { PROVIDER_SUBSCRIPTION_LIMITS } = await import('../../../shared/constants/index');
+    const { PROVIDER_SUBSCRIPTION_LIMITS } = await import('@petco/shared');
     const tierLimits = PROVIDER_SUBSCRIPTION_LIMITS[provider.subscription.tier];
 
     const existingLocations = await db.collection(COLLECTIONS.PROVIDER_LOCATIONS)

@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isProvider, isAdmin } from '../../middleware/auth.middleware';
-import { PROVIDER_SUBSCRIPTION_LIMITS } from '../../../shared/constants/index';
+import { PROVIDER_SUBSCRIPTION_LIMITS } from '@petco/shared';
 import { nanoid } from 'nanoid';
 import type { Service, Provider } from '@petco/shared';
 

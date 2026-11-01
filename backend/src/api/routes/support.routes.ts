@@ -5,7 +5,7 @@ import { authenticate, isAdmin } from '../../middleware/auth.middleware';
 import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
 import type { SupportTicket, TicketMessage, TicketStatus, TicketPriority } from '@petco/shared';
-import { TICKET_NUMBER_PREFIX } from '../../../shared/constants/index';
+import { TICKET_NUMBER_PREFIX } from '@petco/shared';
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 

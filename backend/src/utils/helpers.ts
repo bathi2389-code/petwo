@@ -1,13 +1,13 @@
 import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
-import { BOOKING, TICKET_NUMBER_PREFIX, CURRENCY } from '../../../shared/constants/index';
+import { BOOKING, TICKET_NUMBER_PREFIX, CURRENCY } from '@petco/shared';
 
 /**
  * Generate a human-readable booking number: PTC-20241102-A3K9
  */
 export function generateBookingNumber(): string {
   const date = dayjs().format('YYYYMMDD');
-  const suffix = nanoid(4).toUpperCase();
+  const suffix = nanoid(4).toUpperCase().replace(/[^A-Z0-9]/g, 'A');
   return `${BOOKING.NUMBER_PREFIX}-${date}-${suffix}`;
 }
 
@@ -16,7 +16,7 @@ export function generateBookingNumber(): string {
  */
 export function generateTicketNumber(): string {
   const date = dayjs().format('YYYYMMDD');
-  const suffix = nanoid(4).toUpperCase();
+  const suffix = nanoid(4).toUpperCase().replace(/[^A-Z0-9]/g, 'B');
   return `${TICKET_NUMBER_PREFIX}-${date}-${suffix}`;
 }
 

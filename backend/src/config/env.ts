@@ -36,7 +36,21 @@ const envSchema = z.object({
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 });
 
-const parsed = envSchema.safeParse(process.env);
+// In test mode, provide safe fallback values for integration testing
+const testDefaults = process.env.NODE_ENV === 'test' ? {
+  FIREBASE_PROJECT_ID: 'petco-test-suite',
+  FIREBASE_PRIVATE_KEY: '-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC5\n-----END PRIVATE KEY-----',
+  FIREBASE_CLIENT_EMAIL: 'qa-tester@petco-test.iam.gserviceaccount.com',
+  FIREBASE_STORAGE_BUCKET: 'petco-test.appspot.com',
+  JWT_SECRET: 'test_jwt_secret_super_secure_32_chars_long_key_12345',
+  RAZORPAY_KEY_ID: 'rzp_test_qa12345678',
+  RAZORPAY_KEY_SECRET: 'rzp_secret_qa12345678',
+  RAZORPAY_WEBHOOK_SECRET: 'rzp_wh_secret_qa12345678',
+  LOG_LEVEL: 'fatal',
+} : {};
+
+const rawEnv = { ...testDefaults, ...process.env };
+const parsed = envSchema.safeParse(rawEnv);
 
 if (!parsed.success) {
   console.error('❌ Invalid environment variables:\n', parsed.error.format());
