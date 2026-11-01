@@ -1,0 +1,28 @@
+{
+  "name": "petco-platform",
+  "version": "1.0.0",
+  "description": "PETCO — Production-Grade PetCare Marketplace & Multi-Tenant SaaS Platform",
+  "private": true,
+  "workspaces": [
+    "apps/provider-web",
+    "apps/admin-web",
+    "backend",
+    "shared"
+  ],
+  "scripts": {
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:provider": "npm run dev --workspace=apps/provider-web",
+    "dev:admin": "npm run dev --workspace=apps/admin-web",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "type-check": "npm run type-check --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

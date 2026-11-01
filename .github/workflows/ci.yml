@@ -1,0 +1,107 @@
+name: PETCO CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-test:
+    name: Backend Test & Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Shared Types
+        run: npm run build --workspace=@petco/shared
+
+      - name: Type-Check Backend
+        run: npm run type-check --workspace=@petco/backend
+
+      - name: Run Backend Tests
+        run: npm run test --workspace=@petco/backend
+
+  provider-web:
+    name: Provider Web Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Provider Web
+        run: npm run build --workspace=petco-provider-web
+
+  admin-web:
+    name: Admin Web Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Admin Web
+        run: npm run build --workspace=petco-admin-web
+
+  flutter-app:
+    name: Flutter Customer App Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Install Dependencies
+        run: |
+          cd apps/customer-app
+          flutter pub get
+
+      - name: Analyze Flutter Code
+        run: |
+          cd apps/customer-app
+          flutter analyze
+
+      - name: Build Android APK in Cloud
+        run: |
+          cd apps/customer-app
+          flutter build apk --debug
+
+      - name: Upload APK Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: petco-customer-app-debug-apk
+          path: apps/customer-app/build/app/outputs/flutter-apk/app-debug.apk

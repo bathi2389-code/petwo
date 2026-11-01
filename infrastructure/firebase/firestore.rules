@@ -1,0 +1,311 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper Functions ─────────────────────────────────────────────────────
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isUser(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    function hasRole(role) {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
+    }
+
+    function isCustomer() {
+      return hasRole('customer');
+    }
+
+    function isProvider() {
+      return hasRole('provider');
+    }
+
+    function isAdmin() {
+      return hasRole('admin') || hasRole('super_admin');
+    }
+
+    function isActiveUser() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isActive == true;
+    }
+
+    function isOwner(resource) {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    function isValidString(field, min, max) {
+      return field is string && field.size() >= min && field.size() <= max;
+    }
+
+    function isValidTimestamp(field) {
+      return field is timestamp || field is string;
+    }
+
+    // ─── Users ────────────────────────────────────────────────────────────────
+
+    match /users/{userId} {
+      allow read: if isUser(userId) || isAdmin();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isUser(userId) && isActiveUser()
+        && request.resource.data.role == resource.data.role  // Role can't self-change
+        && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isAdmin();
+    }
+
+    // ─── Customers ────────────────────────────────────────────────────────────
+
+    match /customers/{customerId} {
+      allow read: if isUser(customerId) || isAdmin();
+      allow create: if isAuthenticated() && request.auth.uid == customerId;
+      allow update: if isUser(customerId) && isActiveUser();
+      allow delete: if isAdmin();
+    }
+
+    // ─── Pets ────────────────────────────────────────────────────────────────
+
+    match /pets/{petId} {
+      allow read: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin() ||
+        isProvider()  // Providers can read pets of customers they've served
+      );
+      allow create: if isCustomer() && isActiveUser()
+        && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isAuthenticated()
+        && resource.data.ownerId == request.auth.uid
+        && request.resource.data.ownerId == resource.data.ownerId; // Can't change owner
+      allow delete: if isAdmin();
+    }
+
+    // ─── Vaccination Records ──────────────────────────────────────────────────
+
+    match /vaccinationRecords/{recordId} {
+      allow read: if isAuthenticated() && (
+        get(/databases/$(database)/documents/pets/$(resource.data.petId)).data.ownerId == request.auth.uid ||
+        isProvider() ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated() && isActiveUser();
+      allow update: if isAuthenticated() && (
+        get(/databases/$(database)/documents/pets/$(resource.data.petId)).data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+
+    // ─── Medical Records ──────────────────────────────────────────────────────
+
+    match /medicalRecords/{recordId} {
+      allow read: if isAuthenticated() && (
+        get(/databases/$(database)/documents/pets/$(resource.data.petId)).data.ownerId == request.auth.uid ||
+        isProvider() ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated() && isActiveUser() && (isCustomer() || isProvider());
+      allow update: if isAuthenticated() && (
+        get(/databases/$(database)/documents/pets/$(resource.data.petId)).data.ownerId == request.auth.uid ||
+        resource.data.providerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+
+    // ─── Providers ────────────────────────────────────────────────────────────
+
+    match /providers/{providerId} {
+      // Public can read approved/active providers
+      allow read: if resource.data.verificationStatus == 'approved'
+        && resource.data.isActive == true
+        || isUser(providerId)
+        || isAdmin();
+
+      allow create: if isAuthenticated() && request.auth.uid == providerId;
+
+      allow update: if (isUser(providerId) && isActiveUser()
+        // Provider cannot self-approve
+        && !('verificationStatus' in request.resource.data.diff(resource.data).affectedKeys()))
+        || isAdmin();
+
+      allow delete: if isAdmin();
+    }
+
+    // ─── Provider Locations ───────────────────────────────────────────────────
+
+    match /providerLocations/{locationId} {
+      allow read: if resource.data.isActive == true ||
+        isAuthenticated() && (
+          resource.data.providerId == request.auth.uid || isAdmin()
+        );
+      allow create: if isProvider() && isActiveUser()
+        && request.resource.data.providerId == request.auth.uid;
+      allow update: if isAuthenticated() &&
+        resource.data.providerId == request.auth.uid && isActiveUser()
+        || isAdmin();
+      allow delete: if isAdmin() ||
+        (isProvider() && resource.data.providerId == request.auth.uid);
+    }
+
+    // ─── Staff ────────────────────────────────────────────────────────────────
+
+    match /staff/{staffId} {
+      allow read: if resource.data.isActive == true ||
+        isAuthenticated() && (
+          resource.data.providerId == request.auth.uid || isAdmin()
+        );
+      allow create: if isProvider() && isActiveUser()
+        && request.resource.data.providerId == request.auth.uid;
+      allow update: if isProvider() && isActiveUser()
+        && resource.data.providerId == request.auth.uid
+        || isAdmin();
+      allow delete: if isAdmin() ||
+        (isProvider() && resource.data.providerId == request.auth.uid);
+    }
+
+    // ─── Service Categories ───────────────────────────────────────────────────
+
+    match /serviceCategories/{categoryId} {
+      allow read: if true; // Public
+      allow write: if isAdmin();
+    }
+
+    // ─── Services ────────────────────────────────────────────────────────────
+
+    match /services/{serviceId} {
+      allow read: if resource.data.isActive == true
+        || isAuthenticated() && (
+          resource.data.providerId == request.auth.uid || isAdmin()
+        );
+      allow create: if isProvider() && isActiveUser()
+        && request.resource.data.providerId == request.auth.uid;
+      allow update: if isProvider() && isActiveUser()
+        && resource.data.providerId == request.auth.uid
+        || isAdmin();
+      allow delete: if isAdmin() ||
+        (isProvider() && resource.data.providerId == request.auth.uid);
+    }
+
+    // ─── Bookings ────────────────────────────────────────────────────────────
+
+    match /bookings/{bookingId} {
+      allow read: if isAuthenticated() && (
+        resource.data.customerId == request.auth.uid ||
+        resource.data.providerId == request.auth.uid ||
+        isAdmin()
+      );
+      // Only create via backend API (server-side only)
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ─── Payments ────────────────────────────────────────────────────────────
+
+    match /payments/{paymentId} {
+      allow read: if isAuthenticated() && (
+        resource.data.customerId == request.auth.uid ||
+        resource.data.providerId == request.auth.uid ||
+        isAdmin()
+      );
+      // Payments are server-side only
+      allow write: if false;
+    }
+
+    // ─── Settlements ─────────────────────────────────────────────────────────
+
+    match /settlements/{settlementId} {
+      allow read: if isAuthenticated() && (
+        resource.data.providerId == request.auth.uid || isAdmin()
+      );
+      allow write: if false; // Server-side only
+    }
+
+    // ─── Coupons ─────────────────────────────────────────────────────────────
+
+    match /coupons/{couponId} {
+      allow read: if resource.data.isActive == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ─── Reviews ─────────────────────────────────────────────────────────────
+
+    match /reviews/{reviewId} {
+      allow read: if resource.data.status == 'published'
+        || isAuthenticated() && (
+          resource.data.customerId == request.auth.uid ||
+          resource.data.providerId == request.auth.uid ||
+          isAdmin()
+        );
+      // Create only via backend API (enforces booking completion check)
+      allow create: if false;
+      allow update: if isAdmin() ||
+        (isProvider() && resource.data.providerId == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['providerResponse', 'providerRespondedAt']));
+      allow delete: if isAdmin();
+    }
+
+    // ─── Notifications ────────────────────────────────────────────────────────
+
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid || isAdmin();
+      allow update: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead', 'readAt']);
+      allow create: if false; // Server-side only
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid
+        || isAdmin();
+    }
+
+    // ─── Support Tickets ──────────────────────────────────────────────────────
+
+    match /supportTickets/{ticketId} {
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow create: if isAuthenticated() && isActiveUser()
+        && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+
+    // ─── OTP Cache ────────────────────────────────────────────────────────────
+
+    match /otpCache/{phone} {
+      allow read, write: if false; // Server-side only
+    }
+
+    // ─── Audit Logs ───────────────────────────────────────────────────────────
+
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false; // Server-side only
+    }
+
+    // ─── System Config ────────────────────────────────────────────────────────
+
+    match /systemConfig/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // ─── Subscription Plans ───────────────────────────────────────────────────
+
+    match /subscriptionPlans/{planId} {
+      allow read: if true; // Public
+      allow write: if isAdmin();
+    }
+
+    // ─── Catch-all: Deny everything else ─────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
