@@ -266,3 +266,85 @@
   "announcement": "PETCO 24/7 Emergency Care Active • Free Dental Checkups during Pet Health Month in Hyderabad"
 }
 ```
+
+---
+
+## 15. Digital Pet Health Passport & DPDPA Consent (`/health-passport`)
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET`  | `/health-passport/:petId` | Authenticated | Generates full Digital Passport, QR verification code & ISO 11784 microchip status |
+| `POST` | `/health-passport/:petId/microchip` | Customer / Vet | Register or update 15-digit ISO 11784/11785 microchip details |
+| `POST` | `/health-passport/:petId/consent` | Customer | Grant time-bound DPDPA medical record read consent to a clinic/provider |
+| `DELETE` | `/health-passport/:petId/consent/:providerId` | Customer | Revoke provider access to medical records immediately |
+
+### Health Passport Verification QR Payload Sample:
+```json
+{
+  "passportNumber": "PETCO-PASS-8812A",
+  "pet": {
+    "name": "Rocky",
+    "species": "dog",
+    "breed": "Golden Retriever",
+    "isNeutered": true,
+    "bloodGroup": "DEA 1.1+",
+    "microchip": {
+      "number": "900215000492817",
+      "implantDate": "2023-04-12",
+      "implantedBy": "Dr. Srinivas Rao, MVSc",
+      "verified": true
+    }
+  },
+  "vaccinationsSummary": {
+    "total": 4,
+    "upToDate": true,
+    "nextDue": "2026-12-05",
+    "rabiesValidUntil": "2027-01-10"
+  },
+  "verificationUrl": "https://verify.petco.in/passport/PETCO-PASS-8812A"
+}
+```
+
+---
+
+## 16. PawRewards Points & Loyalty Ledger (`/rewards`)
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET`  | `/rewards/balance` | Customer | Fetches current balance, tier (Silver/Gold/Platinum), and lifetime points |
+| `GET`  | `/rewards/history` | Customer | Paginated point transactions (credits from bookings, debits from vouchers) |
+| `GET`  | `/rewards/catalog` | Customer | Active reward vouchers available for redemption |
+| `POST` | `/rewards/redeem` | Customer | Redeems points for service vouchers or partner grooming discounts |
+
+---
+
+## 17. Pet Health Insurance Marketplace & Cashless Pre-Auth (`/insurance`)
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET`  | `/insurance/quotes` | Customer | Instant quotation matrix across Bajaj Allianz, Digit, and PetSecure partners |
+| `POST` | `/insurance/policies/bind` | Customer | Issues policy coverage instantly with digital certificate and cashless card |
+| `POST` | `/insurance/claims/pre-auth` | Provider / Clinic | Initiates real-time cashless claim pre-authorization for emergency or surgery |
+| `GET`  | `/insurance/claims/:claimId/status` | Customer / Clinic | Live claim adjudication tracking and authorized amount |
+
+---
+
+## 18. At-Home Diagnostic Sample Collection & Lab Reports (`/diagnostics`)
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET`  | `/diagnostics/packages` | Public | List available home pathology tests (CBC, Renal, Liver, Tick Fever PCR) |
+| `POST` | `/diagnostics/orders` | Customer | Book phlebotomist home visit with slot scheduling and address geocoding |
+| `POST` | `/diagnostics/orders/:orderId/publish-report` | Lab Tech / Vet | Upload PDF report and flag abnormal biometric parameters |
+| `GET`  | `/diagnostics/orders/:orderId` | Customer / Vet | Track phlebotomist transit, view test progress, and download PDF report |
+
+---
+
+## 19. Dynamic Yield & Off-Peak Pricing (`/yield-pricing`)
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET`  | `/yield-pricing/rules` | Provider | Retrieve custom yield pricing rules configured for provider services |
+| `POST` | `/yield-pricing/rules` | Provider | Configure off-peak discounts (e.g. 20% off Tue 1-4 PM) or weekend surges |
+| `POST` | `/yield-pricing/quote` | Public / Customer | Calculates dynamic price for service based on timestamp, day, and occupancy |
+

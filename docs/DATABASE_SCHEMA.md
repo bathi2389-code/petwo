@@ -134,6 +134,73 @@ Transactional appointments and reservations.
 | `commission.netProviderAmount`| `number` | Net payable to vendor in paisa |
 | `payment.status` | `enum` | `'created' \| 'captured' \| 'failed' \| 'refunded'` |
 
+### 2.7 `medicalConsents/{consentId}`
+DPDPA 2023 compliant access grants for medical records and health passports.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | `string` | Unique consent record ID |
+| `petId` | `string` | Foreign key to `pets/{petId}` |
+| `customerId` | `string` | Pet owner UID granting consent |
+| `providerId` | `string` | Clinic or veterinarian UID receiving read access |
+| `scope` | `string` | Access scope (`'full' \| 'vaccinations_only' \| 'emergency'`) |
+| `expiresAt` | `string` | ISO 8601 expiry timestamp |
+| `isRevoked` | `boolean` | Immediate revocation flag |
+| `grantedAt` | `string` | ISO 8601 creation timestamp |
+
+### 2.8 `pawRewards/{customerId}` & `pawRewardsLedger/{transactionId}`
+Gamification, loyalty points, and promotional voucher ledger.
+
+| Field | Type | Description |
+|---|---|---|
+| `customerId` | `string` | Pet owner UID |
+| `pointsBalance` | `number` | Current available spendable points |
+| `lifetimeEarned` | `number` | Total historical points accumulated |
+| `tier` | `enum` | `'Silver' \| 'Gold' \| 'Platinum'` |
+| `transactions` | `subcollection` | Historical ledger entries (`amount`, `type: credit \| debit`, `sourceBookingId`, `createdAt`) |
+
+### 2.9 `insurancePolicies/{policyId}` & `insuranceClaims/{claimId}`
+Pet health insurance policies and cashless hospital pre-authorizations.
+
+| Field | Type | Description |
+|---|---|---|
+| `policyId` | `string` | Insurance policy certificate number |
+| `petId` | `string` | Insured pet ID |
+| `insurerName` | `string` | Partner name (`'Bajaj Allianz' \| 'Digit' \| 'PetSecure'`) |
+| `sumInsuredPaisa` | `number` | Total annual coverage amount in paisa |
+| `copayPercent` | `number` | Co-pay percentage (e.g. 10%) |
+| `claimId` | `string` | Unique cashless claim ticket ID |
+| `claimStatus` | `enum` | `'submitted' \| 'pre_authorized' \| 'approved' \| 'settled' \| 'rejected'` |
+| `authorizedAmountPaisa` | `number` | Insurer pre-approved cashless payout amount |
+
+### 2.10 `diagnosticOrders/{orderId}`
+At-home pathology sample collections and diagnostic lab reports.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | `string` | Diagnostic order identifier (`PTC-LAB-XXXX`) |
+| `customerId` | `string` | Pet owner UID |
+| `petId` | `string` | Patient pet ID |
+| `packageId` | `string` | Test package identifier (CBC, Renal, Liver, Tick Fever PCR) |
+| `collectionAddress` | `object` | Home pickup address with geocoded lat/lng |
+| `status` | `enum` | `'pending' \| 'confirmed' \| 'phlebotomist_assigned' \| 'sample_collected' \| 'in_lab' \| 'report_ready'` |
+| `reportPdfUrl` | `string` | Cloud Storage secure signed URL for PDF lab report |
+| `biometricResults` | `object` | Structured lab parameters (RBC, WBC, Platelets, Creatinine) |
+
+### 2.11 `yieldPricingRules/{ruleId}`
+Provider dynamic revenue management and off-peak discount rules.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | `string` | Dynamic pricing rule identifier |
+| `providerId` | `string` | Provider UID |
+| `serviceId` | `string` | Target service or `'*'` for all |
+| `dayOfWeek` | `number` | `0` (Sun) to `6` (Sat) |
+| `startHour` | `number` | Starting hour in 24h format (e.g. 13 for 1 PM) |
+| `endHour` | `number` | Ending hour in 24h format (e.g. 16 for 4 PM) |
+| `adjustmentPercent` | `number` | Percentage delta (-20 for 20% discount, +15 for 15% peak surge) |
+| `isActive` | `boolean` | Rule enable/disable state |
+
 ---
 
 ## 3. Composite Index Requirements

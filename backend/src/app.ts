@@ -26,6 +26,11 @@ import emergencyRoutes from './api/routes/emergency.routes';
 import whatsappRoutes from './api/routes/whatsapp.routes';
 import iotTrackerRoutes from './api/routes/iot-tracker.routes';
 import queueRoutes from './api/routes/queue.routes';
+import healthPassportRoutes from './api/routes/health-passport.routes';
+import rewardsRoutes from './api/routes/rewards.routes';
+import insuranceRoutes from './api/routes/insurance.routes';
+import diagnosticRoutes from './api/routes/diagnostics.routes';
+import yieldPricingRoutes from './api/routes/yield-pricing.routes';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({
@@ -141,6 +146,11 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(whatsappRoutes,    { prefix: `${prefix}/whatsapp` });
   await app.register(iotTrackerRoutes,  { prefix: `${prefix}/iot` });
   await app.register(queueRoutes,       { prefix: `${prefix}/queue` });
+  await app.register(healthPassportRoutes, { prefix: `${prefix}/health-passport` });
+  await app.register(rewardsRoutes,     { prefix: `${prefix}/rewards` });
+  await app.register(insuranceRoutes,   { prefix: `${prefix}/insurance` });
+  await app.register(diagnosticRoutes,  { prefix: `${prefix}/diagnostics` });
+  await app.register(yieldPricingRoutes,{ prefix: `${prefix}/yield-pricing` });
 
   // ─── Global Error Handler ────────────────────────────────────────────────────
   app.setErrorHandler((error, _request, reply) => {
