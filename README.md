@@ -16,9 +16,23 @@
 
 ---
 
-## 1. System Architecture
+## 1. System Architecture & Technical Documentation
 
-The platform is structured as a TypeScript/Dart monorepo supporting three unified client applications and an enterprise backend:
+The platform is backed by comprehensive engineering specifications in the [`docs/`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs) directory:
+
+| Document | Path | Core Focus |
+|---|---|---|
+| **Architecture Design** | [`docs/ARCHITECTURE.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/ARCHITECTURE.md) | Distributed topology, multi-tenancy isolation, edge routing & C4 system model |
+| **API Specification** | [`docs/API_REFERENCE.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/API_REFERENCE.md) | 19 endpoint groups, JSON payloads, headers, error codes & rate limits |
+| **Database Schema** | [`docs/DATABASE_SCHEMA.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/DATABASE_SCHEMA.md) | Firestore collections, composite indexes, integer paisa & DPDPA consents |
+| **Working Flows** | [`docs/WORKFLOWS.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/WORKFLOWS.md) | 15 detailed Mermaid sequence diagrams covering end-to-end business flows |
+| **Security & Compliance** | [`docs/SECURITY_COMPLIANCE.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/SECURITY_COMPLIANCE.md) | DPDPA 2023, VCI licensure rules, HMAC verification, RBAC & OWASP controls |
+| **Financial & Unit Economics** | [`docs/FINANCIAL_MODEL.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/FINANCIAL_MODEL.md) | 18% GST partitioning, commission take-rates, SaaS tiers & Hyderabad unit economics |
+| **Zero-Install Run Guide** | [`docs/RUN_WITHOUT_LOCAL_INSTALLS.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/RUN_WITHOUT_LOCAL_INSTALLS.md) | Run 100% in browser via GitHub Codespaces, Render, Railway, or Vercel |
+| **Deployment Runbook** | [`docs/DEPLOYMENT_RUNBOOK.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/DEPLOYMENT_RUNBOOK.md) | Production launch checklist, environment secrets, CI/CD, and rollback steps |
+| **Product Roadmap** | [`docs/ROADMAP_AND_EXTENSIONS.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/ROADMAP_AND_EXTENSIONS.md) | Next-gen features, expansion cities (Bengaluru, Mumbai, Delhi-NCR), and AI agents |
+
+The repository is structured as a TypeScript/Dart monorepo supporting three unified client applications and an enterprise backend:
 
 ```
 PETCO/
