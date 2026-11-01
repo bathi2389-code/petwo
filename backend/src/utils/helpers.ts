@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
-import { BOOKING, TICKET_NUMBER_PREFIX, CURRENCY } from '../../shared/constants/index';
+import { BOOKING, TICKET_NUMBER_PREFIX, CURRENCY } from '../../../shared/constants/index';
 
 /**
  * Generate a human-readable booking number: PTC-20241102-A3K9
@@ -90,7 +90,7 @@ export function normalizePhoneNumber(phone: string): string {
  */
 export function isValidIndianPhone(phone: string): boolean {
   const digits = phone.replace(/\D/g, '');
-  const cleaned = digits.length === 12 ? digits.slice(2) : digits;
+  const cleaned = digits.length === 12 && digits.startsWith('91') ? digits.slice(2) : digits;
   return /^[6-9]\d{9}$/.test(cleaned);
 }
 
