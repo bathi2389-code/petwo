@@ -3,7 +3,7 @@ import 'package:petco_customer/config/theme.dart';
 import 'package:petco_customer/models/pet_model.dart';
 
 class AddPetScreen extends StatefulWidget {
-  const AddPetScreen({Key? key}) : super(key: key);
+  const AddPetScreen({super.key});
 
   @override
   State<AddPetScreen> createState() => _AddPetScreenState();

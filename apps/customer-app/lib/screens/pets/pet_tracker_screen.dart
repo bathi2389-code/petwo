@@ -7,10 +7,10 @@ class PetTrackerScreen extends StatefulWidget {
   final String petName;
 
   const PetTrackerScreen({
-    Key? key,
+    super.key,
     required this.petId,
     required this.petName,
-  }) : super(key: key);
+  });
 
   @override
   State<PetTrackerScreen> createState() => _PetTrackerScreenState();
@@ -34,6 +34,7 @@ class _PetTrackerScreenState extends State<PetTrackerScreen> {
     try {
       final dio = Dio();
       final res = await dio.post('http://localhost:4000/api/v1/iot/simulate/${widget.petId}');
+      if (!mounted) return;
       if (res.data != null && res.data['data'] != null) {
         final d = res.data['data'];
         setState(() {
@@ -45,6 +46,7 @@ class _PetTrackerScreenState extends State<PetTrackerScreen> {
         });
       }
     } catch (_) {
+      if (!mounted) return;
       // Offline local simulation
       setState(() {
         latitude += 0.0005;
@@ -53,7 +55,9 @@ class _PetTrackerScreenState extends State<PetTrackerScreen> {
         steps += 120;
       });
     } finally {
-      setState(() => isSimulating = false);
+      if (mounted) {
+        setState(() => isSimulating = false);
+      }
     }
   }
 

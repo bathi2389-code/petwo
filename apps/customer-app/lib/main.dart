@@ -10,7 +10,7 @@ void main() {
 }
 
 class PetcoApp extends StatelessWidget {
-  const PetcoApp({Key? key}) : super(key: key);
+  const PetcoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class PetcoApp extends StatelessWidget {
 }
 
 class MainNavigationShell extends StatefulWidget {
-  const MainNavigationShell({Key? key}) : super(key: key);
+  const MainNavigationShell({super.key});
 
   @override
   State<MainNavigationShell> createState() => _MainNavigationShellState();
@@ -81,7 +81,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 }
 
 class ProfilePlaceholderScreen extends StatelessWidget {
-  const ProfilePlaceholderScreen({Key? key}) : super(key: key);
+  const ProfilePlaceholderScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

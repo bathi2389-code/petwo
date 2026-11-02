@@ -23,7 +23,7 @@ class ApiService {
 
     dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) async {
+        onRequest: (RequestOptions options, RequestInterceptorHandler handler) async {
           final prefs = await SharedPreferences.getInstance();
           final token = prefs.getString('auth_token');
           if (token != null) {
@@ -31,7 +31,7 @@ class ApiService {
           }
           handler.next(options);
         },
-        onError: (DioException e, handler) {
+        onError: (DioException e, ErrorInterceptorHandler handler) {
           handler.next(e);
         },
       ),

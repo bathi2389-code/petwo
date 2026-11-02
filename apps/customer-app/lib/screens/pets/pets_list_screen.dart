@@ -4,7 +4,7 @@ import 'package:petco_customer/models/pet_model.dart';
 import 'package:petco_customer/screens/pets/add_pet_screen.dart';
 
 class PetsListScreen extends StatefulWidget {
-  const PetsListScreen({Key? key}) : super(key: key);
+  const PetsListScreen({super.key});
 
   @override
   State<PetsListScreen> createState() => _PetsListScreenState();
@@ -51,6 +51,7 @@ class _PetsListScreenState extends State<PetsListScreen> {
                 MaterialPageRoute(builder: (context) => const AddPetScreen()),
               );
               if (newPet != null) {
+                if (!mounted) return;
                 setState(() => pets.add(newPet));
               }
             },

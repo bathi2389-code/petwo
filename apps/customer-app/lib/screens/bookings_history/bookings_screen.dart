@@ -4,7 +4,7 @@ import 'package:petco_customer/models/booking_model.dart';
 import 'package:intl/intl.dart';
 
 class BookingsScreen extends StatefulWidget {
-  const BookingsScreen({Key? key}) : super(key: key);
+  const BookingsScreen({super.key});
 
   @override
   State<BookingsScreen> createState() => _BookingsScreenState();

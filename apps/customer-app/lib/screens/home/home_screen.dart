@@ -4,7 +4,7 @@ import 'package:petco_customer/models/provider_model.dart';
 import 'package:petco_customer/services/api_service.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -33,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> loadFeatured() async {
     try {
       final res = await ApiService().searchProviders();
+      if (!mounted) return;
       if (res.data != null && res.data['data'] != null) {
         final list = res.data['data'] as List;
         setState(() {
@@ -41,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       // Fallback for offline/preview
       setState(() {
         featuredProviders = [
