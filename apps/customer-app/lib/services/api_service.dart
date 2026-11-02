@@ -29,10 +29,10 @@ class ApiService {
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';
           }
-          return handler.next(options);
+          handler.next(options);
         },
         onError: (DioException e, handler) {
-          return handler.next(e);
+          handler.next(e);
         },
       ),
     );

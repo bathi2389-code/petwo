@@ -5,3 +5,8 @@ analyzer:
     deprecated_member_use: ignore
     todo: ignore
     avoid_print: ignore
+    prefer_const_constructors: ignore
+    prefer_const_literals_to_create_immutables: ignore
+    use_key_in_widget_constructors: ignore
+    library_private_types_in_public_api: ignore
+    prefer_interpolation_to_compose_strings: ignore
