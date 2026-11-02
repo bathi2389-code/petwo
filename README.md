@@ -22,7 +22,8 @@ The platform is backed by comprehensive engineering specifications in the [`docs
 
 | Document | Path | Core Focus |
 |---|---|---|
-| **Architecture Design** | [`docs/ARCHITECTURE.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/ARCHITECTURE.md) | Distributed topology, multi-tenancy isolation, edge routing & C4 system model |
+| **Platform & Startup Overview** | [`docs/OVERVIEW.md`](docs/OVERVIEW.md) | Mission, system demonstration, operational services, monetization & future product lines |
+| **Architecture Design** | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Distributed topology, multi-tenancy isolation, edge routing & C4 system model |
 | **API Specification** | [`docs/API_REFERENCE.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/API_REFERENCE.md) | 19 endpoint groups, JSON payloads, headers, error codes & rate limits |
 | **Database Schema** | [`docs/DATABASE_SCHEMA.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/DATABASE_SCHEMA.md) | Firestore collections, composite indexes, integer paisa & DPDPA consents |
 | **Working Flows** | [`docs/WORKFLOWS.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/WORKFLOWS.md) | 15 detailed Mermaid sequence diagrams covering end-to-end business flows |
