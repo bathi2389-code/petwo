@@ -23,7 +23,6 @@ class PetcoTheme {
         seedColor: primary,
         primary: primary,
         surface: surface,
-        background: background,
         error: error,
       ),
       scaffoldBackgroundColor: background,

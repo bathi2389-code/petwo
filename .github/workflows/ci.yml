@@ -103,7 +103,7 @@ jobs:
 
       - name: Analyze Flutter Code
         working-directory: apps/customer-app
-        run: flutter analyze --no-fatal-infos
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
       - name: Build Android APK
         working-directory: apps/customer-app

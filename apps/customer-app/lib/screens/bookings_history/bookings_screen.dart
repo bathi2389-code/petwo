@@ -53,6 +53,12 @@ class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProvid
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
