@@ -9,8 +9,8 @@ COPY backend ./backend
 
 # Install dependencies and build shared + backend
 RUN npm install
-RUN npm run build --workspace=@petco/shared
-RUN npm run build --workspace=@petco/backend
+RUN npm run build --workspace=@petwo/shared
+RUN npm run build --workspace=@petwo/backend
 
 FROM node:20-alpine AS runner
 WORKDIR /app

@@ -2,9 +2,9 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isProvider, isAdmin } from '../../middleware/auth.middleware';
-import { PROVIDER_SUBSCRIPTION_LIMITS } from '@petco/shared';
+import { PROVIDER_SUBSCRIPTION_LIMITS } from '@petwo/shared';
 import { nanoid } from 'nanoid';
-import type { Service, Provider } from '@petco/shared';
+import type { Service, Provider } from '@petwo/shared';
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 

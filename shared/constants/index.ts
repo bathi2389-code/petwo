@@ -1,5 +1,5 @@
 /**
- * PETCO Platform — Shared Constants
+ * PETWO Platform — Shared Constants
  * All enums, codes, and configuration values
  */
 
@@ -79,13 +79,13 @@ export const ERROR_CODES = {
 // ─── Business Constants ───────────────────────────────────────────────────────
 
 export const PLATFORM = {
-  NAME: 'PETCO',
+  NAME: 'PETWO',
   TAGLINE: 'Trusted Pet Care, At Your Convenience',
-  SUPPORT_EMAIL: 'support@petco.in',
+  SUPPORT_EMAIL: 'support@petwo.in',
   SUPPORT_PHONE: '+91-XXXXXXXXXX',
-  WEBSITE: 'https://petco.in',
-  APP_STORE_URL: 'https://apps.apple.com/in/app/petco',
-  PLAY_STORE_URL: 'https://play.google.com/store/apps/details?id=in.petco',
+  WEBSITE: 'https://petwo.in',
+  APP_STORE_URL: 'https://apps.apple.com/in/app/petwo',
+  PLAY_STORE_URL: 'https://play.google.com/store/apps/details?id=in.petwo',
 } as const;
 
 export const CURRENCY = {

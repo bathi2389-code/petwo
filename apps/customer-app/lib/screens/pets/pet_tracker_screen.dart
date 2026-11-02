@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:petco_customer/config/theme.dart';
+import 'package:petwo_customer/config/theme.dart';
 import 'package:dio/dio.dart';
 
 class PetTrackerScreen extends StatefulWidget {
@@ -92,11 +92,11 @@ class _PetTrackerScreenState extends State<PetTrackerScreen> {
                     height: 48,
                     width: 48,
                     decoration: BoxDecoration(
-                      color: PetcoTheme.primaryLight,
+                      color: PetwoTheme.primaryLight,
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: const Center(
-                      child: Icon(Icons.gps_fixed, color: PetcoTheme.primary),
+                      child: Icon(Icons.gps_fixed, color: PetwoTheme.primary),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -107,7 +107,7 @@ class _PetTrackerScreenState extends State<PetTrackerScreen> {
                         Row(
                           children: [
                             const Text(
-                              'PETCO SmartCollar Pro',
+                              'PETWO SmartCollar Pro',
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                             const SizedBox(width: 8),
@@ -124,7 +124,7 @@ class _PetTrackerScreenState extends State<PetTrackerScreen> {
                         const SizedBox(height: 2),
                         Text(
                           'Battery: $batteryPercent% • Firmware v2.1.0',
-                          style: const TextStyle(fontSize: 12, color: PetcoTheme.textSecondary),
+                          style: const TextStyle(fontSize: 12, color: PetwoTheme.textSecondary),
                         ),
                       ],
                     ),
@@ -177,14 +177,14 @@ class _PetTrackerScreenState extends State<PetTrackerScreen> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: PetcoTheme.primary.withOpacity(0.2),
+                            color: PetwoTheme.primary.withOpacity(0.2),
                             shape: BoxShape.circle,
                           ),
                           child: Container(
                             height: 24,
                             width: 24,
                             decoration: const BoxDecoration(
-                              color: PetcoTheme.primary,
+                              color: PetwoTheme.primary,
                               shape: BoxShape.circle,
                             ),
                             child: const Center(
@@ -240,7 +240,7 @@ class _PetTrackerScreenState extends State<PetTrackerScreen> {
 
             const Text(
               'Real-Time Health & Biometrics',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: PetcoTheme.textPrimary),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: PetwoTheme.textPrimary),
             ),
             const SizedBox(height: 12),
 
@@ -279,7 +279,7 @@ class _PetTrackerScreenState extends State<PetTrackerScreen> {
                   value: activity,
                   subtitle: 'No excessive scratching',
                   icon: Icons.pets,
-                  iconColor: PetcoTheme.primary,
+                  iconColor: PetwoTheme.primary,
                 ),
               ],
             ),
@@ -310,12 +310,12 @@ class _PetTrackerScreenState extends State<PetTrackerScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.between,
             children: [
-              Text(title, style: const TextStyle(fontSize: 12, color: PetcoTheme.textSecondary, fontWeight: FontWeight.w600)),
+              Text(title, style: const TextStyle(fontSize: 12, color: PetwoTheme.textSecondary, fontWeight: FontWeight.w600)),
               Icon(icon, size: 18, color: iconColor),
             ],
           ),
-          Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: PetcoTheme.textPrimary)),
-          Text(subtitle, style: const TextStyle(fontSize: 10, color: PetcoTheme.textMuted)),
+          Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: PetwoTheme.textPrimary)),
+          Text(subtitle, style: const TextStyle(fontSize: 10, color: PetwoTheme.textMuted)),
         ],
       ),
     );

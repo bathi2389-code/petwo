@@ -47,13 +47,13 @@ export class WhatsAppService {
         type: 'button',
         header: {
           type: 'text',
-          text: '🐾 PETCO Appointment Confirmed',
+          text: '🐾 PETWO Appointment Confirmed',
         },
         body: {
           text: `Hello ${params.customerName}!\n\nYour appointment for *${params.petName}* at *${params.providerName}* is confirmed.\n\n📅 Date: ${params.appointmentDate}\n⏰ Time: ${params.appointmentTime}\n🔖 Booking #: ${params.bookingNumber}\n\nPlease arrive 10 minutes prior to your slot.`,
         },
         footer: {
-          text: 'PETCO Healthcare Network • Hyderabad',
+          text: 'PETWO Healthcare Network • Hyderabad',
         },
         action: {
           buttons: [

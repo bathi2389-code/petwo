@@ -1,5 +1,5 @@
 """
-PETCO QA Automation Framework — Selenium Base Page Object Model
+PETWO QA Automation Framework — Selenium Base Page Object Model
 """
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC

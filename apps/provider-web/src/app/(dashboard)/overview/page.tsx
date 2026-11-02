@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency, formatTime, formatDate } from '@/lib/utils';
 import { bookingApi, providerApi } from '@/lib/api-client';
-import type { Booking, Provider } from '@petco/shared';
+import type { Booking, Provider } from '@petwo/shared';
 
 export default function OverviewPage() {
   const [provider, setProvider] = useState<Provider | null>(null);
@@ -44,7 +44,7 @@ export default function OverviewPage() {
           <div className="text-sm">
             <h4 className="font-semibold text-amber-800">Verification in Progress</h4>
             <p className="text-amber-700 mt-0.5">
-              Your business documentation is being reviewed by the PETCO compliance team for Hyderabad.
+              Your business documentation is being reviewed by the PETWO compliance team for Hyderabad.
               You can set up your service catalogue and operating hours in the meantime.
             </p>
           </div>
@@ -56,7 +56,7 @@ export default function OverviewPage() {
           <div className="flex items-center gap-3">
             <ShieldCheck className="h-5 w-5 text-emerald-600 flex-shrink-0" />
             <div>
-              <span className="font-semibold text-emerald-900 text-sm">Verified PETCO Partner</span>
+              <span className="font-semibold text-emerald-900 text-sm">Verified PETWO Partner</span>
               <p className="text-xs text-emerald-700">Your profile is public and accepting bookings in Hyderabad.</p>
             </div>
           </div>

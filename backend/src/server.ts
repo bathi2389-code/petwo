@@ -10,7 +10,7 @@ async function main(): Promise<void> {
 
   try {
     await app.listen({ port: env.PORT, host: env.HOST });
-    app.log.info(`🐾 PETCO API running at http://${env.HOST}:${env.PORT}`);
+    app.log.info(`🐾 PETWO API running at http://${env.HOST}:${env.PORT}`);
     app.log.info(`📚 API Docs at http://localhost:${env.PORT}/docs`);
     app.log.info(`🌍 Environment: ${env.NODE_ENV}`);
   } catch (err) {

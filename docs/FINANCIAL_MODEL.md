@@ -1,6 +1,6 @@
-# PETCO — Financial, Commission & Settlement Architecture
+# PETWO — Financial, Commission & Settlement Architecture
 
-This document specifies the financial mechanics, taxation, and automated vendor settlement ledger governing PETCO operations in India.
+This document specifies the financial mechanics, taxation, and automated vendor settlement ledger governing PETWO operations in India.
 
 ---
 
@@ -9,7 +9,7 @@ This document specifies the financial mechanics, taxation, and automated vendor 
 1. **Integer Arithmetic**: All monetary transactions, platform fees, taxes, and refunds are stored in **integer paisa** ($\text{₹}1 = 100\text{ paisa}$).
    - Example: An appointment costing $\text{₹}1,499.50$ is stored as `149950`.
    - Floating-point calculations are strictly prohibited in the billing engine.
-2. **Escrow-Like Flow**: Customer payments are authorized and captured into PETCO's master Razorpay account upon booking confirmation. Funds are held until service fulfillment, protecting pet owners from unfulfilled appointments.
+2. **Escrow-Like Flow**: Customer payments are authorized and captured into PETWO's master Razorpay account upon booking confirmation. Funds are held until service fulfillment, protecting pet owners from unfulfilled appointments.
 3. **Weekly Automated Payouts**: Completed appointments are consolidated every Monday for automated batch transfer via **Razorpay Route** directly to the provider's verified Indian bank account.
 
 ---

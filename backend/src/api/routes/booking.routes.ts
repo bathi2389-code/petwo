@@ -3,10 +3,10 @@ import { z } from 'zod';
 import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isCustomer, isProvider, isAdmin, isProviderOrAdmin } from '../../middleware/auth.middleware';
 import { generateBookingNumber, computeCommission } from '../../utils/helpers';
-import { BOOKING as BOOKING_CONFIG } from '@petco/shared';
+import { BOOKING as BOOKING_CONFIG } from '@petwo/shared';
 import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
-import type { Booking, BookingStatus, BookingPricing, CommissionDetails, Service, Provider } from '@petco/shared';
+import type { Booking, BookingStatus, BookingPricing, CommissionDetails, Service, Provider } from '@petwo/shared';
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 

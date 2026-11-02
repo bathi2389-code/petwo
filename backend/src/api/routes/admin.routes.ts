@@ -5,7 +5,7 @@ import { authenticate, isAdmin } from '../../middleware/auth.middleware';
 import { createAuditLog } from '../../middleware/audit.middleware';
 import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
-import type { Provider, Booking, Payment, Settlement, Coupon, AuditLog, ServiceCategory } from '@petco/shared';
+import type { Provider, Booking, Payment, Settlement, Coupon, AuditLog, ServiceCategory } from '@petwo/shared';
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 

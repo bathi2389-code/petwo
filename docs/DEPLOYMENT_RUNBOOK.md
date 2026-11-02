@@ -1,6 +1,6 @@
-# PETCO — Production Deployment & Operations Runbook
+# PETWO — Production Deployment & Operations Runbook
 
-This guide contains deployment instructions, environment variables configuration, and incident recovery runbooks for running the PETCO platform in production.
+This guide contains deployment instructions, environment variables configuration, and incident recovery runbooks for running the PETWO platform in production.
 
 ---
 
@@ -13,15 +13,15 @@ NODE_ENV=production
 PORT=4000
 HOST=0.0.0.0
 API_VERSION=v1
-CORS_ORIGINS=https://provider.petco.in,https://admin.petco.in,https://petco.in
+CORS_ORIGINS=https://provider.petwo.in,https://admin.petwo.in,https://petwo.in
 
 # Firebase Enterprise Admin Credentials
-FIREBASE_PROJECT_ID=petco-prod
+FIREBASE_PROJECT_ID=petwo-prod
 FIREBASE_PRIVATE_KEY_ID=your_private_key_id
 FIREBASE_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----\n"
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@petco-prod.iam.gserviceaccount.com
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@petwo-prod.iam.gserviceaccount.com
 FIREBASE_CLIENT_ID=your_client_id
-FIREBASE_STORAGE_BUCKET=petco-prod.appspot.com
+FIREBASE_STORAGE_BUCKET=petwo-prod.appspot.com
 
 # JWT Authentication
 JWT_SECRET=production_grade_high_entropy_random_secret_at_least_32_chars
@@ -38,7 +38,7 @@ GEMINI_API_KEY=AIzaSy...your_gemini_key
 # SMS / OTP
 MSG91_AUTH_KEY=your_msg91_key
 MSG91_TEMPLATE_ID_OTP=your_template_id
-MSG91_SENDER_ID=PETCOI
+MSG91_SENDER_ID=PETWOI
 
 # Logging & Telemetry
 LOG_LEVEL=info
@@ -46,11 +46,11 @@ LOG_LEVEL=info
 
 ### Provider Web (`apps/provider-web/.env.production`)
 ```bash
-NEXT_PUBLIC_API_URL=https://api.petco.in/api/v1
+NEXT_PUBLIC_API_URL=https://api.petwo.in/api/v1
 NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSy...
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=petco-prod.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=petco-prod
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=petco-prod.appspot.com
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=petwo-prod.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=petwo-prod
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=petwo-prod.appspot.com
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=1234567890
 NEXT_PUBLIC_FIREBASE_APP_ID=1:1234567890:web:abcdef123456
 ```
@@ -62,11 +62,11 @@ NEXT_PUBLIC_FIREBASE_APP_ID=1:1234567890:web:abcdef123456
 ### 2.1 Backend Deployment (Google Cloud Run)
 ```bash
 # 1. Build and push container to Google Artifact Registry
-gcloud builds submit --tag asia-south1-docker.pkg.dev/petco-prod/petco-repo/backend:latest ./backend
+gcloud builds submit --tag asia-south1-docker.pkg.dev/petwo-prod/petwo-repo/backend:latest ./backend
 
 # 2. Deploy to Cloud Run (Mumbai Region: asia-south1)
-gcloud run deploy petco-backend \
-  --image asia-south1-docker.pkg.dev/petco-prod/petco-repo/backend:latest \
+gcloud run deploy petwo-backend \
+  --image asia-south1-docker.pkg.dev/petwo-prod/petwo-repo/backend:latest \
   --platform managed \
   --region asia-south1 \
   --allow-unauthenticated \
@@ -80,13 +80,13 @@ gcloud run deploy petco-backend \
 ### 2.2 Firebase Rules & Indexes Deployment
 ```bash
 # Deploy Firestore security rules and composite indexes
-npx firebase-tools deploy --only firestore:rules,firestore:indexes --project petco-prod
+npx firebase-tools deploy --only firestore:rules,firestore:indexes --project petwo-prod
 ```
 
 ### 2.3 Provider & Admin Web Apps (Firebase App Hosting)
 ```bash
 # Deploy Next.js apps with automated SSR
-npx firebase-tools apphosting:backends:create --project petco-prod
+npx firebase-tools apphosting:backends:create --project petwo-prod
 ```
 
 ### 2.4 Mobile App Build (Flutter)
@@ -94,10 +94,10 @@ npx firebase-tools apphosting:backends:create --project petco-prod
 cd apps/customer-app
 
 # Android App Bundle (AAB) for Google Play Store
-flutter build appbundle --release --dart-define=API_URL=https://api.petco.in/api/v1
+flutter build appbundle --release --dart-define=API_URL=https://api.petwo.in/api/v1
 
 # iOS IPA for Apple App Store
-flutter build ipa --release --dart-define=API_URL=https://api.petco.in/api/v1
+flutter build ipa --release --dart-define=API_URL=https://api.petwo.in/api/v1
 ```
 
 ---
@@ -105,10 +105,10 @@ flutter build ipa --release --dart-define=API_URL=https://api.petco.in/api/v1
 ## 3. Operations & Incident Response
 
 ### 3.1 Health Check Monitoring
-- Automated ping to `https://api.petco.in/health` every 60 seconds.
+- Automated ping to `https://api.petwo.in/health` every 60 seconds.
 - Expect HTTP 200:
   ```json
-  { "status": "ok", "service": "PETCO API", "version": "1.0.0" }
+  { "status": "ok", "service": "PETWO API", "version": "1.0.0" }
   ```
 
 ### 3.2 Webhook Failure Runbook
@@ -122,7 +122,7 @@ flutter build ipa --release --dart-define=API_URL=https://api.petco.in/api/v1
 - In the event of catastrophic data corruption, execute restore via gcloud:
   ```bash
   gcloud firestore databases restore \
-    --source-database='projects/petco-prod/databases/(default)' \
-    --destination-database='projects/petco-prod/databases/recovery-db' \
+    --source-database='projects/petwo-prod/databases/(default)' \
+    --destination-database='projects/petwo-prod/databases/recovery-db' \
     --recovery-time='2024-11-02T00:00:00Z'
   ```

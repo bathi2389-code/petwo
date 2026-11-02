@@ -3,14 +3,14 @@ import { z } from 'zod';
 import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isCustomer } from '../../middleware/auth.middleware';
 import { nanoid } from 'nanoid';
-import type { Pet } from '@petco/shared';
+import type { Pet } from '@petwo/shared';
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
 const PairDeviceSchema = z.object({
   petId: z.string().min(1),
   deviceSerial: z.string().min(5).max(50),
-  deviceModel: z.enum(['PETCO_SMART_COLLAR_GEN1', 'PETCO_SMART_COLLAR_PRO', 'GENERIC_GPS']),
+  deviceModel: z.enum(['PETWO_SMART_COLLAR_GEN1', 'PETWO_SMART_COLLAR_PRO', 'GENERIC_GPS']),
   firmwareVersion: z.string().default('v2.1.0'),
 });
 
@@ -198,7 +198,7 @@ export default async function iotTrackerRoutes(app: FastifyInstance): Promise<vo
 
     const simulation = {
       petId,
-      deviceSerial: 'PETCO-SMART-DEMO-01',
+      deviceSerial: 'PETWO-SMART-DEMO-01',
       lat: baseLat + jitterLat,
       lng: baseLng + jitterLng,
       speedKmph: Number((Math.random() * 8 + 2).toFixed(1)),

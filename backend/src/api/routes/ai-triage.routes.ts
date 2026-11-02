@@ -4,7 +4,7 @@ import axios from 'axios';
 import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isCustomer } from '../../middleware/auth.middleware';
 import { nanoid } from 'nanoid';
-import type { Pet } from '@petco/shared';
+import type { Pet } from '@petwo/shared';
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -62,7 +62,7 @@ export default async function aiTriageRoutes(app: FastifyInstance): Promise<void
     }
 
     // Build veterinary clinical prompt
-    const prompt = `You are PETCO's Clinical Triage Assistant designed by board-certified veterinarians in India.
+    const prompt = `You are PETWO's Clinical Triage Assistant designed by board-certified veterinarians in India.
 Assess the following pet symptoms and provide an immediate structured triage response in JSON format.
 
 PET PROFILE:
@@ -132,7 +132,7 @@ Return ONLY a valid JSON object matching this schema:
       symptoms,
       result: triageResult,
       createdAt: now,
-      disclaimer: 'PETCO AI Triage is an advisory decision-support system and does not constitute a veterinary medical diagnosis. If your pet exhibits collapse, pale gums, seizure, or acute breathing distress, proceed immediately to the nearest 24/7 veterinary emergency hospital.',
+      disclaimer: 'PETWO AI Triage is an advisory decision-support system and does not constitute a veterinary medical diagnosis. If your pet exhibits collapse, pale gums, seizure, or acute breathing distress, proceed immediately to the nearest 24/7 veterinary emergency hospital.',
     };
 
     // Save to Firestore audit history

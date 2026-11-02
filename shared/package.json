@@ -1,7 +1,7 @@
 {
-  "name": "@petco/shared",
+  "name": "@petwo/shared",
   "version": "1.0.0",
-  "description": "Shared TypeScript types and constants for the PETCO platform",
+  "description": "Shared TypeScript types and constants for the PETWO platform",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

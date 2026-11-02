@@ -1,4 +1,4 @@
-# PETCO — Database Schema Specification
+# PETWO — Database Schema Specification
 
 This document provides the full data dictionary and entity design for Cloud Firestore Enterprise mode.
 

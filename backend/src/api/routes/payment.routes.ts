@@ -6,7 +6,7 @@ import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isCustomer, isAdmin } from '../../middleware/auth.middleware';
 import { env } from '../../config/env';
 import { nanoid } from 'nanoid';
-import type { Booking, Payment } from '@petco/shared';
+import type { Booking, Payment } from '@petwo/shared';
 
 // ─── Razorpay Client ─────────────────────────────────────────────────────────
 
@@ -91,7 +91,7 @@ export default async function paymentRoutes(app: FastifyInstance): Promise<void>
         bookingId,
         customerId: booking.customerId,
         providerId: booking.providerId,
-        platform: 'PETCO',
+        platform: 'PETWO',
       },
     });
 

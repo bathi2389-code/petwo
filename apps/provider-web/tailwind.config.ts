@@ -48,7 +48,20 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
-        // PETCO Brand Colors
+        // PETWO Brand Colors
+        petwo: {
+          50: '#fff8ed',
+          100: '#ffefd3',
+          200: '#ffdba6',
+          300: '#ffc16d',
+          400: '#ff9a33',
+          500: '#ff7b0a',
+          600: '#f05f00',
+          700: '#c74600',
+          800: '#9e3800',
+          900: '#7f2f00',
+          950: '#451500',
+        },
         petco: {
           50: '#fff8ed',
           100: '#ffefd3',

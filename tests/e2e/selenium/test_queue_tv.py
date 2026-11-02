@@ -1,5 +1,5 @@
 """
-PETCO QA E2E — In-Clinic Reception TV Display Suite
+PETWO QA E2E — In-Clinic Reception TV Display Suite
 """
 import pytest
 from pages.queue_tv_page import QueueTvPage

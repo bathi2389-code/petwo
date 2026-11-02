@@ -1,5 +1,5 @@
 /**
- * PETCO Platform — Multilingual Localization Strings
+ * PETWO Platform — Multilingual Localization Strings
  * Languages supported: English (en), Telugu (te - Hyderabad regional), Hindi (hi - National)
  */
 
@@ -7,7 +7,7 @@ export type SupportedLocale = 'en' | 'te' | 'hi';
 
 export const I18N_STRINGS = {
   en: {
-    app_title: 'PETCO — Pet Care Marketplace',
+    app_title: 'PETWO — Pet Care Marketplace',
     tagline: 'World-Class Care For Your Furry Family',
     location_hyderabad: 'Banjara Hills, Hyderabad',
     search_placeholder: 'Search veterinarians, grooming spas, clinics...',
@@ -37,7 +37,7 @@ export const I18N_STRINGS = {
     },
   },
   te: {
-    app_title: 'పెట్కో (PETCO) — పెట్ కేర్ మార్కెట్‌ప్లేస్',
+    app_title: 'పెట్వో (PETWO) — పెట్ కేర్ మార్కెట్‌ప్లేస్',
     tagline: 'మీ ప్రియమైన మూగజీవుల కోసం ఉత్తమ సంరక్షణ',
     location_hyderabad: 'బంజారా హిల్స్, హైదరాబాద్',
     search_placeholder: 'పశువైద్యులు, గ్రూమింగ్ స్పా, క్లినిక్‌ల కోసం వెతకండి...',
@@ -67,7 +67,7 @@ export const I18N_STRINGS = {
     },
   },
   hi: {
-    app_title: 'पेटको (PETCO) — पेट केयर मार्केटप्लेस',
+    app_title: 'पेटवो (PETWO) — पेट केयर मार्केटप्लेस',
     tagline: 'आपके प्यारे पालतू जानवरों के लिए सर्वोत्तम देखभाल',
     location_hyderabad: 'बंजारा हिल्स, हैदराबाद',
     search_placeholder: 'पशु चिकित्सक, ग्रूमिंग स्पा, क्लीनिक खोजें...',

@@ -1,5 +1,5 @@
 {
-  "name": "petco-provider-web",
+  "name": "petwo-provider-web",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -10,6 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@petwo/shared": "*",
     "@petco/shared": "*",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.0.4",

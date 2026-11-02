@@ -4,7 +4,7 @@ import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isCustomer, isAnyAuthenticatedUser } from '../../middleware/auth.middleware';
 import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
-import type { Pet } from '@petco/shared';
+import type { Pet } from '@petwo/shared';
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -88,7 +88,7 @@ export default async function healthPassportRoutes(app: FastifyInstance): Promis
         microchipId: pet.microchipId || 'NOT_IMPLANTED',
         isMicrochipped: !!pet.microchipId,
       },
-      verificationQRCodeData: `https://petco.in/verify/passport/${passportNumber}`,
+      verificationQRCodeData: `https://petwo.in/verify/passport/${passportNumber}`,
       vaccinationLedger: vaccinations,
       upcomingVaccinationSchedule: schedule,
       healthStatus: vaccinations.length > 0 ? 'Up-to-Date' : 'Pending Boosters',

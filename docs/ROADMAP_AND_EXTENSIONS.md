@@ -1,6 +1,6 @@
-# PETCO — Roadmap, Extensions & Architectural Enhancements
+# PETWO — Roadmap, Extensions & Architectural Enhancements
 
-This document outlines upcoming product extensions, advanced architectural upgrades, and the geographic expansion roadmap for PETCO.
+This document outlines upcoming product extensions, advanced architectural upgrades, and the geographic expansion roadmap for PETWO.
 
 ---
 
@@ -29,7 +29,7 @@ This document outlines upcoming product extensions, advanced architectural upgra
 - **Offerings**:
   - Emergency surgery & accident cover up to ₹1,00,000.
   - Outpatient diagnostic tests & blood panel reimbursement.
-  - Cashless claim settlement directly across verified PETCO network hospitals in Hyderabad.
+  - Cashless claim settlement directly across verified PETWO network hospitals in Hyderabad.
 
 ### 1.5 WhatsApp Business Interactive Bot
 - **Concept**: Conversational booking and reminders via WhatsApp:

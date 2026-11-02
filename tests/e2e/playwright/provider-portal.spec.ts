@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Provider Portal E2E Smoke & Functional Flow', () => {
   test('renders provider authentication page with phone input', async ({ page }) => {
     await page.goto('/login');
-    await expect(page).toHaveTitle(/PETCO/i);
+    await expect(page).toHaveTitle(/PETWO/i);
     const phoneInput = page.locator('input[type="tel"], input[name="phone"]');
     await expect(phoneInput).toBeVisible();
   });

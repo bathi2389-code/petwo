@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:petco_customer/config/theme.dart';
-import 'package:petco_customer/models/pet_model.dart';
+import 'package:petwo_customer/config/theme.dart';
+import 'package:petwo_customer/models/pet_model.dart';
 
 class AddPetScreen extends StatefulWidget {
   const AddPetScreen({super.key});
@@ -43,7 +43,7 @@ class _AddPetScreenState extends State<AddPetScreen> {
             children: [
               const Text(
                 'Select Pet Species',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: PetcoTheme.textPrimary),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: PetwoTheme.textPrimary),
               ),
               const SizedBox(height: 12),
               SizedBox(
@@ -60,9 +60,9 @@ class _AddPetScreenState extends State<AddPetScreen> {
                       child: Container(
                         width: 72,
                         decoration: BoxDecoration(
-                          color: isSelected ? PetcoTheme.primaryLight : Colors.white,
+                          color: isSelected ? PetwoTheme.primaryLight : Colors.white,
                           border: Border.all(
-                            color: isSelected ? PetcoTheme.primary : const Color(0xFFE2E8F0),
+                            color: isSelected ? PetwoTheme.primary : const Color(0xFFE2E8F0),
                             width: isSelected ? 2 : 1,
                           ),
                           borderRadius: BorderRadius.circular(16),
@@ -77,7 +77,7 @@ class _AddPetScreenState extends State<AddPetScreen> {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                color: isSelected ? PetcoTheme.primary : PetcoTheme.textSecondary,
+                                color: isSelected ? PetwoTheme.primary : PetwoTheme.textSecondary,
                               ),
                             ),
                           ],

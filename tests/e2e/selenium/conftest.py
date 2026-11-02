@@ -1,5 +1,5 @@
 """
-PETCO QA Automation — PyTest / Selenium Fixtures and Setup
+PETWO QA Automation — PyTest / Selenium Fixtures and Setup
 """
 import pytest
 import os

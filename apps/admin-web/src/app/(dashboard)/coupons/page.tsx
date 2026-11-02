@@ -7,7 +7,7 @@ import { formatCurrency } from '@/lib/utils';
 export default function AdminCouponsPage() {
   const coupons = [
     {
-      code: 'PETCOFIRST',
+      code: 'PETWOFIRST',
       description: 'First booking 20% discount up to ₹300',
       type: 'percentage',
       value: '20%',

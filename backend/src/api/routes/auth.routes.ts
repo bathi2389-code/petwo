@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { getAuth, getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate } from '../../middleware/auth.middleware';
 import { normalizePhoneNumber, isValidIndianPhone } from '../../utils/helpers';
-import { OTP, UserRole } from '@petco/shared';
+import { OTP, UserRole } from '@petwo/shared';
 import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
 
@@ -296,7 +296,7 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
 // ─── Cryptographic OTP Helpers ──────────────────────────────────────────────────
 
 export function hashOtp(otp: string, salt: string): string {
-  const secret = process.env.JWT_SECRET || 'petco-secure-otp-pepper-secret-2024';
+  const secret = process.env.JWT_SECRET || 'petwo-secure-otp-pepper-secret-2024';
   return crypto.createHmac('sha256', secret).update(`${salt}:${otp}`).digest('hex');
 }
 

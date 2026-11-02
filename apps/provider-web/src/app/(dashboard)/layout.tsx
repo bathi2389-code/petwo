@@ -61,7 +61,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white font-bold text-sm">
               P
             </div>
-            <span className="font-bold text-lg text-gray-900">PETCO</span>
+            <span className="font-bold text-lg text-gray-900">PETWO</span>
             <span className="text-xs text-muted-foreground">Provider</span>
           </Link>
           <button

@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isProvider } from '../../middleware/auth.middleware';
 import dayjs from 'dayjs';
-import type { Booking } from '@petco/shared';
+import type { Booking } from '@petwo/shared';
 
 export default async function queueRoutes(app: FastifyInstance): Promise<void> {
 
@@ -67,7 +67,7 @@ export default async function queueRoutes(app: FastifyInstance): Promise<void> {
         completedToday: completedCount,
         inWaitingRoom: upNext.length,
       },
-      announcement: 'PETCO 24/7 Emergency Care Active • Free Dental Checkups during Pet Health Month in Hyderabad',
+      announcement: 'PETWO 24/7 Emergency Care Active • Free Dental Checkups during Pet Health Month in Hyderabad',
     };
 
     return reply.send({ success: true, data: queueData });

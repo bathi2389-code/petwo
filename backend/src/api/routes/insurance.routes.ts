@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isCustomer } from '../../middleware/auth.middleware';
 import { nanoid } from 'nanoid';
-import type { Pet } from '@petco/shared';
+import type { Pet } from '@petwo/shared';
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -75,7 +75,7 @@ export default async function insuranceRoutes(app: FastifyInstance): Promise<voi
           'Dedicated pet medical concierge service in Hyderabad',
         ],
         waitingPeriodDays: 30,
-        underwriter: 'PETCO Underwriting Syndicate',
+        underwriter: 'PETWO Underwriting Syndicate',
       },
     ];
 
@@ -139,7 +139,7 @@ export default async function insuranceRoutes(app: FastifyInstance): Promise<voi
       status: 'pre_authorized',
       approvedCoveragePaisa: Math.round(body.estimatedCostPaisa * 0.9), // 90% cashless coverage
       deductiblePaisa: Math.round(body.estimatedCostPaisa * 0.1), // 10% co-pay
-      guaranteeLetterReference: `PETCO-GOP-${nanoid(8).toUpperCase()}`,
+      guaranteeLetterReference: `PETWO-GOP-${nanoid(8).toUpperCase()}`,
       authorizedAt: now,
     };
 

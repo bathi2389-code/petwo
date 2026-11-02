@@ -24,7 +24,7 @@ describe('QA API Integration — System Health & Diagnostics', () => {
     const body = JSON.parse(res.body);
 
     expect(body.status).toBe('ok');
-    expect(body.service).toBe('PETCO API');
+    expect(body.service).toBe('PETWO API');
     expect(body.version).toBe('1.0.0');
     expect(body.timestamp).toBeDefined();
     expect(new Date(body.timestamp).getTime()).not.toBeNaN();

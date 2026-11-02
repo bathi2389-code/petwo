@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { getDb, COLLECTIONS } from '../config/firebase';
-import type { AuditLog, UserRole } from '@petco/shared';
+import type { AuditLog, UserRole } from '@petwo/shared';
 import { nanoid } from 'nanoid';
 
 /**

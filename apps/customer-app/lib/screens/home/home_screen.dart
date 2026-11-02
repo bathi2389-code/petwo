@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:petco_customer/config/theme.dart';
-import 'package:petco_customer/models/provider_model.dart';
-import 'package:petco_customer/services/api_service.dart';
+import 'package:petwo_customer/config/theme.dart';
+import 'package:petwo_customer/models/provider_model.dart';
+import 'package:petwo_customer/services/api_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -75,24 +75,24 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             const Text(
               'LOCATION',
-              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: PetcoTheme.primary),
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: PetwoTheme.primary),
             ),
             Row(
               children: [
-                const Icon(Icons.location_on, size: 16, color: PetcoTheme.primary),
+                const Icon(Icons.location_on, size: 16, color: PetwoTheme.primary),
                 const SizedBox(width: 4),
                 Text(
                   selectedLocation,
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: PetcoTheme.textPrimary),
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: PetwoTheme.textPrimary),
                 ),
-                const Icon(Icons.keyboard_arrow_down, size: 18, color: PetcoTheme.textSecondary),
+                const Icon(Icons.keyboard_arrow_down, size: 18, color: PetwoTheme.textSecondary),
               ],
             ),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none, color: PetcoTheme.textPrimary),
+            icon: const Icon(Icons.notifications_none, color: PetwoTheme.textPrimary),
             onPressed: () {},
           ),
         ],
@@ -112,11 +112,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Row(
                   children: const [
-                    Icon(Icons.search, color: PetcoTheme.textSecondary),
+                    Icon(Icons.search, color: PetwoTheme.textSecondary),
                     SizedBox(width: 12),
                     Text(
                       'Search veterinarians, salons, clinics...',
-                      style: TextStyle(color: PetcoTheme.textSecondary, fontSize: 13),
+                      style: TextStyle(color: PetwoTheme.textSecondary, fontSize: 13),
                     ),
                   ],
                 ),
@@ -179,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: const Text(
                 'Explore Services',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: PetcoTheme.textPrimary),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: PetwoTheme.textPrimary),
               ),
             ),
             const SizedBox(height: 12),
@@ -214,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: PetcoTheme.textPrimary,
+                            color: PetwoTheme.textPrimary,
                           ),
                         ),
                       ],
@@ -234,11 +234,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: const [
                   Text(
                     'Top Rated in Hyderabad',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: PetcoTheme.textPrimary),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: PetwoTheme.textPrimary),
                   ),
                   Text(
                     'See All',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: PetcoTheme.primary),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: PetwoTheme.primary),
                   ),
                 ],
               ),
@@ -268,7 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 56,
                           width: 56,
                           decoration: BoxDecoration(
-                            color: PetcoTheme.primaryLight,
+                            color: PetwoTheme.primaryLight,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Center(
@@ -288,7 +288,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
-                                        color: PetcoTheme.textPrimary,
+                                        color: PetwoTheme.textPrimary,
                                       ),
                                     ),
                                   ),
@@ -299,7 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 const SizedBox(height: 2),
                                 Text(
                                   p.tagline!,
-                                  style: const TextStyle(fontSize: 11, color: PetcoTheme.textSecondary),
+                                  style: const TextStyle(fontSize: 11, color: PetwoTheme.textSecondary),
                                 ),
                               ],
                               const SizedBox(height: 6),
@@ -312,7 +312,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                                   ),
                                   const SizedBox(width: 10),
-                                  const Text('• 2.4 km away', style: TextStyle(fontSize: 11, color: PetcoTheme.textMuted)),
+                                  const Text('• 2.4 km away', style: TextStyle(fontSize: 11, color: PetwoTheme.textMuted)),
                                 ],
                               ),
                             ],

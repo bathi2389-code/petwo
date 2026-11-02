@@ -1,8 +1,8 @@
-# PETCO — Architecture Design Document
+# PETWO — Architecture Design Document
 
 ## 1. System Vision & Paradigm
 
-PETCO is designed as a hybrid **B2C Marketplace** and **Multi-Tenant B2B SaaS Platform** for veterinary clinics, hospitals, independent veterinarians, groomers, boarding resorts, and diagnostics centers. The platform enforces strict tenant isolation, financial accuracy, and data privacy while maintaining a single, unified discovery and booking engine for pet owners.
+PETWO is designed as a hybrid **B2C Marketplace** and **Multi-Tenant B2B SaaS Platform** for veterinary clinics, hospitals, independent veterinarians, groomers, boarding resorts, and diagnostics centers. The platform enforces strict tenant isolation, financial accuracy, and data privacy while maintaining a single, unified discovery and booking engine for pet owners.
 
 ---
 
@@ -69,7 +69,7 @@ graph TD
 
 ## 3. Multi-Tenancy Architecture
 
-PETCO implements a **Logical Multi-Tenancy Model** built on Cloud Firestore:
+PETWO implements a **Logical Multi-Tenancy Model** built on Cloud Firestore:
 
 1. **Tenant Representation**: Each provider organization (e.g. `TailBlazers Specialty Pet Hospital`) is an independent tenant assigned a unique `providerId`.
 2. **Sub-facility Scoping**: A provider can operate multiple locations (`providerLocations`), each with independent geo-coordinates, operating schedules, and staff assignments.
@@ -85,7 +85,7 @@ PETCO implements a **Logical Multi-Tenancy Model** built on Cloud Firestore:
 | Layer | Chosen Technology | Justification |
 |---|---|---|
 | **Mobile App** | **Flutter 3.x** | Single Dart codebase producing high-performance native iOS and Android experiences with Material 3 styling and direct device hardware access (Camera, GPS, Razorpay Native SDK). |
-| **Provider & Admin Web** | **Next.js 14 (App Router)** | React Server Components (RSC) for instantaneous page loads, server-side data fetching, strong SEO for public provider profiles, and seamless TypeScript type sharing with `@petco/shared`. |
+| **Provider & Admin Web** | **Next.js 14 (App Router)** | React Server Components (RSC) for instantaneous page loads, server-side data fetching, strong SEO for public provider profiles, and seamless TypeScript type sharing with `@petwo/shared`. |
 | **Backend Framework** | **Fastify + TypeScript** | 2-3x faster throughput than Express, built-in schema validation via Ajv/Zod, native async/await lifecycle hooks, and low memory overhead. |
 | **Primary Database** | **Cloud Firestore (Enterprise)** | Managed NoSQL with millisecond low latency, automatic horizontal scaling, offline SDK synchronization, real-time snapshot listeners for live appointment queues, and granular rule enforcement. |
 | **Payments** | **Razorpay Route & Smart Collect** | Optimal payment gateway for the Indian market supporting UPI AutoPay, cards, net banking, split marketplace commissions, and automated vendor payouts. |

@@ -1,6 +1,6 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "npm install && npm run build --workspace=@petco/shared && npm run build --workspace=@petco/backend"
+buildCommand = "npm install && npm run build --workspace=@petwo/shared && npm run build --workspace=@petwo/backend"
 
 [deploy]
 startCommand = "node backend/dist/server.js"

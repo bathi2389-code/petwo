@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isProvider, isAdmin, isProviderOrAdmin } from '../../middleware/auth.middleware';
 import { nanoid } from 'nanoid';
-import type { Provider, ProviderType, VerificationStatus, ProviderDocument } from '@petco/shared';
+import type { Provider, ProviderType, VerificationStatus, ProviderDocument } from '@petwo/shared';
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -313,7 +313,7 @@ export default async function providerRoutes(app: FastifyInstance): Promise<void
     // Check subscription limit
     const providerDoc = await db.collection(COLLECTIONS.PROVIDERS).doc(request.user!.uid).get();
     const provider = providerDoc.data() as Provider;
-    const { PROVIDER_SUBSCRIPTION_LIMITS } = await import('@petco/shared');
+    const { PROVIDER_SUBSCRIPTION_LIMITS } = await import('@petwo/shared');
     const tierLimits = PROVIDER_SUBSCRIPTION_LIMITS[provider.subscription.tier];
 
     const existingLocations = await db.collection(COLLECTIONS.PROVIDER_LOCATIONS)

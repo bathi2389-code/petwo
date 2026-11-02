@@ -1,6 +1,6 @@
-# PETCO — Security, Privacy & Regulatory Compliance
+# PETWO — Security, Privacy & Regulatory Compliance
 
-This document outlines the security architecture, role-based access control (RBAC), and regulatory compliance standards for PETCO operations in India under the **Digital Personal Data Protection Act (DPDPA 2023)** and **RBI Payment Aggregator guidelines**.
+This document outlines the security architecture, role-based access control (RBAC), and regulatory compliance standards for PETWO operations in India under the **Digital Personal Data Protection Act (DPDPA 2023)** and **RBI Payment Aggregator guidelines**.
 
 ---
 
@@ -39,7 +39,7 @@ graph TD
 
 ## 2. Database Security (Cloud Firestore Rules)
 
-PETCO implements a **Deny-by-Default** security posture in `infrastructure/firebase/firestore.rules`:
+PETWO implements a **Deny-by-Default** security posture in `infrastructure/firebase/firestore.rules`:
 
 1. **Zero Client-Side Financial Writes**:
    - Clients (Customer App / Provider Web) have **zero write access** to `bookings`, `payments`, `settlements`, or `coupons`.
@@ -58,7 +58,7 @@ PETCO implements a **Deny-by-Default** security posture in `infrastructure/fireb
 ## 3. Financial Security & PCI-DSS Scope Reduction
 
 1. **Zero Raw Card Storage**:
-   - PETCO servers never ingest, transmit, or store Primary Account Numbers (PAN), CVVs, or bank net-banking passwords.
+   - PETWO servers never ingest, transmit, or store Primary Account Numbers (PAN), CVVs, or bank net-banking passwords.
    - Payment capture is offloaded entirely to **Razorpay Standard SDK** running in secure browser/native client contexts.
 2. **Cryptographic Webhook Verification**:
    - Razorpay server-to-server notifications are validated via `HMAC-SHA256` hashing using a 32-byte secret (`RAZORPAY_WEBHOOK_SECRET`).
@@ -82,5 +82,5 @@ PETCO implements a **Deny-by-Default** security posture in `infrastructure/fireb
 ## 5. Network & Infrastructure Hardening
 
 - **Fastify Helmet**: Secure HTTP response headers (Content-Security-Policy, Strict-Transport-Security, X-Frame-Options `DENY`).
-- **CORS Whitelist**: Explicit origin restrictions matching verified domains (`https://petco.in`, `https://provider.petco.in`, `https://admin.petco.in`).
+- **CORS Whitelist**: Explicit origin restrictions matching verified domains (`https://petwo.in`, `https://provider.petwo.in`, `https://admin.petwo.in`).
 - **Distributed Rate Limiting**: Enforced via `@fastify/rate-limit` (100 requests per minute per IP / authenticated user) with exponential penalties for brute-force OTP attempts.

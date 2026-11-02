@@ -7,8 +7,8 @@ import { Toaster } from '@/components/ui/toaster';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'PETCO Provider Portal',
-  description: 'Manage your pet care business on PETCO',
+  title: 'PETWO Provider Portal',
+  description: 'Manage your pet care business on PETWO',
   icons: { icon: '/favicon.ico' },
 };
 

@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { bookingApi } from '@/lib/api-client';
 import { formatCurrency, formatTime, formatDate } from '@/lib/utils';
-import type { Booking, BookingStatus } from '@petco/shared';
+import type { Booking, BookingStatus } from '@petwo/shared';
 
 const statusTabs: { label: string; value: string }[] = [
   { label: 'All', value: 'all' },

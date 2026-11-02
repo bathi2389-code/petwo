@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-class PetcoTheme {
+class PetwoTheme {
   // Brand Colors
-  static const Color primary = Color(0xFFFF6A00); // PETCO Warm Orange
+  static const Color primary = Color(0xFFFF6A00); // PETWO Warm Orange
   static const Color primaryDark = Color(0xFFD65600);
   static const Color primaryLight = Color(0xFFFFF0E5);
 

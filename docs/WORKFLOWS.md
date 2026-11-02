@@ -1,4 +1,4 @@
-# PETCO — End-to-End Working Flows
+# PETWO — End-to-End Working Flows
 
 This document details the lifecycle and sequence of operations across all core platform interactions.
 
@@ -335,7 +335,7 @@ sequenceDiagram
     Customer->>Rewards: POST /api/v1/rewards/redeem { voucherId: "VOUCHER-GROOM-500" }
     Rewards->>DB: Check balance >= 500 points
     Rewards->>DB: Deduct 500 points with debit transaction
-    Rewards->>DB: Issue single-use promotional voucher code `PETCO-PAW-778`
+    Rewards->>DB: Issue single-use promotional voucher code `PETWO-PAW-778`
     Rewards-->>Customer: Return voucher for next checkout deduction
 ```
 

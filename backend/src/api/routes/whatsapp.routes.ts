@@ -30,7 +30,7 @@ export default async function whatsappRoutes(app: FastifyInstance): Promise<void
     const token = request.query['hub.verify_token'];
     const challenge = request.query['hub.challenge'];
 
-    const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN || 'petco_whatsapp_token_2026';
+    const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN || 'petwo_whatsapp_token_2026';
 
     if (mode === 'subscribe' && token === verifyToken) {
       return reply.status(200).send(challenge);

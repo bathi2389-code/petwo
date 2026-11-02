@@ -1,5 +1,5 @@
 {
   "framework": "nextjs",
-  "buildCommand": "cd ../.. && npm install && npm run build --workspace=@petco/shared && npm run build --workspace=petco-admin-web",
+  "buildCommand": "cd ../.. && npm install && npm run build --workspace=@petwo/shared && npm run build --workspace=petwo-admin-web",
   "outputDirectory": ".next"
 }

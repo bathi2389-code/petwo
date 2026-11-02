@@ -1,6 +1,6 @@
-# PETCO — REST API Specification & Contract Reference
+# PETWO — REST API Specification & Contract Reference
 
-- **Base URL**: `https://api.petco.in/api/v1` (Local: `http://localhost:4000/api/v1`)
+- **Base URL**: `https://api.petwo.in/api/v1` (Local: `http://localhost:4000/api/v1`)
 - **Interactive Documentation**: Swagger UI available at `http://localhost:4000/docs`
 - **Authentication**: Bearer Token in `Authorization: Bearer <FIREBASE_ID_TOKEN>` header
 - **Standard Response Envelope**:
@@ -227,7 +227,7 @@
 ### Telemetry Payload Sample:
 ```json
 {
-  "deviceSerial": "PETCO-PRO-8812",
+  "deviceSerial": "PETWO-PRO-8812",
   "lat": 17.4239,
   "lng": 78.4378,
   "batteryPercent": 94,
@@ -263,7 +263,7 @@
     { "tokenNumber": "A-12EF", "scheduledTime": "11:30 AM", "estimatedWaitMins": 27 }
   ],
   "stats": { "totalToday": 24, "completedToday": 14, "inWaitingRoom": 3 },
-  "announcement": "PETCO 24/7 Emergency Care Active • Free Dental Checkups during Pet Health Month in Hyderabad"
+  "announcement": "PETWO 24/7 Emergency Care Active • Free Dental Checkups during Pet Health Month in Hyderabad"
 }
 ```
 
@@ -281,7 +281,7 @@
 ### Health Passport Verification QR Payload Sample:
 ```json
 {
-  "passportNumber": "PETCO-PASS-8812A",
+  "passportNumber": "PETWO-PASS-8812A",
   "pet": {
     "name": "Rocky",
     "species": "dog",
@@ -301,7 +301,7 @@
     "nextDue": "2026-12-05",
     "rabiesValidUntil": "2027-01-10"
   },
-  "verificationUrl": "https://verify.petco.in/passport/PETCO-PASS-8812A"
+  "verificationUrl": "https://verify.petwo.in/passport/PETWO-PASS-8812A"
 }
 ```
 

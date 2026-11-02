@@ -9,7 +9,7 @@ const nextConfig = {
   },
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1',
-    NEXT_PUBLIC_APP_NAME: 'PETCO Provider',
+    NEXT_PUBLIC_APP_NAME: 'PETWO Provider',
   },
 };
 

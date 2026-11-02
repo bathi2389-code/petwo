@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isCustomer, isAdmin } from '../../middleware/auth.middleware';
 import { nanoid } from 'nanoid';
-import type { Pet, PetSpecies, PetGender, VaccinationRecord, MedicalRecord } from '@petco/shared';
+import type { Pet, PetSpecies, PetGender, VaccinationRecord, MedicalRecord } from '@petwo/shared';
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 

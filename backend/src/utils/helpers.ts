@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
-import { BOOKING, TICKET_NUMBER_PREFIX, CURRENCY } from '@petco/shared';
+import { BOOKING, TICKET_NUMBER_PREFIX, CURRENCY } from '@petwo/shared';
 
 /**
  * Generate a human-readable booking number: PTC-20241102-A3K9

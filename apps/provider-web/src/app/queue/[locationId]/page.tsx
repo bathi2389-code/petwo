@@ -80,7 +80,7 @@ export default function ReceptionQueueTVDisplay({ params }: { params: { location
             completedToday: 14,
             inWaitingRoom: 3,
           },
-          announcement: 'PETCO 24/7 Emergency Care Active • Free Dental Checkups during Pet Health Month in Hyderabad',
+          announcement: 'PETWO 24/7 Emergency Care Active • Free Dental Checkups during Pet Health Month in Hyderabad',
         });
       }
     }
@@ -100,7 +100,7 @@ export default function ReceptionQueueTVDisplay({ params }: { params: { location
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl lg:text-3xl font-extrabold tracking-tight">PETCO Healthcare Network</h1>
+              <h1 className="text-2xl lg:text-3xl font-extrabold tracking-tight">PETWO Healthcare Network</h1>
               <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full border border-emerald-500/20">
                 LIVE QUEUE
               </span>

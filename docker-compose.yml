@@ -11,12 +11,12 @@ services:
       - NODE_ENV=development
       - PORT=4000
       - HOST=0.0.0.0
-      - FIREBASE_PROJECT_ID=petco-prod
+      - FIREBASE_PROJECT_ID=petwo-prod
       - FIREBASE_PRIVATE_KEY_ID=mock-key-id
       - FIREBASE_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEA0mockkey...\n-----END RSA PRIVATE KEY-----\n"
-      - FIREBASE_CLIENT_EMAIL=mock@petco-prod.iam.gserviceaccount.com
+      - FIREBASE_CLIENT_EMAIL=mock@petwo-prod.iam.gserviceaccount.com
       - FIREBASE_CLIENT_ID=mock-client-id
-      - FIREBASE_STORAGE_BUCKET=petco-prod.appspot.com
+      - FIREBASE_STORAGE_BUCKET=petwo-prod.appspot.com
       - JWT_SECRET=supersecretproductiongradekey123456789
       - RAZORPAY_KEY_ID=rzp_test_1234567890abcdef
       - RAZORPAY_KEY_SECRET=rzp_secret_abcdef1234567890

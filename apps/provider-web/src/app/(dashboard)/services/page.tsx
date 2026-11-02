@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Scissors, Clock, IndianRupee, Trash2, Edit2, CheckCircle2 } from 'lucide-react';
 import { serviceApi, providerApi } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/utils';
-import type { Service, Provider } from '@petco/shared';
+import type { Service, Provider } from '@petwo/shared';
 
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
@@ -90,7 +90,7 @@ export default function ServicesPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Service Catalogue</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Offerings displayed to pet owners on the PETCO mobile marketplace
+            Offerings displayed to pet owners on the PETWO mobile marketplace
           </p>
         </div>
         <button

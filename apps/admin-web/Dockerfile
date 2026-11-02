@@ -7,8 +7,8 @@ COPY shared ./shared
 COPY apps/admin-web ./apps/admin-web
 
 RUN npm install
-RUN npm run build --workspace=@petco/shared
-RUN npm run build --workspace=petco-admin-web
+RUN npm run build --workspace=@petwo/shared
+RUN npm run build --workspace=petwo-admin-web
 
 FROM node:20-alpine AS runner
 WORKDIR /app

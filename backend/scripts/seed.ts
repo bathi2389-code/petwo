@@ -1,10 +1,10 @@
 import 'dotenv/config';
 import { initializeFirebase, getDb, COLLECTIONS } from '../src/config/firebase';
 import { SERVICE_CATEGORIES, SUBSCRIPTION_PRICES, PROVIDER_SUBSCRIPTION_LIMITS } from '../../shared/constants/index';
-import type { ServiceCategory, SubscriptionPlan, Provider, ProviderLocation, Service } from '@petco/shared';
+import type { ServiceCategory, SubscriptionPlan, Provider, ProviderLocation, Service } from '@petwo/shared';
 
 async function seed() {
-  console.log('🌱 Starting PETCO database seeding...');
+  console.log('🌱 Starting PETWO database seeding...');
   initializeFirebase();
   const db = getDb();
   const now = new Date().toISOString();
@@ -172,7 +172,7 @@ async function seed() {
   await db.collection(COLLECTIONS.COUPONS).doc('coupon-pawfirst').set({
     id: 'coupon-pawfirst',
     code: 'PAWFIRST',
-    description: 'Get 20% off your first pet care booking on PETCO in Hyderabad!',
+    description: 'Get 20% off your first pet care booking on PETWO in Hyderabad!',
     discountType: 'percentage',
     discountValue: 20,
     maxDiscountAmount: 30000, // ₹300 max
@@ -299,7 +299,7 @@ async function seed() {
     await db.collection(COLLECTIONS.SERVICES).doc(srv.id).set(srv);
   }
 
-  console.log('✅ PETCO database seeding completed successfully!');
+  console.log('✅ PETWO database seeding completed successfully!');
 }
 
 seed().catch(err => {

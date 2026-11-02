@@ -1,7 +1,7 @@
 {
-  "name": "@petco/backend",
+  "name": "@petwo/backend",
   "version": "1.0.0",
-  "description": "PETCO Backend API — Node.js + TypeScript + Fastify",
+  "description": "PETWO Backend API — Node.js + TypeScript + Fastify",
   "private": true,
   "main": "dist/server.js",
   "scripts": {
@@ -22,6 +22,7 @@
     "@fastify/rate-limit": "^9.0.0",
     "@fastify/swagger": "^8.0.0",
     "@fastify/swagger-ui": "^3.0.0",
+    "@petwo/shared": "*",
     "@petco/shared": "*",
     "fastify": "^4.27.0",
     "firebase-admin": "^12.0.0",

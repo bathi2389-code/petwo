@@ -84,7 +84,7 @@ export default function RegisterPage() {
           <div className="h-10 w-10 rounded-xl bg-primary text-white font-black text-xl flex items-center justify-center mb-3">
             P
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">Partner with PETCO</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Partner with PETWO</h2>
           <p className="text-sm text-gray-500 mt-1">
             Grow your veterinary clinic, hospital, grooming or pet care business in Hyderabad.
           </p>

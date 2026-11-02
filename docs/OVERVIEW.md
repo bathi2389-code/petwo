@@ -1,4 +1,4 @@
-# PETCO — Company Overview, System Architecture & Vision
+# PETWO — Company Overview, System Architecture & Vision
 
 > **"Empowering Pet Parents. Elevating Pet Professionals. Transforming Pet Care Across India."**
 
@@ -6,13 +6,13 @@
 
 ## 1. Executive Summary & Startup Mission
 
-**PETCO** is an India-first, hyper-local pet-care marketplace and enterprise multi-tenant SaaS platform. 
+**PETWO** is an India-first, hyper-local pet-care marketplace and enterprise multi-tenant SaaS platform. 
 
 The Indian pet care market is experiencing unprecedented explosive growth (>25% CAGR), driven by urban nuclear families, pet humanization, and disposable income growth in major metro hubs. However, the ecosystem remains severely fragmented:
 - **Pet Parents** struggle with unverified veterinarians, lack of pricing transparency, lost vaccination books, double-booked appointments, and zero emergency response coordination.
 - **Pet Care Providers** (veterinarians, clinics, groomers, boarding facilities, and trainers) are burdened with pen-and-paper management, manual WhatsApp bookings, no-shows, delayed customer payments, and no modern practice management tools.
 
-**PETCO bridges this divide.** We unify the entire lifecycle of pet care into a seamless digital ecosystem connecting pet parents, certified care providers, and platform administrators.
+**PETWO bridges this divide.** We unify the entire lifecycle of pet care into a seamless digital ecosystem connecting pet parents, certified care providers, and platform administrators.
 
 - **Initial Launchpad**: **Hyderabad, Telangana** (High-density pet ownership hubs: Banjara Hills, Jubilee Hills, Gachibowli, Madhapur, Kondapur, and Secunderabad).
 - **Scale Horizon**: Tier-1 Metros (Bengaluru, Mumbai, Delhi-NCR, Pune, Chennai) $\rightarrow$ Tier-2 Urban Centers $\rightarrow$ International Emerging Markets.
@@ -21,7 +21,7 @@ The Indian pet care market is experiencing unprecedented explosive growth (>25% 
 
 ## 2. Platform Architecture: The Three Connected Pillars
 
-PETCO operates through three synchronized, high-performance applications powered by a central cloud engine.
+PETWO operates through three synchronized, high-performance applications powered by a central cloud engine.
 
 ```mermaid
 flowchart TD
@@ -100,7 +100,7 @@ sequenceDiagram
     autonumber
     actor Customer as 🐕 Pet Parent
     participant App as 📱 Customer App
-    participant API as ⚙️ PETCO Backend
+    participant API as ⚙️ PETWO Backend
     participant DB as 🗄️ Firestore (Atomic Lock)
     participant Gateway as 💳 Razorpay Gateway
     participant Provider as 🏥 Provider Web / TV
@@ -124,7 +124,7 @@ sequenceDiagram
 1. **Search**: Customer enters location (*"Banjara Hills, Hyderabad"*) and chooses *"Veterinary Care"*.
 2. **Availability**: The system retrieves real-time open slots for Dr. Rao Pet Hospital, filtering out occupied or blocked times.
 3. **Atomic Slot Hold**: When the user selects 11:30 AM, an atomic Firestore transaction locks `slotLocks/provider_loc_staff_time`. If another customer clicks at the same millisecond, the second customer receives a polite *"Slot just taken"* notification with zero double-booking risk.
-4. **Razorpay Settlement**: User pays ₹850 via UPI. The webhook reconciles the transaction, retains PETCO's 15% platform commission (₹127.50), and queues the net provider balance (₹722.50) for settlement.
+4. **Razorpay Settlement**: User pays ₹850 via UPI. The webhook reconciles the transaction, retains PETWO's 15% platform commission (₹127.50), and queues the net provider balance (₹722.50) for settlement.
 5. **Waiting Room Display**: The appointment immediately appears on the clinic's reception dashboard and the waiting-room TV display as **Token #08**.
 6. **Digital Prescription**: Post-consultation, the vet enters clinical findings and uploads Rx directly to the pet's Digital Health Passport.
 
@@ -146,10 +146,10 @@ sequenceDiagram
 
 ## 5. Startup Monetization & Unit Economics
 
-PETCO generates high-margin revenue through four synchronized streams:
+PETWO generates high-margin revenue through four synchronized streams:
 
 ```mermaid
-pie title PETCO Revenue Streams
+pie title PETWO Revenue Streams
     "Marketplace Commission (12-20%)" : 55
     "Provider SaaS Subscriptions" : 20
     "Featured Listings & Ads" : 10
@@ -168,32 +168,32 @@ pie title PETCO Revenue Streams
 
 ## 6. The Future: Post-Launch Roadmap & Private Label Products
 
-Upon establishing market density in Hyderabad and expansion cities, PETCO will leverage its customer trust, pet demographic data, and distribution channels to launch proprietary high-margin physical products and fintech verticals.
+Upon establishing market density in Hyderabad and expansion cities, PETWO will leverage its customer trust, pet demographic data, and distribution channels to launch proprietary high-margin physical products and fintech verticals.
 
 ```mermaid
 flowchart LR
     Phase1["Phase 1: Marketplace & SaaS<br/>(Hyderabad Launch)"] --> Phase2["Phase 2: Pan-India Expansion<br/>(Bengaluru, Mumbai, Delhi)"]
-    Phase2 --> Phase3["Phase 3: D2C Physical Products<br/>(PETCO Foods & Care)"]
+    Phase2 --> Phase3["Phase 3: D2C Physical Products<br/>(PETWO Foods & Care)"]
     Phase3 --> Phase4["Phase 4: Smart IoT Hardware & FinTech<br/>(Trackers, Insurance)"]
     Phase4 --> Phase5["Phase 5: Flagship Experience Hubs<br/>(Hybrid Wellness Centers)"]
 ```
 
-### Vertical 1: PETCO D2C Private Label Pet Products
+### Vertical 1: PETWO D2C Private Label Pet Products
 Leveraging anonymized dietary, breed, and health data from our platform, we will formulate and retail clean-label, high-nutrition pet products:
-- **PETCO Fresh Nutrition**: Human-grade, vacuum-cooked wet meals formulated with Indian veterinary nutritionists (tailored for Indie, Golden Retriever, German Shepherd, and Persian breeds).
+- **PETWO Fresh Nutrition**: Human-grade, vacuum-cooked wet meals formulated with Indian veterinary nutritionists (tailored for Indie, Golden Retriever, German Shepherd, and Persian breeds).
 - **Functional Treats & Supplements**: Joint-care chews (Glucosamine/Chondroitin), skin & coat omega supplements, and probiotic dental sticks.
 - **Ayurvedic & Chemical-Free Pet Grooming**: Natural shampoos, neem tick repellents, paw balms, and ear cleaners manufactured in India.
 - **Eco-Friendly Pet Accessories**: Bio-degradable waste bags, ergonomic hemp harnesses, orthopedic memory foam pet beds, and travel crates.
 
 ### Vertical 2: Proprietary Smart Hardware Line
-- **PETCO Smart Collar 2.0**: Sleek, waterproof 4G LTE/GPS pet tracker with vital-sign monitoring (heart rate, resting respiratory rate, temperature) feeding real-time diagnostics directly into the PETCO app.
+- **PETWO Smart Collar 2.0**: Sleek, waterproof 4G LTE/GPS pet tracker with vital-sign monitoring (heart rate, resting respiratory rate, temperature) feeding real-time diagnostics directly into the PETWO app.
 - **Automated RFID Feeders**: Microchip-reading portion-controlled pet feeders for multi-pet households.
 
 ### Vertical 3: Pet Health Insurance & Financial Products
-- **PETCO Shield Insurance**: In partnership with leading IRDAI-registered Indian underwriters, offering 1-click cashless hospitalization coverage for accidents, tick fever, surgeries, and cancer treatments.
+- **PETWO Shield Insurance**: In partnership with leading IRDAI-registered Indian underwriters, offering 1-click cashless hospitalization coverage for accidents, tick fever, surgeries, and cancer treatments.
 - **Pet Care Emergency Credit Line**: Instant zero-interest 3-month EMI for emergency surgeries and intensive care treatments.
 
-### Vertical 4: PETCO Experience Hubs & Community
+### Vertical 4: PETWO Experience Hubs & Community
 - **Flagship Urban Wellness Centers**: State-of-the-art hybrid clinics combining veterinary trauma care, grooming spas, dog parks, pet cafes, and community adoption drives under one unified brand.
 - **Adoption & Stray Welfare Initiatives**: Automatic 1% platform revenue commitment towards stray animal vaccination, rabies eradication, and sterilization in partnership with local municipal bodies (GHMC).
 

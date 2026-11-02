@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-PETCO QA Automation — Selenium Suite Runner & Reporting Engine
+PETWO QA Automation — Selenium Suite Runner & Reporting Engine
 """
 import sys
 import subprocess
@@ -9,7 +9,7 @@ import os
 
 def main():
     print("🐾 ===================================================")
-    print("🐾 PETCO QA AUTOMATION — SELENIUM SUITE RUNNER")
+    print("🐾 PETWO QA AUTOMATION — SELENIUM SUITE RUNNER")
     print("🐾 Target Geography: Hyderabad / Pan-India Multi-Tenant")
     print("🐾 ===================================================\n")
 

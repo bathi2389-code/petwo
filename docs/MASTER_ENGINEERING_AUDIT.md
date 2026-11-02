@@ -1,7 +1,7 @@
-# MASTER ENGINEERING AUDIT REPORT — PETCO
+# MASTER ENGINEERING AUDIT REPORT — PETWO
 ## Production-Grade Pet Care Marketplace & Multi-Tenant SaaS Platform
 
-- **Repository**: [https://github.com/Areefbaba/PETCO](https://github.com/Areefbaba/PETCO)
+- **Repository**: [https://github.com/Areefbaba/PETWO](https://github.com/Areefbaba/PETWO)
 - **Target Market**: India (Flagship Launch: Hyderabad, Telangana)
 - **Long-Term Objective**: Pan-India Scale & International Expansion
 - **Audit Date**: November 2, 2026
@@ -11,7 +11,7 @@
 
 ## 1. Executive Summary
 
-PETCO aims to become an enterprise-grade multi-vendor pet-care marketplace and multi-tenant SaaS operating system connecting pet owners with verified veterinary clinics, grooming salons, boarding resorts, diagnostic labs, and pet professionals.
+PETWO aims to become an enterprise-grade multi-vendor pet-care marketplace and multi-tenant SaaS operating system connecting pet owners with verified veterinary clinics, grooming salons, boarding resorts, diagnostic labs, and pet professionals.
 
 This audit conducted a code-level, forensic inspection across all 115+ repository files, 19 Fastify REST route handlers, 3 frontend applications (Flutter customer mobile app, Next.js 14 provider SaaS portal, Next.js 14 marketplace admin console), Firestore security rules, CI/CD pipelines, and 62 automated tests.
 
@@ -23,7 +23,7 @@ While the repository contains clean architectural blueprints, strict TypeScript 
 1. **Critical Authentication Defect (P0)**: In `backend/src/api/routes/auth.routes.ts` (L162), OTP verification compares the raw 6-digit OTP against a Base64-encoded string in production, rendering customer and provider login **100% inoperable in production**.
 2. **Double-Booking & Concurrency Race Condition (P0)**: In `backend/src/api/routes/booking.routes.ts` (L133-L152), slot conflict validation is executed outside a Firestore atomic transaction or Redis distributed lock, and only queries already-confirmed bookings. Two users booking the same doctor slot simultaneously will both succeed. Furthermore, every booking request downloads the entire historical booking collection for that clinic location into Node.js memory.
 3. **Razorpay Webhook Signature Breakage (P0)**: In `backend/src/api/routes/webhook.routes.ts` (L29-L36), webhook HMAC-SHA256 signature calculation runs on `JSON.stringify(request.body)` after Fastify has already parsed the JSON, mutating whitespace and key ordering. Real Razorpay webhooks will consistently fail cryptographic verification.
-4. **Missing Financial Payout Engine (P0)**: While `FINANCIAL_MODEL.md` outlines automated weekly payouts via Razorpay Route, **no code exists in the repository to generate, batch, or execute vendor settlements**. Money captured from customers will accumulate in PETCO's master account with zero automated disbursement to clinics.
+4. **Missing Financial Payout Engine (P0)**: While `FINANCIAL_MODEL.md` outlines automated weekly payouts via Razorpay Route, **no code exists in the repository to generate, batch, or execute vendor settlements**. Money captured from customers will accumulate in PETWO's master account with zero automated disbursement to clinics.
 5. **Major Data Privacy & DPDPA Violation (P0)**: In `infrastructure/firebase/firestore.rules` (L73-L77, L88-L93, L104-L109), any authenticated user with the role of `provider` can execute client-side queries to read **all pets, all owners, all vaccination records, and all confidential medical records across the entire marketplace**, with zero clinic-to-patient relationship checks.
 6. **Illegal Clinical Prescriptions (P0)**: In `backend/src/api/routes/teleconsult.routes.ts` (L96-L120), any non-veterinary provider (e.g. dog walkers, pet groomers) can issue and digitally sign official medical prescriptions. No VCI registration verification or cryptographic signing certificate is enforced, violating the Veterinary Council of India (VCI) Act 1984.
 7. **Frontend Incompleteness (P1)**: The customer Flutter app has only 5 screens (lacking authentication, provider discovery, checkout, and medical records). The Provider Web portal has only 6 screens (lacking staff management, multi-location configuration, and prescription generation). The Admin portal has only 3 pages (lacking customer CRM, dispute resolution, settlements, and audit viewers).
@@ -36,7 +36,7 @@ While the repository contains clean architectural blueprints, strict TypeScript 
 The repository is organized as an npm workspace monorepo:
 
 ```
-PETCO/
+PETWO/
 ├── apps/
 │   ├── customer-app/          # Flutter 3.22 mobile application (iOS & Android)
 │   ├── provider-web/          # Next.js 14 App Router provider SaaS dashboard
@@ -154,7 +154,7 @@ flowchart TD
 ### Finding F-01: Production OTP Verification Failure
 - **Severity**: **P0 — Critical**
 - **Classification**: Confirmed Code Defect
-- **File**: [`backend/src/api/routes/auth.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/backend/src/api/routes/auth.routes.ts#L83-L86) and [`L162-L172`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/backend/src/api/routes/auth.routes.ts#L162-L172)
+- **File**: [`backend/src/api/routes/auth.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/backend/src/api/routes/auth.routes.ts#L83-L86) and [`L162-L172`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/backend/src/api/routes/auth.routes.ts#L162-L172)
 - **Existing Behaviour**:
   ```typescript
   // Line 85: Stored as base64 in production
@@ -182,7 +182,7 @@ flowchart TD
 ### Finding F-02: Double-Booking Concurrency Race Condition & O(N) In-Memory Query
 - **Severity**: **P0 — Critical**
 - **Classification**: Confirmed Code Defect & Architectural Limitation
-- **File**: [`backend/src/api/routes/booking.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/backend/src/api/routes/booking.routes.ts#L132-L153)
+- **File**: [`backend/src/api/routes/booking.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/backend/src/api/routes/booking.routes.ts#L132-L153)
 - **Existing Behaviour**:
   ```typescript
   const conflictingSnapshot = await db.collection(COLLECTIONS.BOOKINGS)
@@ -211,7 +211,7 @@ flowchart TD
 ### Finding F-03: Razorpay Webhook Signature Mismatch via JSON Serialization
 - **Severity**: **P0 — Critical**
 - **Classification**: Confirmed Code Defect
-- **File**: [`backend/src/api/routes/webhook.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/backend/src/api/routes/webhook.routes.ts#L29-L36)
+- **File**: [`backend/src/api/routes/webhook.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/backend/src/api/routes/webhook.routes.ts#L29-L36)
 - **Existing Behaviour**:
   ```typescript
   const payloadString = typeof request.body === 'string'
@@ -234,7 +234,7 @@ flowchart TD
 ### Finding F-04: Non-Existent Settlement Disbursement Logic
 - **Severity**: **P0 — Critical**
 - **Classification**: Missing Implementation
-- **File**: [`backend/src/api/routes/admin.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/backend/src/api/routes/admin.routes.ts#L286-L310)
+- **File**: [`backend/src/api/routes/admin.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/backend/src/api/routes/admin.routes.ts#L286-L310)
 - **Existing Behaviour**: `GET /admin/settlements` queries the `settlements` collection, but **no code anywhere in the backend computes or writes settlements**.
 - **Expected Behaviour**: A scheduled cron job (or admin trigger) consolidates all `completed` bookings past their dispute window (e.g. 48 hours), calculates `netProviderAmount`, aggregates by provider, generates a formal settlement invoice, and calls Razorpay Route / Payouts API.
 - **Business Impact**: Platform collects gross revenue, but doctors and groomers never receive their earnings. Clinics churn immediately.
@@ -245,7 +245,7 @@ flowchart TD
 ### Finding F-05: Global Medical Record & Pet Data Exposure in Firestore Rules
 - **Severity**: **P0 — Critical**
 - **Classification**: Confirmed Security Defect
-- **File**: [`infrastructure/firebase/firestore.rules`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/infrastructure/firebase/firestore.rules#L73-L77), [`L88-L93`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/infrastructure/firebase/firestore.rules#L88-L93), [`L104-L109`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/infrastructure/firebase/firestore.rules#L104-L109)
+- **File**: [`infrastructure/firebase/firestore.rules`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/infrastructure/firebase/firestore.rules#L73-L77), [`L88-L93`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/infrastructure/firebase/firestore.rules#L88-L93), [`L104-L109`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/infrastructure/firebase/firestore.rules#L104-L109)
 - **Existing Behaviour**:
   ```javascript
   match /medicalRecords/{recordId} {
@@ -273,7 +273,7 @@ flowchart TD
 ### Finding F-06: Non-Veterinary Providers Permitted to Issue Clinical Prescriptions
 - **Severity**: **P0 — Critical**
 - **Classification**: Confirmed Security & Compliance Defect
-- **File**: [`backend/src/api/routes/teleconsult.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/backend/src/api/routes/teleconsult.routes.ts#L96-L120)
+- **File**: [`backend/src/api/routes/teleconsult.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/backend/src/api/routes/teleconsult.routes.ts#L96-L120)
 - **Existing Behaviour**: `POST /teleconsult/prescriptions` checks `preHandler: [authenticate, isProvider]`. Any registered provider—whether a certified surgeon or an unverified dog walker—can issue a prescription. Furthermore, `isDigitallySigned` is a hardcoded boolean `true` with no cryptographic key or DSC verification.
 - **Expected Behaviour**:
   1. Only providers with `businessType: 'individual_vet'` or `veterinary_clinic` with verified VCI licensure can generate prescriptions.
@@ -286,7 +286,7 @@ flowchart TD
 ### Finding F-07: Fabricated Emergency Ambulance Dispatch Status
 - **Severity**: **P0 — Critical**
 - **Classification**: Dangerous Operational Defect
-- **File**: [`backend/src/api/routes/emergency.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/backend/src/api/routes/emergency.routes.ts#L60-L77)
+- **File**: [`backend/src/api/routes/emergency.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/backend/src/api/routes/emergency.routes.ts#L60-L77)
 - **Existing Behaviour**:
   ```typescript
   ambulanceStatus: body.requiresAmbulance ? 'dispatching' : 'not_requested',
@@ -300,14 +300,14 @@ flowchart TD
 ### Finding F-08: Complete Absence of Staff / Multi-Tenant Permissions Architecture
 - **Severity**: **P1 — High**
 - **Classification**: Missing Implementation & Architectural Limitation
-- **File**: [`backend/src/api/routes/provider.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/backend/src/api/routes/provider.routes.ts#L95-L105)
+- **File**: [`backend/src/api/routes/provider.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/backend/src/api/routes/provider.routes.ts#L95-L105)
 - **Existing Behaviour**: The `providerId` is set to `request.user!.uid`. A provider is rigidly bound to a single Firebase login.
 - **Expected Behaviour**: A clinic entity must support multiple staff members:
   - Practice Owner (Full financial & legal control)
   - Associate Veterinarians (Clinical records, appointments, prescriptions)
   - Receptionists (Queue check-in, bookings, invoicing, but no bank details)
   - Groomers / Technicians (Service checklist execution only)
-- **Business Impact**: Multi-doctor clinics and veterinary hospitals in Hyderabad cannot adopt PETCO unless doctors share a single account password.
+- **Business Impact**: Multi-doctor clinics and veterinary hospitals in Hyderabad cannot adopt PETWO unless doctors share a single account password.
 - **Technical Risk**: Severe privilege escalation and absence of auditability for staff actions.
 
 ---
@@ -315,7 +315,7 @@ flowchart TD
 ### Finding F-09: Unfiltered Geospatial Search
 - **Severity**: **P1 — High**
 - **Classification**: Confirmed Code Defect
-- **File**: [`backend/src/api/routes/provider.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/backend/src/api/routes/provider.routes.ts#L220-L245)
+- **File**: [`backend/src/api/routes/provider.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/backend/src/api/routes/provider.routes.ts#L220-L245)
 - **Existing Behaviour**: `lat`, `lng`, and `radiusKm` query parameters are parsed by Zod but dropped from Firestore queries.
 - **Expected Behaviour**: Providers should be indexed with Geohashes (or PostGIS `ST_DWithin`) to filter providers within the requested kilometer radius (e.g., Banjara Hills vs. Madhapur).
 - **Business Impact**: Pet parents looking for nearby clinics are shown facilities 30 km away across town, ruining marketplace conversion.
@@ -326,9 +326,9 @@ flowchart TD
 - **Severity**: **P1 — High**
 - **Classification**: Missing Implementation
 - **Files**:
-  - Customer App: [`apps/customer-app/lib/screens/`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/apps/customer-app/lib/screens) (Only 5 screens)
-  - Provider Web: [`apps/provider-web/src/app/`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/apps/provider-web/src/app) (Only 6 screens)
-  - Admin Web: [`apps/admin-web/src/app/`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/apps/admin-web/src/app) (Only 3 pages)
+  - Customer App: [`apps/customer-app/lib/screens/`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/apps/customer-app/lib/screens) (Only 5 screens)
+  - Provider Web: [`apps/provider-web/src/app/`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/apps/provider-web/src/app) (Only 6 screens)
+  - Admin Web: [`apps/admin-web/src/app/`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/apps/admin-web/src/app) (Only 3 pages)
 - **Existing Behaviour**: Critical user journeys—such as Customer Phone Login, Service Search Results, Payment Gateway Launch, and Admin Dispute Resolution—have no UI screens implemented.
 - **Expected Behaviour**: Complete visual coverage for all core product features outlined in Section 3 of the master prompt.
 - **Business Impact**: The platform cannot be used by real end-users without building the missing 25+ frontend screens.
@@ -338,7 +338,7 @@ flowchart TD
 ### Finding F-11: 54 Node.js Dependency Security Vulnerabilities
 - **Severity**: **P1 — High**
 - **Classification**: Dependency Vulnerability
-- **File**: [`package-lock.json`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/package-lock.json)
+- **File**: [`package-lock.json`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/package-lock.json)
 - **Audit Details**:
   - `fast-jwt <= 6.3.3`: **5 Critical vulnerabilities** (JWT algorithm confusion, expiration bypass, empty secret bypass).
   - `@fastify/static`: **High** (Path traversal authorization bypass).
@@ -352,7 +352,7 @@ flowchart TD
 ### Finding F-12: Full Collection In-Memory Table Scans in Admin Overview
 - **Severity**: **P2 — Medium**
 - **Classification**: Performance Bottleneck
-- **File**: [`backend/src/api/routes/admin.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/backend/src/api/routes/admin.routes.ts#L205-L210)
+- **File**: [`backend/src/api/routes/admin.routes.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/backend/src/api/routes/admin.routes.ts#L205-L210)
 - **Existing Behaviour**: `Promise.all([ db.collection(COLLECTIONS.BOOKINGS).get(), ... ])` downloads the entire collection to calculate revenue and booking counts.
 - **Expected Behaviour**: Use Firestore `count()` and `aggregate()` queries or maintained rollup counter documents.
 - **Business Impact**: Dashboard crashes with HTTP 504 Gateway Timeout or Node.js Out-Of-Memory once the platform exceeds 10,000 bookings.
@@ -362,7 +362,7 @@ flowchart TD
 ### Finding F-13: Missing Database Field Level Encryption for Medical & PII Records
 - **Severity**: **P2 — Medium**
 - **Classification**: Security Architecture Limitation
-- **File**: [`infrastructure/firebase/firestore.rules`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/infrastructure/firebase/firestore.rules)
+- **File**: [`infrastructure/firebase/firestore.rules`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/infrastructure/firebase/firestore.rules)
 - **Existing Behaviour**: Medical prescriptions, clinical diagnosis, and owner PAN/Aadhaar data are stored as plaintext JSON in Firestore.
 - **Expected Behaviour**: PII and sensitive medical notes must be encrypted at rest using AES-256-GCM application-level keys before writing to Firestore.
 
@@ -392,7 +392,7 @@ flowchart TD
          ┌───────────────────────────┬────────────────┴───────────────────────────┐
          ▼                           ▼                                            ▼
    GLOBAL VET SAAS             GLOBAL MARKETPLACE                          INDIAN HYBRID
-  (ezyVet, Digitail)            (Rover, Wag!, Petco)                  (Supertails, HUFT, ThePetNest)
+  (ezyVet, Digitail)            (Rover, Wag!, Petwo)                  (Supertails, HUFT, ThePetNest)
          │                           │                                            │
   • Full EMR / SOAP notes     • GPS Dog Walking Radar                      • Pet Pharmacy & D2C Commerce
   • In-clinic Diagnostics     • Sitter Verification & Badges               • High-density WhatsApp alerts
@@ -403,13 +403,13 @@ flowchart TD
 ### Competitor Benchmarking Matrix:
 1. **ezyVet & Digitail (Global Vet SaaS)**:
    - *What they have*: Rich SOAP clinical notes, DICOM medical imaging viewers, automated laboratory integrations (IDEXX), multi-room operating theater scheduling.
-   - *PETCO Status*: Basic prescription JSON only. No EMR, no lab machine connectivity, no SOAP structure.
+   - *PETWO Status*: Basic prescription JSON only. No EMR, no lab machine connectivity, no SOAP structure.
 2. **Rover & Wag! (Global Pet Services)**:
    - *What they have*: Live GPS route tracking during dog walks, automated photo/video check-in updates, insurance backed by sitter background checks.
-   - *PETCO Status*: Smart collar GPS simulated, but no dog walking service workflow, photo updates, or sitter background check pipelines.
+   - *PETWO Status*: Smart collar GPS simulated, but no dog walking service workflow, photo updates, or sitter background check pipelines.
 3. **Supertails & ThePetNest (Indian Leaders)**:
    - *What they have*: Heavy D2C commerce (pet food, medicines), instant tele-consultations, door-step home grooming vans in Hyderabad.
-   - *PETCO Status*: Strong multi-tenant provider SaaS vision and reception TV queue display; lacks commerce storefront, D2C inventory, and physical home van dispatch.
+   - *PETWO Status*: Strong multi-tenant provider SaaS vision and reception TV queue display; lacks commerce storefront, D2C inventory, and physical home van dispatch.
 
 ---
 
@@ -439,7 +439,7 @@ Transition to a **Hybrid Polyglot Architecture**:
 
 ```mermaid
 gantt
-    title PETCO Engineering Roadmap to Production
+    title PETWO Engineering Roadmap to Production
     dateFormat  YYYY-MM-DD
     section Phase 1: Security
     Fix Production OTP & Base64 Bug       :crit, p1_1, 2026-11-03, 5d
@@ -509,14 +509,14 @@ gantt
 
 ---
 
-## 10. Updated PETCO Master Engineering Prompt
+## 10. Updated PETWO Master Engineering Prompt
 
 *(Save this standardized prompt for future agentic or engineering build tasks to guarantee strict adherence to production standards.)*
 
 ```markdown
-MASTER PROMPT: PETCO ENTERPRISE PET-CARE ECOSYSTEM
+MASTER PROMPT: PETWO ENTERPRISE PET-CARE ECOSYSTEM
 
-You are a Principal Software Architect and Staff Engineer building PETCO, an enterprise-grade multi-tenant pet-care marketplace and SaaS platform launched in Hyderabad, India.
+You are a Principal Software Architect and Staff Engineer building PETWO, an enterprise-grade multi-tenant pet-care marketplace and SaaS platform launched in Hyderabad, India.
 
 CRITICAL ENGINEERING CONSTRAINTS:
 1. CURRENCY: All monetary amounts MUST be integer paisa (₹1 = 100 paisa). Never use floating-point numbers for currency. Partition 18% GST strictly on platform commission fees. Deduct 1% TDS under Section 194-O.
@@ -532,6 +532,6 @@ CRITICAL ENGINEERING CONSTRAINTS:
 
 ## 11. Conclusion
 
-PETCO possesses an exceptional market concept, clean data modeling, and well-designed utility libraries. However, it currently resides in an early development phase with critical vulnerabilities in authentication, concurrency locks, webhook verification, multi-tenancy, and medical compliance.
+PETWO possesses an exceptional market concept, clean data modeling, and well-designed utility libraries. However, it currently resides in an early development phase with critical vulnerabilities in authentication, concurrency locks, webhook verification, multi-tenancy, and medical compliance.
 
-By systematically executing the **8-Phase Master Implementation Roadmap**, transitioning from Firestore to a PostgreSQL+PostGIS transactional engine, and resolving the P0 findings detailed above, PETCO will transition into a commercially defensible, scalable, and dominant pet-care platform in India.
+By systematically executing the **8-Phase Master Implementation Roadmap**, transitioning from Firestore to a PostgreSQL+PostGIS transactional engine, and resolving the P0 findings detailed above, PETWO will transition into a commercially defensible, scalable, and dominant pet-care platform in India.

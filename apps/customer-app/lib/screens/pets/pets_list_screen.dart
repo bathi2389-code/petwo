@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:petco_customer/config/theme.dart';
-import 'package:petco_customer/models/pet_model.dart';
-import 'package:petco_customer/screens/pets/add_pet_screen.dart';
+import 'package:petwo_customer/config/theme.dart';
+import 'package:petwo_customer/models/pet_model.dart';
+import 'package:petwo_customer/screens/pets/add_pet_screen.dart';
 
 class PetsListScreen extends StatefulWidget {
   const PetsListScreen({super.key});
@@ -44,7 +44,7 @@ class _PetsListScreenState extends State<PetsListScreen> {
         title: const Text('My Furry Family'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_circle_outline, color: PetcoTheme.primary),
+            icon: const Icon(Icons.add_circle_outline, color: PetwoTheme.primary),
             onPressed: () async {
               final newPet = await Navigator.push<Pet>(
                 context,
@@ -73,7 +73,7 @@ class _PetsListScreenState extends State<PetsListScreen> {
                   const Text(
                     'Add your pet profiles to track vaccinations,\nmedical history & book appointments.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: PetcoTheme.textSecondary, fontSize: 13),
+                    style: TextStyle(color: PetwoTheme.textSecondary, fontSize: 13),
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton.icon(
@@ -112,7 +112,7 @@ class _PetsListScreenState extends State<PetsListScreen> {
                               height: 60,
                               width: 60,
                               decoration: BoxDecoration(
-                                color: PetcoTheme.primaryLight,
+                                color: PetwoTheme.primaryLight,
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Center(
@@ -132,7 +132,7 @@ class _PetsListScreenState extends State<PetsListScreen> {
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
-                                      color: PetcoTheme.textPrimary,
+                                      color: PetwoTheme.textPrimary,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -140,7 +140,7 @@ class _PetsListScreenState extends State<PetsListScreen> {
                                     '${pet.breed} • ${pet.gender.toUpperCase()}',
                                     style: const TextStyle(
                                       fontSize: 12,
-                                      color: PetcoTheme.textSecondary,
+                                      color: PetwoTheme.textSecondary,
                                     ),
                                   ),
                                   if (pet.weight != null)
@@ -149,14 +149,14 @@ class _PetsListScreenState extends State<PetsListScreen> {
                                       style: const TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w600,
-                                        color: PetcoTheme.primary,
+                                        color: PetwoTheme.primary,
                                       ),
                                     ),
                                 ],
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.edit_outlined, size: 20, color: PetcoTheme.textMuted),
+                              icon: const Icon(Icons.edit_outlined, size: 20, color: PetwoTheme.textMuted),
                               onPressed: () {},
                             ),
                           ],
@@ -169,18 +169,18 @@ class _PetsListScreenState extends State<PetsListScreen> {
                           children: [
                             TextButton.icon(
                               onPressed: () {},
-                              icon: const Icon(Icons.vaccines, size: 16, color: PetcoTheme.primary),
+                              icon: const Icon(Icons.vaccines, size: 16, color: PetwoTheme.primary),
                               label: const Text(
                                 'Vaccines (Up to date)',
-                                style: TextStyle(fontSize: 12, color: PetcoTheme.primary),
+                                style: TextStyle(fontSize: 12, color: PetwoTheme.primary),
                               ),
                             ),
                             TextButton.icon(
                               onPressed: () {},
-                              icon: const Icon(Icons.history, size: 16, color: PetcoTheme.textSecondary),
+                              icon: const Icon(Icons.history, size: 16, color: PetwoTheme.textSecondary),
                               label: const Text(
                                 'Medical History',
-                                style: TextStyle(fontSize: 12, color: PetcoTheme.textSecondary),
+                                style: TextStyle(fontSize: 12, color: PetwoTheme.textSecondary),
                               ),
                             ),
                           ],

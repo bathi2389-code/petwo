@@ -57,7 +57,7 @@ export default function EarningsPage() {
         </div>
 
         <div className="bg-white p-5 rounded-xl border shadow-sm">
-          <span className="text-xs text-gray-500 font-medium">PETCO Platform Commission</span>
+          <span className="text-xs text-gray-500 font-medium">PETWO Platform Commission</span>
           <div className="mt-2 text-2xl font-bold text-gray-700">
             {formatCurrency(earningsSummary.commissionPaid)}
           </div>

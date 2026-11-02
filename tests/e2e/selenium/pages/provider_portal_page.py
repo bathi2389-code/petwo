@@ -1,5 +1,5 @@
 """
-PETCO QA Automation — Provider Portal Page Object Model
+PETWO QA Automation — Provider Portal Page Object Model
 """
 from selenium.webdriver.common.by import By
 from .base_page import BasePage

@@ -1,11 +1,11 @@
 services:
   - type: web
-    name: petco-backend
+    name: petwo-backend
     env: node
     plan: free
     region: singapore
     rootDir: backend
-    buildCommand: npm install && npm run build --workspace=@petco/shared && npm run build
+    buildCommand: npm install && npm run build --workspace=@petwo/shared && npm run build
     startCommand: node dist/server.js
     envVars:
       - key: NODE_ENV
@@ -23,40 +23,40 @@ services:
       - key: RAZORPAY_WEBHOOK_SECRET
         value: rzp_webhook_secret_placeholder
       - key: FIREBASE_PROJECT_ID
-        value: petco-prod
+        value: petwo-prod
       - key: FIREBASE_CLIENT_EMAIL
-        value: mock@petco-prod.iam.gserviceaccount.com
+        value: mock@petwo-prod.iam.gserviceaccount.com
       - key: FIREBASE_STORAGE_BUCKET
-        value: petco-prod.appspot.com
+        value: petwo-prod.appspot.com
       - key: FIREBASE_PRIVATE_KEY
         value: "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEA0mockkey...\n-----END RSA PRIVATE KEY-----\n"
 
   - type: web
-    name: petco-provider-web
+    name: petwo-provider-web
     env: node
     plan: free
     region: singapore
     rootDir: apps/provider-web
-    buildCommand: npm install && npm run build --workspace=@petco/shared && npm run build
+    buildCommand: npm install && npm run build --workspace=@petwo/shared && npm run build
     startCommand: npm start
     envVars:
       - key: NEXT_PUBLIC_API_URL
         fromService:
-          name: petco-backend
+          name: petwo-backend
           type: web
           property: host
 
   - type: web
-    name: petco-admin-web
+    name: petwo-admin-web
     env: node
     plan: free
     region: singapore
     rootDir: apps/admin-web
-    buildCommand: npm install && npm run build --workspace=@petco/shared && npm run build
+    buildCommand: npm install && npm run build --workspace=@petwo/shared && npm run build
     startCommand: npm start
     envVars:
       - key: NEXT_PUBLIC_API_URL
         fromService:
-          name: petco-backend
+          name: petwo-backend
           type: web
           property: host

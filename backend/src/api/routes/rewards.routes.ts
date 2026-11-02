@@ -33,7 +33,7 @@ export default async function rewardsRoutes(app: FastifyInstance): Promise<void>
         lifetimeEarned: 150,
         tier: 'Silver Paw',
         badges: [
-          { id: 'welcome_paw', title: 'Welcome to PETCO', icon: '🐾', unlockedAt: new Date().toISOString() },
+          { id: 'welcome_paw', title: 'Welcome to PETWO', icon: '🐾', unlockedAt: new Date().toISOString() },
         ],
         updatedAt: new Date().toISOString(),
       };

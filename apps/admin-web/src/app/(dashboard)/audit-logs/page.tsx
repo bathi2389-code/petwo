@@ -17,7 +17,7 @@ export default function AdminAuditLogsPage() {
     {
       id: 'AUD-88209',
       timestamp: '02 Nov 2026, 12:15:10',
-      actor: 'admin@petco.in',
+      actor: 'admin@petwo.in',
       action: 'PROVIDER_APPROVE_KYC',
       target: 'Dr. Rao Pet Hospital (Banjara Hills)',
       ip: '49.205.112.44',
@@ -35,7 +35,7 @@ export default function AdminAuditLogsPage() {
     {
       id: 'AUD-88207',
       timestamp: '02 Nov 2026, 09:30:15',
-      actor: 'admin@petco.in',
+      actor: 'admin@petwo.in',
       action: 'COMMISSION_UPDATE',
       target: 'Category: Veterinary Care (15% -> 15%)',
       ip: '49.205.112.44',

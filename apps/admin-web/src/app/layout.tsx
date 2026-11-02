@@ -5,8 +5,8 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'PETCO Central Admin',
-  description: 'Super Admin and Operations Portal for PETCO Marketplace',
+  title: 'PETWO Central Admin',
+  description: 'Super Admin and Operations Portal for PETWO Marketplace',
 };
 
 export default function RootLayout({

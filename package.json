@@ -1,7 +1,7 @@
 {
-  "name": "petco-platform",
+  "name": "petwo-platform",
   "version": "1.0.0",
-  "description": "PETCO — Production-Grade PetCare Marketplace & Multi-Tenant SaaS Platform",
+  "description": "PETWO — Production-Grade PetCare Marketplace & Multi-Tenant SaaS Platform",
   "private": true,
   "workspaces": [
     "apps/provider-web",

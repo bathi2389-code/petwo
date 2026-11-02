@@ -87,7 +87,7 @@ export default async function emergencyRoutes(app: FastifyInstance): Promise<voi
         incident: sosIncident,
         nearestEmergencyHospitals: emergencyFacilities,
         emergencyHelplines: [
-          { label: 'PETCO Hyderabad 24/7 Emergency Desk', number: '1800-PETCO-SOS' },
+          { label: 'PETWO Hyderabad 24/7 Emergency Desk', number: '1800-PETWO-SOS' },
           { label: 'Telangana Mobile Pet Ambulance', number: '1962' },
         ],
       },

@@ -3,7 +3,7 @@ import * as crypto from 'crypto';
 import { nanoid } from 'nanoid';
 import { getDb, COLLECTIONS } from '../../config/firebase';
 import { env } from '../../config/env';
-import type { Payment, Booking, PaymentStatus, BookingStatus } from '@petco/shared';
+import type { Payment, Booking, PaymentStatus, BookingStatus } from '@petwo/shared';
 
 export default async function webhookRoutes(app: FastifyInstance): Promise<void> {
   // Raw body parser or hook for webhook signature validation if needed

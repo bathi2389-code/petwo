@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { getAuth } from '../config/firebase';
 import { getDb, COLLECTIONS } from '../config/firebase';
-import type { UserRole } from '@petco/shared';
+import type { UserRole } from '@petwo/shared';
 
 export interface AuthenticatedUser {
   uid: string;

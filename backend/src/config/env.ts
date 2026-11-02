@@ -22,11 +22,11 @@ const envSchema = z.object({
 
   MSG91_AUTH_KEY: z.string().optional(),
   MSG91_TEMPLATE_ID_OTP: z.string().optional(),
-  MSG91_SENDER_ID: z.string().default('PETCOI'),
+  MSG91_SENDER_ID: z.string().default('PETWOI'),
 
   ALGOLIA_APP_ID: z.string().optional(),
   ALGOLIA_ADMIN_API_KEY: z.string().optional(),
-  ALGOLIA_INDEX_PROVIDERS: z.string().default('petco_providers'),
+  ALGOLIA_INDEX_PROVIDERS: z.string().default('petwo_providers'),
 
   GOOGLE_MAPS_API_KEY: z.string().optional(),
 
@@ -38,10 +38,10 @@ const envSchema = z.object({
 
 // In test mode, provide safe fallback values for integration testing
 const testDefaults = process.env.NODE_ENV === 'test' ? {
-  FIREBASE_PROJECT_ID: 'petco-test-suite',
+  FIREBASE_PROJECT_ID: 'petwo-test-suite',
   FIREBASE_PRIVATE_KEY: '-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC5\n-----END PRIVATE KEY-----',
-  FIREBASE_CLIENT_EMAIL: 'qa-tester@petco-test.iam.gserviceaccount.com',
-  FIREBASE_STORAGE_BUCKET: 'petco-test.appspot.com',
+  FIREBASE_CLIENT_EMAIL: 'qa-tester@petwo-test.iam.gserviceaccount.com',
+  FIREBASE_STORAGE_BUCKET: 'petwo-test.appspot.com',
   JWT_SECRET: 'test_jwt_secret_super_secure_32_chars_long_key_12345',
   RAZORPAY_KEY_ID: 'rzp_test_qa12345678',
   RAZORPAY_KEY_SECRET: 'rzp_secret_qa12345678',

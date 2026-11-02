@@ -1,5 +1,5 @@
 /**
- * PETCO Platform — Shared TypeScript Types
+ * PETWO Platform — Shared TypeScript Types
  * Single source of truth for all API contracts and data models
  */
 

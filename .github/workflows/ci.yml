@@ -1,4 +1,4 @@
-name: PETCO CI/CD Pipeline
+name: PETWO CI/CD Pipeline
 
 on:
   push:
@@ -25,13 +25,13 @@ jobs:
         run: npm ci
 
       - name: Build Shared Types
-        run: npm run build --workspace=@petco/shared
+        run: npm run build --workspace=@petwo/shared
 
       - name: Type-Check Backend
-        run: npm run type-check --workspace=@petco/backend
+        run: npm run type-check --workspace=@petwo/backend
 
       - name: Run Backend Tests
-        run: npm run test --workspace=@petco/backend
+        run: npm run test --workspace=@petwo/backend
 
   provider-web:
     name: Provider Web Build Check
@@ -50,10 +50,10 @@ jobs:
         run: npm ci
 
       - name: Build Shared Types
-        run: npm run build --workspace=@petco/shared
+        run: npm run build --workspace=@petwo/shared
 
       - name: Build Provider Web
-        run: npm run build --workspace=petco-provider-web
+        run: npm run build --workspace=petwo-provider-web
 
   admin-web:
     name: Admin Web Build Check
@@ -72,10 +72,10 @@ jobs:
         run: npm ci
 
       - name: Build Shared Types
-        run: npm run build --workspace=@petco/shared
+        run: npm run build --workspace=@petwo/shared
 
       - name: Build Admin Web
-        run: npm run build --workspace=petco-admin-web
+        run: npm run build --workspace=petwo-admin-web
 
   flutter-app:
     name: Flutter Customer App Analysis
@@ -115,6 +115,6 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: petco-customer-app-debug-apk
+          name: petwo-customer-app-debug-apk
           path: apps/customer-app/build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: ignore

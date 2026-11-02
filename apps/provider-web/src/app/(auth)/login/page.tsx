@@ -59,7 +59,7 @@ export default function LoginPage() {
           <div className="h-12 w-12 rounded-2xl bg-primary text-white font-black text-2xl flex items-center justify-center mx-auto shadow-md shadow-primary/20">
             P
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">PETCO Provider Portal</h2>
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">PETWO Provider Portal</h2>
           <p className="text-sm text-gray-500">Sign in with your registered business phone number</p>
         </div>
 
@@ -141,7 +141,7 @@ export default function LoginPage() {
         )}
 
         <div className="border-t pt-4 text-center text-xs text-gray-500">
-          New to PETCO?{' '}
+          New to PETWO?{' '}
           <Link href="/register" className="text-primary font-semibold hover:underline">
             Register your clinic or business
           </Link>

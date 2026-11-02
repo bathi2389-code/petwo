@@ -81,10 +81,10 @@ export async function buildApp(): Promise<FastifyInstance> {
     await app.register(swagger, {
       openapi: {
         info: {
-          title: 'PETCO API',
+          title: 'PETWO API',
           description: 'Production-Grade PetCare Marketplace API',
           version: '1.0.0',
-          contact: { name: 'PETCO Engineering', email: 'engineering@petco.in' },
+          contact: { name: 'PETWO Engineering', email: 'engineering@petwo.in' },
         },
         servers: [{ url: `http://localhost:${env.PORT}`, description: 'Development' }],
         components: {
@@ -118,7 +118,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   }, async (_req, reply) => {
     return reply.send({
       status: 'ok',
-      service: 'PETCO API',
+      service: 'PETWO API',
       version: '1.0.0',
       environment: env.NODE_ENV,
       timestamp: new Date().toISOString(),

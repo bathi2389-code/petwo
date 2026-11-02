@@ -34,7 +34,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               P
             </div>
             <div>
-              <span className="font-bold text-white text-base">PETCO</span>
+              <span className="font-bold text-white text-base">PETWO</span>
               <span className="text-[10px] uppercase font-semibold tracking-wider text-orange-400 block">
                 Central Admin
               </span>
@@ -70,7 +70,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-slate-400 font-medium">Hyderabad Hub Online</span>
           </div>
-          <div>PETCO SaaS v1.0.0-prod</div>
+          <div>PETWO SaaS v1.0.0-prod</div>
         </div>
       </aside>
 

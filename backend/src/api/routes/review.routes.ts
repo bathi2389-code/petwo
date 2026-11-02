@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isProvider, isAdmin } from '../../middleware/auth.middleware';
 import { nanoid } from 'nanoid';
-import type { Review, Booking } from '@petco/shared';
+import type { Review, Booking } from '@petwo/shared';
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 

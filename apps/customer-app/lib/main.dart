@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:petco_customer/config/theme.dart';
-import 'package:petco_customer/screens/home/home_screen.dart';
-import 'package:petco_customer/screens/bookings_history/bookings_screen.dart';
-import 'package:petco_customer/screens/pets/pets_list_screen.dart';
+import 'package:petwo_customer/config/theme.dart';
+import 'package:petwo_customer/screens/home/home_screen.dart';
+import 'package:petwo_customer/screens/bookings_history/bookings_screen.dart';
+import 'package:petwo_customer/screens/pets/pets_list_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const PetcoApp());
+  runApp(const PetwoApp());
 }
 
-class PetcoApp extends StatelessWidget {
-  const PetcoApp({super.key});
+class PetwoApp extends StatelessWidget {
+  const PetwoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'PETCO',
+      title: 'PETWO',
       debugShowCheckedModeBanner: false,
-      theme: PetcoTheme.lightTheme,
+      theme: PetwoTheme.lightTheme,
       home: const MainNavigationShell(),
     );
   }
@@ -50,28 +50,28 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (idx) => setState(() => _currentIndex = idx),
-        indicatorColor: PetcoTheme.primaryLight,
+        indicatorColor: PetwoTheme.primaryLight,
         backgroundColor: Colors.white,
         elevation: 4,
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home, color: PetcoTheme.primary),
+            selectedIcon: Icon(Icons.home, color: PetwoTheme.primary),
             label: 'Home',
           ),
           NavigationDestination(
             icon: Icon(Icons.calendar_month_outlined),
-            selectedIcon: Icon(Icons.calendar_month, color: PetcoTheme.primary),
+            selectedIcon: Icon(Icons.calendar_month, color: PetwoTheme.primary),
             label: 'Bookings',
           ),
           NavigationDestination(
             icon: Icon(Icons.pets_outlined),
-            selectedIcon: Icon(Icons.pets, color: PetcoTheme.primary),
+            selectedIcon: Icon(Icons.pets, color: PetwoTheme.primary),
             label: 'My Pets',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person, color: PetcoTheme.primary),
+            selectedIcon: Icon(Icons.person, color: PetwoTheme.primary),
             label: 'Profile',
           ),
         ],
@@ -101,7 +101,7 @@ class ProfilePlaceholderScreen extends StatelessWidget {
               children: [
                 const CircleAvatar(
                   radius: 28,
-                  backgroundColor: PetcoTheme.primaryLight,
+                  backgroundColor: PetwoTheme.primaryLight,
                   child: Text('🐾', style: TextStyle(fontSize: 24)),
                 ),
                 const SizedBox(width: 16),
@@ -114,7 +114,7 @@ class ProfilePlaceholderScreen extends StatelessWidget {
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       SizedBox(height: 2),
-                      Text('+91 98765 43210', style: TextStyle(color: PetcoTheme.textSecondary, fontSize: 13)),
+                      Text('+91 98765 43210', style: TextStyle(color: PetwoTheme.textSecondary, fontSize: 13)),
                     ],
                   ),
                 ),
@@ -141,9 +141,9 @@ class ProfilePlaceholderScreen extends StatelessWidget {
         side: const BorderSide(color: Color(0xFFF1F5F9)),
       ),
       child: ListTile(
-        leading: Icon(icon, color: PetcoTheme.primary, size: 22),
+        leading: Icon(icon, color: PetwoTheme.primary, size: 22),
         title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-        trailing: const Icon(Icons.chevron_right, size: 18, color: PetcoTheme.textMuted),
+        trailing: const Icon(Icons.chevron_right, size: 18, color: PetwoTheme.textMuted),
         onTap: () {},
       ),
     );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:petco_customer/config/theme.dart';
-import 'package:petco_customer/models/booking_model.dart';
+import 'package:petwo_customer/config/theme.dart';
+import 'package:petwo_customer/models/booking_model.dart';
 import 'package:intl/intl.dart';
 
 class BookingsScreen extends StatefulWidget {
@@ -65,9 +65,9 @@ class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProvid
         title: const Text('My Bookings'),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: PetcoTheme.primary,
-          unselectedLabelColor: PetcoTheme.textSecondary,
-          indicatorColor: PetcoTheme.primary,
+          labelColor: PetwoTheme.primary,
+          unselectedLabelColor: PetwoTheme.textSecondary,
+          indicatorColor: PetwoTheme.primary,
           tabs: const [
             Tab(text: 'Upcoming'),
             Tab(text: 'Past Visits'),
@@ -90,7 +90,7 @@ class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProvid
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
-            Icon(Icons.calendar_month, size: 54, color: PetcoTheme.textMuted),
+            Icon(Icons.calendar_month, size: 54, color: PetwoTheme.textMuted),
             SizedBox(height: 12),
             Text('No appointments found', style: TextStyle(fontWeight: FontWeight.bold)),
           ],
@@ -123,7 +123,7 @@ class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProvid
                   children: [
                     Text(
                       b.bookingNumber,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: PetcoTheme.textPrimary),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: PetwoTheme.textPrimary),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -138,7 +138,7 @@ class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProvid
                         style: TextStyle(
                           color: b.status == 'confirmed'
                               ? const Color(0xFF059669)
-                              : PetcoTheme.textSecondary,
+                              : PetwoTheme.textSecondary,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
@@ -149,7 +149,7 @@ class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProvid
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    const Icon(Icons.access_time, size: 16, color: PetcoTheme.primary),
+                    const Icon(Icons.access_time, size: 16, color: PetwoTheme.primary),
                     const SizedBox(width: 8),
                     Text(formattedDate, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                   ],
@@ -157,7 +157,7 @@ class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProvid
                 const SizedBox(height: 8),
                 Text(
                   'TailBlazers Specialty Pet Hospital, Banjara Hills',
-                  style: const TextStyle(fontSize: 12, color: PetcoTheme.textSecondary),
+                  style: const TextStyle(fontSize: 12, color: PetwoTheme.textSecondary),
                 ),
                 const SizedBox(height: 12),
                 const Divider(height: 1),
@@ -167,18 +167,18 @@ class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProvid
                   children: [
                     Text(
                       '₹${(b.totalAmount / 100).toStringAsFixed(0)} Paid',
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: PetcoTheme.textPrimary),
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: PetwoTheme.textPrimary),
                     ),
                     if (isUpcoming)
                       Row(
                         children: [
                           TextButton(
                             onPressed: () {},
-                            child: const Text('Reschedule', style: TextStyle(fontSize: 12, color: PetcoTheme.textSecondary)),
+                            child: const Text('Reschedule', style: TextStyle(fontSize: 12, color: PetwoTheme.textSecondary)),
                           ),
                           TextButton(
                             onPressed: () {},
-                            child: const Text('Cancel', style: TextStyle(fontSize: 12, color: PetcoTheme.error)),
+                            child: const Text('Cancel', style: TextStyle(fontSize: 12, color: PetwoTheme.error)),
                           ),
                         ],
                       )

@@ -1,42 +1,42 @@
-# PETCO — Production-Grade PetCare Marketplace & Multi-Tenant SaaS Platform
+# PETWO — Production-Grade PetCare Marketplace & Multi-Tenant SaaS Platform
 
-[![CI/CD](https://github.com/petco/platform/actions/workflows/ci.yml/badge.svg)](https://github.com/petco/platform)
+[![CI/CD](https://github.com/petwo/platform/actions/workflows/ci.yml/badge.svg)](https://github.com/petwo/platform)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node: >=20](https://img.shields.io/badge/node->=20.0.0-green.svg)](https://nodejs.org/)
 [![Flutter: 3.x](https://img.shields.io/badge/flutter-3.x-blue.svg)](https://flutter.dev/)
 
-**PETCO** is an enterprise-ready, multi-tenant digital marketplace connecting pet owners with verified veterinary professionals, diagnostic centers, groomers, boarders, and pet-care service businesses.
+**PETWO** is an enterprise-ready, multi-tenant digital marketplace connecting pet owners with verified veterinary professionals, diagnostic centers, groomers, boarders, and pet-care service businesses.
 
 - **Initial Launch Market**: India (Flagship launch in **Hyderabad** — Banjara Hills, Jubilee Hills, Gachibowli, Madhapur, Kondapur, Secunderabad).
 - **Core Business Model**: Commission take-rates on bookings (12–20%), provider SaaS tier subscriptions (Starter, Growth, Pro), featured listing placements, and promotional coupons.
 
 > [!TIP]
 > **Don't want to install Node, Flutter, or Android Studio on your laptop?**
-> See [**Running Without Local Installs**](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/RUN_WITHOUT_LOCAL_INSTALLS.md) to run everything 100% in your browser using **GitHub Codespaces** or free cloud deployment.
+> See [**Running Without Local Installs**](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/docs/RUN_WITHOUT_LOCAL_INSTALLS.md) to run everything 100% in your browser using **GitHub Codespaces** or free cloud deployment.
 
 ---
 
 ## 1. System Architecture & Technical Documentation
 
-The platform is backed by comprehensive engineering specifications in the [`docs/`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs) directory:
+The platform is backed by comprehensive engineering specifications in the [`docs/`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/docs) directory:
 
 | Document | Path | Core Focus |
 |---|---|---|
 | **Platform & Startup Overview** | [`docs/OVERVIEW.md`](docs/OVERVIEW.md) | Mission, system demonstration, operational services, monetization & future product lines |
 | **Architecture Design** | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Distributed topology, multi-tenancy isolation, edge routing & C4 system model |
-| **API Specification** | [`docs/API_REFERENCE.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/API_REFERENCE.md) | 19 endpoint groups, JSON payloads, headers, error codes & rate limits |
-| **Database Schema** | [`docs/DATABASE_SCHEMA.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/DATABASE_SCHEMA.md) | Firestore collections, composite indexes, integer paisa & DPDPA consents |
-| **Working Flows** | [`docs/WORKFLOWS.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/WORKFLOWS.md) | 15 detailed Mermaid sequence diagrams covering end-to-end business flows |
-| **Security & Compliance** | [`docs/SECURITY_COMPLIANCE.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/SECURITY_COMPLIANCE.md) | DPDPA 2023, VCI licensure rules, HMAC verification, RBAC & OWASP controls |
-| **Financial & Unit Economics** | [`docs/FINANCIAL_MODEL.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/FINANCIAL_MODEL.md) | 18% GST partitioning, commission take-rates, SaaS tiers & Hyderabad unit economics |
-| **Zero-Install Run Guide** | [`docs/RUN_WITHOUT_LOCAL_INSTALLS.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/RUN_WITHOUT_LOCAL_INSTALLS.md) | Run 100% in browser via GitHub Codespaces, Render, Railway, or Vercel |
-| **Deployment Runbook** | [`docs/DEPLOYMENT_RUNBOOK.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/DEPLOYMENT_RUNBOOK.md) | Production launch checklist, environment secrets, CI/CD, and rollback steps |
-| **Product Roadmap** | [`docs/ROADMAP_AND_EXTENSIONS.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETCO/docs/ROADMAP_AND_EXTENSIONS.md) | Next-gen features, expansion cities (Bengaluru, Mumbai, Delhi-NCR), and AI agents |
+| **API Specification** | [`docs/API_REFERENCE.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/docs/API_REFERENCE.md) | 19 endpoint groups, JSON payloads, headers, error codes & rate limits |
+| **Database Schema** | [`docs/DATABASE_SCHEMA.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/docs/DATABASE_SCHEMA.md) | Firestore collections, composite indexes, integer paisa & DPDPA consents |
+| **Working Flows** | [`docs/WORKFLOWS.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/docs/WORKFLOWS.md) | 15 detailed Mermaid sequence diagrams covering end-to-end business flows |
+| **Security & Compliance** | [`docs/SECURITY_COMPLIANCE.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/docs/SECURITY_COMPLIANCE.md) | DPDPA 2023, VCI licensure rules, HMAC verification, RBAC & OWASP controls |
+| **Financial & Unit Economics** | [`docs/FINANCIAL_MODEL.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/docs/FINANCIAL_MODEL.md) | 18% GST partitioning, commission take-rates, SaaS tiers & Hyderabad unit economics |
+| **Zero-Install Run Guide** | [`docs/RUN_WITHOUT_LOCAL_INSTALLS.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/docs/RUN_WITHOUT_LOCAL_INSTALLS.md) | Run 100% in browser via GitHub Codespaces, Render, Railway, or Vercel |
+| **Deployment Runbook** | [`docs/DEPLOYMENT_RUNBOOK.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/docs/DEPLOYMENT_RUNBOOK.md) | Production launch checklist, environment secrets, CI/CD, and rollback steps |
+| **Product Roadmap** | [`docs/ROADMAP_AND_EXTENSIONS.md`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/docs/ROADMAP_AND_EXTENSIONS.md) | Next-gen features, expansion cities (Bengaluru, Mumbai, Delhi-NCR), and AI agents |
 
 The repository is structured as a TypeScript/Dart monorepo supporting three unified client applications and an enterprise backend:
 
 ```
-PETCO/
+PETWO/
 ├── apps/
 │   ├── customer-app/          # Flutter 3.x Mobile App (iOS & Android)
 │   ├── provider-web/          # Next.js 14 (App Router) Provider SaaS Portal
@@ -116,8 +116,8 @@ PETCO/
 
 1. **Clone and install dependencies:**
    ```bash
-   git clone https://github.com/petco/platform.git
-   cd PETCO
+   git clone https://github.com/petwo/platform.git
+   cd PETWO
    npm install
    ```
 
@@ -129,12 +129,12 @@ PETCO/
 
 3. **Build shared types package:**
    ```bash
-   npm run build --workspace=@petco/shared
+   npm run build --workspace=@petwo/shared
    ```
 
 4. **Seed Database with Hyderabad Launch Providers & Categories:**
    ```bash
-   npm run db:seed --workspace=@petco/backend
+   npm run db:seed --workspace=@petwo/backend
    ```
 
 5. **Run backend and web apps concurrently:**
@@ -162,7 +162,7 @@ PETCO/
 
 Run backend unit and integration test suites:
 ```bash
-npm run test --workspace=@petco/backend
+npm run test --workspace=@petwo/backend
 ```
 
 ---

@@ -68,7 +68,7 @@ describe('QA Accessibility (a11y) & WCAG 2.1 AA Audits', () => {
   });
 
   describe('Color Contrast Ratios (WCAG AA Standard 4.5:1)', () => {
-    it('verifies PETCO brand emerald green on white meets WCAG AA contrast for text', () => {
+    it('verifies PETWO brand emerald green on white meets WCAG AA contrast for text', () => {
       // Relative luminances for emerald-800 (#065f46) vs white (#ffffff)
       const textLuminance = 0.08;
       const bgLuminance = 1.0;
