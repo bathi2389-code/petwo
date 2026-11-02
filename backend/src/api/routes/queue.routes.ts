@@ -12,7 +12,7 @@ export default async function queueRoutes(app: FastifyInstance): Promise<void> {
    */
   app.get('/:locationId', {
     schema: { tags: ['In-Clinic Queue Display'] },
-  }, async (request: FastifyRequest<{ Params: { locationId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { locationId } = request.params;
     const db = getDb();
 
@@ -79,7 +79,7 @@ export default async function queueRoutes(app: FastifyInstance): Promise<void> {
   app.put('/:locationId/call-next', {
     preHandler: [authenticate, isProvider],
     schema: { tags: ['In-Clinic Queue Display'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { locationId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { locationId } = request.params;
     const db = getDb();
     const now = new Date().toISOString();

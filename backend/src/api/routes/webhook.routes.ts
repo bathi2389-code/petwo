@@ -11,9 +11,6 @@ export default async function webhookRoutes(app: FastifyInstance): Promise<void>
    * Razorpay Webhook Handler
    */
   app.post('/razorpay', {
-    config: {
-      rawBody: true,
-    },
     schema: {
       tags: ['Webhooks'],
       summary: 'Razorpay webhook receiver',

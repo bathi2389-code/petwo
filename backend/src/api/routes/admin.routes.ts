@@ -98,7 +98,7 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
    */
   app.put('/providers/:id/verify', {
     schema: { tags: ['Admin'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { id } = request.params;
     const body = VerifyProviderSchema.parse(request.body);
     const db = getDb();
@@ -260,7 +260,7 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
    */
   app.get('/payments', {
     schema: { tags: ['Admin'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Querystring: { status?: string; page?: string; limit?: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const page = Number(request.query.page ?? 1);
     const limit = Number(request.query.limit ?? 20);
     const { status } = request.query;
@@ -287,7 +287,7 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
    */
   app.get('/settlements', {
     schema: { tags: ['Admin'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Querystring: { status?: string; page?: string; limit?: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const page = Number(request.query.page ?? 1);
     const limit = Number(request.query.limit ?? 20);
     const { status } = request.query;
@@ -357,7 +357,7 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
    */
   app.get('/audit-logs', {
     schema: { tags: ['Admin'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Querystring: { page?: string; limit?: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const page = Number(request.query.page ?? 1);
     const limit = Number(request.query.limit ?? 25);
     const db = getDb();
@@ -426,7 +426,7 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
    */
   app.put('/coupons/:id', {
     schema: { tags: ['Admin'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { id } = request.params;
     const body = UpdateCouponSchema.parse(request.body);
     const db = getDb();
@@ -451,7 +451,7 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
    */
   app.delete('/coupons/:id', {
     schema: { tags: ['Admin'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { id } = request.params;
     const db = getDb();
     const docRef = db.collection(COLLECTIONS.COUPONS).doc(id);

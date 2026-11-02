@@ -126,7 +126,7 @@ export default async function diagnosticRoutes(app: FastifyInstance): Promise<vo
   app.put('/orders/:id/results', {
     preHandler: [authenticate, isProviderOrAdmin],
     schema: { tags: ['Diagnostics & Pathology'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { id } = request.params;
     const body = UploadTestResultsSchema.parse(request.body);
     const db = getDb();

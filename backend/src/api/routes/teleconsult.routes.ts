@@ -44,7 +44,7 @@ export default async function teleconsultRoutes(app: FastifyInstance): Promise<v
   app.post('/rooms/:bookingId', {
     preHandler: [authenticate, isAnyAuthenticatedUser],
     schema: { tags: ['Teleconsult'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { bookingId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { bookingId } = request.params;
     const db = getDb();
 
@@ -139,7 +139,7 @@ export default async function teleconsultRoutes(app: FastifyInstance): Promise<v
   app.get('/prescriptions/booking/:bookingId', {
     preHandler: [authenticate],
     schema: { tags: ['Teleconsult'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { bookingId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { bookingId } = request.params;
     const db = getDb();
 

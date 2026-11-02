@@ -149,7 +149,7 @@ export default async function supportRoutes(app: FastifyInstance): Promise<void>
   app.get('/tickets/:id', {
     preHandler: [authenticate],
     schema: { tags: ['Support'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     const doc = await db.collection(COLLECTIONS.SUPPORT_TICKETS).doc(request.params.id).get();
 
@@ -180,7 +180,7 @@ export default async function supportRoutes(app: FastifyInstance): Promise<void>
   app.post('/tickets/:id/messages', {
     preHandler: [authenticate],
     schema: { tags: ['Support'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const parsed = AddMessageSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(422).send({
@@ -302,7 +302,7 @@ export default async function supportRoutes(app: FastifyInstance): Promise<void>
   app.put('/tickets/:id/status', {
     preHandler: [authenticate, isAdmin],
     schema: { tags: ['Support', 'Admin'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const parsed = UpdateTicketStatusSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(422).send({
@@ -359,7 +359,7 @@ export default async function supportRoutes(app: FastifyInstance): Promise<void>
   app.put('/tickets/:id/assign', {
     preHandler: [authenticate, isAdmin],
     schema: { tags: ['Support', 'Admin'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const parsed = AssignTicketSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(422).send({

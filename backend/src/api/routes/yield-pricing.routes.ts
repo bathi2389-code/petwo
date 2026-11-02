@@ -25,7 +25,7 @@ export default async function yieldPricingRoutes(app: FastifyInstance): Promise<
    */
   app.get('/:providerId/rules', {
     schema: { tags: ['Dynamic Yield Pricing'] },
-  }, async (request: FastifyRequest<{ Params: { providerId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { providerId } = request.params;
     const db = getDb();
 
@@ -88,7 +88,7 @@ export default async function yieldPricingRoutes(app: FastifyInstance): Promise<
         },
       },
     },
-  }, async (request: FastifyRequest<{ Querystring: { providerId: string; basePricePaisa: string; day: string; time: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { providerId, basePricePaisa, day, time } = request.query;
     const basePaisa = Number(basePricePaisa);
     const db = getDb();

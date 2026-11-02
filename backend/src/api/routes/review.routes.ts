@@ -84,7 +84,7 @@ export default async function reviewRoutes(app: FastifyInstance): Promise<void> 
    */
   app.get('/:reviewId', {
     schema: { tags: ['Reviews'] },
-  }, async (request: FastifyRequest<{ Params: { reviewId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     const doc = await db.collection(COLLECTIONS.REVIEWS).doc(request.params.reviewId).get();
 
@@ -217,7 +217,7 @@ export default async function reviewRoutes(app: FastifyInstance): Promise<void> 
   app.put('/:reviewId/response', {
     preHandler: [authenticate, isProvider],
     schema: { tags: ['Reviews'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { reviewId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const parsed = ProviderResponseSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(422).send({
@@ -270,7 +270,7 @@ export default async function reviewRoutes(app: FastifyInstance): Promise<void> 
   app.put('/:reviewId/status', {
     preHandler: [authenticate, isAdmin],
     schema: { tags: ['Reviews', 'Admin'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { reviewId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const parsed = AdminStatusSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(422).send({
@@ -315,7 +315,7 @@ export default async function reviewRoutes(app: FastifyInstance): Promise<void> 
   app.post('/:reviewId/helpful', {
     preHandler: [authenticate],
     schema: { tags: ['Reviews'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { reviewId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     const reviewRef = db.collection(COLLECTIONS.REVIEWS).doc(request.params.reviewId);
     const doc = await reviewRef.get();

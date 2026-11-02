@@ -15,8 +15,8 @@
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "paths": {
-      "@petco/shared": ["../shared/types/index.ts"],
-      "@petco/constants": ["../shared/constants/index.ts"]
+      "@petco/shared": ["../shared/dist/index.d.ts"],
+      "@petco/constants": ["../shared/dist/constants/index.d.ts"]
     }
   },
   "include": ["src/**/*"],

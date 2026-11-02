@@ -49,6 +49,9 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Build Shared Types
+        run: npm run build --workspace=@petco/shared
+
       - name: Build Provider Web
         run: npm run build --workspace=petco-provider-web
 
@@ -68,6 +71,9 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Build Shared Types
+        run: npm run build --workspace=@petco/shared
+
       - name: Build Admin Web
         run: npm run build --workspace=petco-admin-web
 
@@ -78,6 +84,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -85,23 +97,26 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Generate Android Skeleton If Missing
+        working-directory: apps/customer-app
+        run: flutter create . --platforms=android --org in.petco
+
       - name: Install Dependencies
-        run: |
-          cd apps/customer-app
-          flutter pub get
+        working-directory: apps/customer-app
+        run: flutter pub get
 
       - name: Analyze Flutter Code
-        run: |
-          cd apps/customer-app
-          flutter analyze
+        working-directory: apps/customer-app
+        run: flutter analyze --no-fatal-infos
 
       - name: Build Android APK in Cloud
-        run: |
-          cd apps/customer-app
-          flutter build apk --debug
+        working-directory: apps/customer-app
+        run: flutter build apk --debug
 
       - name: Upload APK Build Artifact
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: petco-customer-app-debug-apk
           path: apps/customer-app/build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: ignore

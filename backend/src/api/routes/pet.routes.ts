@@ -114,7 +114,7 @@ export default async function petRoutes(app: FastifyInstance): Promise<void> {
   app.get('/:petId', {
     preHandler: [authenticate],
     schema: { tags: ['Pets'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { petId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     const doc = await db.collection(COLLECTIONS.PETS).doc(request.params.petId).get();
 
@@ -144,7 +144,7 @@ export default async function petRoutes(app: FastifyInstance): Promise<void> {
   app.put('/:petId', {
     preHandler: [authenticate, isCustomer],
     schema: { tags: ['Pets'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { petId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const parsed = UpdatePetSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(422).send({
@@ -182,7 +182,7 @@ export default async function petRoutes(app: FastifyInstance): Promise<void> {
   app.delete('/:petId', {
     preHandler: [authenticate, isCustomer],
     schema: { tags: ['Pets'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { petId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     const petRef = db.collection(COLLECTIONS.PETS).doc(request.params.petId);
     const doc = await petRef.get();
@@ -213,7 +213,7 @@ export default async function petRoutes(app: FastifyInstance): Promise<void> {
   app.get('/:petId/vaccinations', {
     preHandler: [authenticate],
     schema: { tags: ['Pets'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { petId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
 
     // Verify ownership
@@ -240,7 +240,7 @@ export default async function petRoutes(app: FastifyInstance): Promise<void> {
   app.post('/:petId/vaccinations', {
     preHandler: [authenticate, isCustomer],
     schema: { tags: ['Pets'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { petId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const parsed = AddVaccinationSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(422).send({
@@ -275,7 +275,7 @@ export default async function petRoutes(app: FastifyInstance): Promise<void> {
   app.get('/:petId/medical-records', {
     preHandler: [authenticate],
     schema: { tags: ['Pets'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { petId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     const petDoc = await db.collection(COLLECTIONS.PETS).doc(request.params.petId).get();
 
@@ -301,7 +301,7 @@ export default async function petRoutes(app: FastifyInstance): Promise<void> {
   app.post('/:petId/medical-records', {
     preHandler: [authenticate],
     schema: { tags: ['Pets'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { petId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const parsed = AddMedicalRecordSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(422).send({

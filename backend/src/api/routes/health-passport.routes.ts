@@ -31,7 +31,7 @@ export default async function healthPassportRoutes(app: FastifyInstance): Promis
   app.get('/:petId', {
     preHandler: [authenticate, isAnyAuthenticatedUser],
     schema: { tags: ['Digital Health Passport'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { petId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { petId } = request.params;
     const db = getDb();
     const uid = request.user!.uid;
@@ -106,7 +106,7 @@ export default async function healthPassportRoutes(app: FastifyInstance): Promis
   app.put('/:petId/microchip', {
     preHandler: [authenticate, isCustomer],
     schema: { tags: ['Digital Health Passport'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { petId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { petId } = request.params;
     const body = UpdateMicrochipSchema.parse(request.body);
     const db = getDb();
@@ -141,7 +141,7 @@ export default async function healthPassportRoutes(app: FastifyInstance): Promis
   app.post('/:petId/consents', {
     preHandler: [authenticate, isCustomer],
     schema: { tags: ['Digital Health Passport'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { petId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { petId } = request.params;
     const body = GrantConsentSchema.parse(request.body);
     const db = getDb();

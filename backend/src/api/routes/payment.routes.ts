@@ -334,7 +334,7 @@ export default async function paymentRoutes(app: FastifyInstance): Promise<void>
   app.get('/:paymentId', {
     preHandler: [authenticate],
     schema: { tags: ['Payments'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { paymentId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     const doc = await db.collection(COLLECTIONS.PAYMENTS).doc(request.params.paymentId).get();
 

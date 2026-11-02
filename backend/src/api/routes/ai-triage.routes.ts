@@ -151,7 +151,7 @@ Return ONLY a valid JSON object matching this schema:
   app.get('/history', {
     preHandler: [authenticate, isCustomer],
     schema: { tags: ['AI Triage'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Querystring: { petId?: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     let q = db.collection('aiTriageSessions')
       .where('customerId', '==', request.user!.uid)

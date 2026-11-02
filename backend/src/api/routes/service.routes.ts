@@ -96,7 +96,7 @@ export default async function serviceRoutes(app: FastifyInstance): Promise<void>
    */
   app.get('/:serviceId', {
     schema: { tags: ['Services'] },
-  }, async (request: FastifyRequest<{ Params: { serviceId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     const doc = await db.collection(COLLECTIONS.SERVICES).doc(request.params.serviceId).get();
 
@@ -202,7 +202,7 @@ export default async function serviceRoutes(app: FastifyInstance): Promise<void>
   app.put('/:serviceId', {
     preHandler: [authenticate, isProvider],
     schema: { tags: ['Services'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { serviceId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const parsed = UpdateServiceSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(422).send({
@@ -245,7 +245,7 @@ export default async function serviceRoutes(app: FastifyInstance): Promise<void>
   app.delete('/:serviceId', {
     preHandler: [authenticate, isProvider],
     schema: { tags: ['Services'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { serviceId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     const serviceRef = db.collection(COLLECTIONS.SERVICES).doc(request.params.serviceId);
     const doc = await serviceRef.get();
@@ -315,7 +315,7 @@ export default async function serviceRoutes(app: FastifyInstance): Promise<void>
   app.put('/:serviceId/toggle', {
     preHandler: [authenticate, isProvider],
     schema: { tags: ['Services'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { serviceId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     const serviceRef = db.collection(COLLECTIONS.SERVICES).doc(request.params.serviceId);
     const doc = await serviceRef.get();

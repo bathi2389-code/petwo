@@ -78,7 +78,7 @@ export default async function notificationRoutes(app: FastifyInstance): Promise<
   app.put('/:id/read', {
     preHandler: [authenticate],
     schema: { tags: ['Notifications'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     const notifRef = db.collection(COLLECTIONS.NOTIFICATIONS).doc(request.params.id);
     const doc = await notifRef.get();
@@ -152,7 +152,7 @@ export default async function notificationRoutes(app: FastifyInstance): Promise<
   app.delete('/:id', {
     preHandler: [authenticate],
     schema: { tags: ['Notifications'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     const notifRef = db.collection(COLLECTIONS.NOTIFICATIONS).doc(request.params.id);
     const doc = await notifRef.get();

@@ -322,7 +322,7 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
   app.get('/:bookingId', {
     preHandler: [authenticate],
     schema: { tags: ['Bookings'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { bookingId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     const doc = await db.collection(COLLECTIONS.BOOKINGS).doc(request.params.bookingId).get();
 
@@ -356,7 +356,7 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
   app.put('/:bookingId/confirm', {
     preHandler: [authenticate, isProvider],
     schema: { tags: ['Bookings'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { bookingId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     const bookingRef = db.collection(COLLECTIONS.BOOKINGS).doc(request.params.bookingId);
     const doc = await bookingRef.get();
@@ -398,7 +398,7 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
   app.put('/:bookingId/cancel', {
     preHandler: [authenticate],
     schema: { tags: ['Bookings'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { bookingId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const parsed = CancelBookingSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(422).send({
@@ -478,7 +478,7 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
   app.put('/:bookingId/reschedule', {
     preHandler: [authenticate, isCustomer],
     schema: { tags: ['Bookings'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { bookingId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const parsed = RescheduleBookingSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(422).send({
@@ -547,7 +547,7 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
   app.put('/:bookingId/status', {
     preHandler: [authenticate, isProviderOrAdmin],
     schema: { tags: ['Bookings'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { bookingId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const parsed = UpdateStatusSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(422).send({

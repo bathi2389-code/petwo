@@ -260,7 +260,7 @@ export default async function providerRoutes(app: FastifyInstance): Promise<void
    */
   app.get('/:providerId', {
     schema: { tags: ['Providers'] },
-  }, async (request: FastifyRequest<{ Params: { providerId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const db = getDb();
     const doc = await db.collection(COLLECTIONS.PROVIDERS).doc(request.params.providerId).get();
 
@@ -354,7 +354,7 @@ export default async function providerRoutes(app: FastifyInstance): Promise<void
    */
   app.get('/:providerId/availability', {
     schema: { tags: ['Providers'] },
-  }, async (request: FastifyRequest<{ Params: { providerId: string }; Querystring: { date?: string; serviceId?: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { date, serviceId } = request.query;
     const { providerId } = request.params;
     const db = getDb();

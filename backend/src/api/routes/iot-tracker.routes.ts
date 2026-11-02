@@ -99,7 +99,6 @@ export default async function iotTrackerRoutes(app: FastifyInstance): Promise<vo
 
     const telemetryRecord = {
       id: nanoid(),
-      deviceSerial: body.deviceSerial,
       petId,
       ...body,
       recordedAt: now,
@@ -123,7 +122,7 @@ export default async function iotTrackerRoutes(app: FastifyInstance): Promise<vo
   app.get('/telemetry/:petId/live', {
     preHandler: [authenticate],
     schema: { tags: ['IoT Smart Collar'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { petId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { petId } = request.params;
     const db = getDb();
 
@@ -187,7 +186,7 @@ export default async function iotTrackerRoutes(app: FastifyInstance): Promise<vo
   app.post('/simulate/:petId', {
     preHandler: [authenticate, isCustomer],
     schema: { tags: ['IoT Smart Collar'], security: [{ bearerAuth: [] }] },
-  }, async (request: FastifyRequest<{ Params: { petId: string } }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const { petId } = request.params;
     const db = getDb();
 

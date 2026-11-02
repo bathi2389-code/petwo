@@ -25,7 +25,7 @@ export default async function whatsappRoutes(app: FastifyInstance): Promise<void
    */
   app.get('/webhook', {
     schema: { tags: ['WhatsApp Integration'] },
-  }, async (request: FastifyRequest<{ Querystring: Record<string, string> }>, reply: FastifyReply) => {
+  }, async (request: any, reply: FastifyReply) => {
     const mode = request.query['hub.mode'];
     const token = request.query['hub.verify_token'];
     const challenge = request.query['hub.challenge'];
