@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import * as crypto from 'crypto';
+import { nanoid } from 'nanoid';
 import { getDb, COLLECTIONS } from '../../config/firebase';
 import { env } from '../../config/env';
 import type { Payment, Booking, PaymentStatus, BookingStatus } from '@petco/shared';
@@ -32,13 +33,18 @@ export default async function webhookRoutes(app: FastifyInstance): Promise<void>
       .update(payloadString)
       .digest('hex');
 
-    // In production, strictly match signature. In test/dev, tolerate mock if secret unset
-    if (env.NODE_ENV === 'production' && expectedSignature !== signature) {
-      request.log.error('Invalid Razorpay webhook signature');
-      return reply.status(400).send({ error: 'Invalid signature' });
+    // Constant-time signature verification in production
+    if (env.NODE_ENV === 'production') {
+      const sigBuf = Buffer.from(signature);
+      const expBuf = Buffer.from(expectedSignature);
+      if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+        request.log.error('Invalid Razorpay webhook signature');
+        return reply.status(400).send({ error: 'Invalid signature' });
+      }
     }
 
     const event = request.body as {
+      id?: string;
       event: string;
       payload?: {
         payment?: {
@@ -65,7 +71,23 @@ export default async function webhookRoutes(app: FastifyInstance): Promise<void>
 
     const db = getDb();
     const eventType = event.event;
-    request.log.info({ event: eventType }, 'Received Razorpay webhook event');
+    const paymentEntity = event.payload?.payment?.entity;
+    const eventId = (request.headers['x-razorpay-event-id'] as string) || event.id || `${eventType}_${paymentEntity?.id || nanoid()}`;
+
+    // Webhook Idempotency: Deduplicate repeated webhooks from gateway retries
+    const eventRef = db.collection('webhookEvents').doc(eventId);
+    const eventDoc = await eventRef.get();
+    if (eventDoc.exists) {
+      request.log.info({ eventId }, 'Duplicate webhook event received; returning 200 idempotent');
+      return reply.status(200).send({ success: true, received: true, duplicate: true });
+    }
+    await eventRef.set({
+      eventId,
+      eventType,
+      processedAt: new Date().toISOString(),
+    });
+
+    request.log.info({ event: eventType, eventId }, 'Processing Razorpay webhook event');
 
     try {
       if (eventType === 'payment.captured') {

@@ -1,4 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import * as crypto from 'crypto';
 import { z } from 'zod';
 import { getAuth, getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate } from '../../middleware/auth.middleware';
@@ -79,10 +80,11 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = dayjs().add(OTP.EXPIRES_MINUTES, 'minute').toISOString();
 
-    // Store OTP hash (in production, hash with bcrypt; using plain for development)
+    // Store cryptographically salted OTP hash
+    const hashedOtp = hashOtp(otp, normalizedPhone);
     await otpRef.set({
       phone: normalizedPhone,
-      otp: process.env.NODE_ENV === 'development' ? otp : hashOtp(otp),
+      otp: hashedOtp,
       expiresAt,
       attempts: 0,
       sentAt: new Date().toISOString(),
@@ -158,9 +160,9 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
       });
     }
 
-    // Verify OTP
-    const storedOtp = process.env.NODE_ENV === 'development' ? otpData.otp : otpData.otp;
-    if (storedOtp !== otp) {
+    // Verify OTP using constant-time salted comparison
+    const isMatch = verifyOtpConstantTime(otp, normalizedPhone, otpData.otp);
+    if (!isMatch) {
       await otpRef.update({ attempts: otpData.attempts + 1 });
       return reply.status(400).send({
         success: false,
@@ -291,11 +293,20 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
   });
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Cryptographic OTP Helpers ──────────────────────────────────────────────────
 
-function hashOtp(otp: string): string {
-  // In production use bcrypt — simplified for now
-  return Buffer.from(otp).toString('base64');
+export function hashOtp(otp: string, salt: string): string {
+  const secret = process.env.JWT_SECRET || 'petco-secure-otp-pepper-secret-2024';
+  return crypto.createHmac('sha256', secret).update(`${salt}:${otp}`).digest('hex');
+}
+
+export function verifyOtpConstantTime(inputOtp: string, salt: string, storedHash: string): boolean {
+  if (!inputOtp || !storedHash) return false;
+  const computedHash = hashOtp(inputOtp, salt);
+  const bufA = Buffer.from(computedHash, 'hex');
+  const bufB = Buffer.from(storedHash, 'hex');
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
 }
 
 async function sendOtpViaSms(phone: string, otp: string): Promise<void> {

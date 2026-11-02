@@ -129,28 +129,6 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
       });
     }
 
-    // Check for conflicting confirmed bookings in same slot
-    const conflictingSnapshot = await db.collection(COLLECTIONS.BOOKINGS)
-      .where('providerId', '==', data.providerId)
-      .where('locationId', '==', data.locationId)
-      .where('status', 'in', ['confirmed', 'in_progress'])
-      .get();
-
-    const hasConflict = conflictingSnapshot.docs.some(doc => {
-      const b = doc.data() as Booking;
-      if (data.staffId && b.staffId && b.staffId !== data.staffId) return false;
-      const bStart = dayjs(b.scheduledAt);
-      const bEnd = dayjs(b.scheduledEnd);
-      return scheduledAt.isBefore(bEnd) && scheduledEnd.isAfter(bStart);
-    });
-
-    if (hasConflict) {
-      return reply.status(409).send({
-        success: false,
-        error: { code: 'BKG_001', message: 'Selected time slot is not available.' },
-      });
-    }
-
     // ── Calculate pricing ──
     const serviceAmount = service.price.amount; // in paisa
     const taxAmount = Math.round(serviceAmount * 0.18); // 18% GST
@@ -193,7 +171,7 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
       commissionRate,
     );
 
-    // ── Create booking ──
+    // ── Prepare booking payload ──
     const id = nanoid();
     const now = new Date().toISOString();
 
@@ -242,7 +220,67 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
       updatedAt: now,
     };
 
-    await db.collection(COLLECTIONS.BOOKINGS).doc(id).set(booking);
+    // ── Atomic Slot Hold & Concurrency Control via Firestore Transaction ──
+    const slotKey = `slot_${data.providerId}_${data.locationId}_${data.staffId || 'any'}_${scheduledAt.unix()}`;
+    const slotLockRef = db.collection('slotLocks').doc(slotKey);
+
+    try {
+      await db.runTransaction(async (transaction) => {
+        const slotDoc = await transaction.get(slotLockRef);
+        if (slotDoc.exists) {
+          const slotData = slotDoc.data();
+          const lockExpires = slotData?.expiresAt ? dayjs(slotData.expiresAt) : null;
+          if (lockExpires && lockExpires.isAfter(dayjs()) && slotData?.status !== 'released') {
+            throw new Error('SLOT_LOCKED');
+          }
+        }
+
+        // Query active overlapping bookings
+        const conflictingSnapshot = await db.collection(COLLECTIONS.BOOKINGS)
+          .where('providerId', '==', data.providerId)
+          .where('locationId', '==', data.locationId)
+          .where('status', 'in', ['confirmed', 'in_progress'])
+          .get();
+
+        const hasConflict = conflictingSnapshot.docs.some(doc => {
+          const b = doc.data() as Booking;
+          if (data.staffId && b.staffId && b.staffId !== data.staffId) return false;
+          const bStart = dayjs(b.scheduledAt);
+          const bEnd = dayjs(b.scheduledEnd);
+          return scheduledAt.isBefore(bEnd) && scheduledEnd.isAfter(bStart);
+        });
+
+        if (hasConflict) {
+          throw new Error('SLOT_CONFLICT');
+        }
+
+        // Atomic lock document write
+        transaction.set(slotLockRef, {
+          slotKey,
+          bookingId: id,
+          customerId,
+          providerId: data.providerId,
+          locationId: data.locationId,
+          staffId: data.staffId || null,
+          scheduledAt: scheduledAt.toISOString(),
+          scheduledEnd: scheduledEnd.toISOString(),
+          status: 'held',
+          expiresAt: dayjs().add(15, 'minute').toISOString(),
+          createdAt: now,
+        });
+
+        // Write the booking document atomically in the same transaction
+        transaction.set(db.collection(COLLECTIONS.BOOKINGS).doc(id), booking);
+      });
+    } catch (err: any) {
+      if (err.message === 'SLOT_LOCKED' || err.message === 'SLOT_CONFLICT') {
+        return reply.status(409).send({
+          success: false,
+          error: { code: 'BKG_001', message: 'Selected time slot is not available or currently locked by another customer.' },
+        });
+      }
+      throw err;
+    }
 
     // Increment coupon usage count asynchronously
     if (appliedCouponCode) {

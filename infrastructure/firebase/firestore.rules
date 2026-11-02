@@ -39,6 +39,10 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == resource.data.userId;
     }
 
+    function hasMedicalConsent(petId) {
+      return isProvider() && exists(/databases/$(database)/documents/medicalConsents/$(request.auth.uid + '_' + petId));
+    }
+
     function isValidString(field, min, max) {
       return field is string && field.size() >= min && field.size() <= max;
     }
@@ -88,32 +92,63 @@ service cloud.firestore {
     match /vaccinationRecords/{recordId} {
       allow read: if isAuthenticated() && (
         get(/databases/$(database)/documents/pets/$(resource.data.petId)).data.ownerId == request.auth.uid ||
-        isProvider() ||
+        hasMedicalConsent(resource.data.petId) ||
+        resource.data.providerId == request.auth.uid ||
         isAdmin()
       );
-      allow create: if isAuthenticated() && isActiveUser();
+      allow create: if isAuthenticated() && isActiveUser() && (
+        isCustomer() || hasMedicalConsent(request.resource.data.petId) || isAdmin()
+      );
       allow update: if isAuthenticated() && (
         get(/databases/$(database)/documents/pets/$(resource.data.petId)).data.ownerId == request.auth.uid ||
+        (resource.data.providerId == request.auth.uid && hasMedicalConsent(resource.data.petId)) ||
         isAdmin()
       );
       allow delete: if isAdmin();
     }
 
-    // ─── Medical Records ──────────────────────────────────────────────────────
+    // ─── Medical Records (Hardened for DPDPA & Veterinary Confidentiality) ──────
 
     match /medicalRecords/{recordId} {
       allow read: if isAuthenticated() && (
         get(/databases/$(database)/documents/pets/$(resource.data.petId)).data.ownerId == request.auth.uid ||
-        isProvider() ||
+        resource.data.providerId == request.auth.uid ||
+        hasMedicalConsent(resource.data.petId) ||
         isAdmin()
       );
-      allow create: if isAuthenticated() && isActiveUser() && (isCustomer() || isProvider());
+      allow create: if isAuthenticated() && isActiveUser() && (
+        (isCustomer() && get(/databases/$(database)/documents/pets/$(request.resource.data.petId)).data.ownerId == request.auth.uid) ||
+        (isProvider() && hasMedicalConsent(request.resource.data.petId)) ||
+        isAdmin()
+      );
       allow update: if isAuthenticated() && (
-        get(/databases/$(database)/documents/pets/$(resource.data.petId)).data.ownerId == request.auth.uid ||
-        resource.data.providerId == request.auth.uid ||
+        (resource.data.providerId == request.auth.uid && hasMedicalConsent(resource.data.petId)) ||
         isAdmin()
       );
       allow delete: if isAdmin();
+    }
+
+    // ─── DPDPA Medical Consents ────────────────────────────────────────────────
+
+    match /medicalConsents/{consentId} {
+      allow read: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        resource.data.providerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated() && isCustomer() &&
+        request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    // ─── Atomic Booking Slot Locks ─────────────────────────────────────────────
+
+    match /slotLocks/{lockId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin(); // Server Admin SDK only
     }
 
     // ─── Providers ────────────────────────────────────────────────────────────
