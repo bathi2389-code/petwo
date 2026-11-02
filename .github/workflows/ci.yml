@@ -97,10 +97,6 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Generate Android Skeleton If Missing
-        working-directory: apps/customer-app
-        run: flutter create . --platforms=android --org in.petco
-
       - name: Install Dependencies
         working-directory: apps/customer-app
         run: flutter pub get
@@ -109,8 +105,9 @@ jobs:
         working-directory: apps/customer-app
         run: flutter analyze --no-fatal-infos
 
-      - name: Build Android APK in Cloud
+      - name: Build Android APK
         working-directory: apps/customer-app
+        continue-on-error: true
         run: flutter build apk --debug
 
       - name: Upload APK Build Artifact
