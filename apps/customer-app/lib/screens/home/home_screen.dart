@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:petwo_customer/config/theme.dart';
 import 'package:petwo_customer/models/provider_model.dart';
 import 'package:petwo_customer/services/api_service.dart';
@@ -16,6 +17,9 @@ class _HomeScreenState extends State<HomeScreen> {
   bool loading = true;
   String? selectedService;
   String? errorMessage;
+  double? _latitude;
+  double? _longitude;
+  bool _locationLoading = false;
 
   static const categories = <_ServiceCategory>[
     _ServiceCategory('Vet care', 'Check-ups & treatment', Icons.medical_services_outlined, Color(0xFFEAF3FF), Color(0xFF2864B4), businessType: 'veterinary_clinic'),
@@ -52,7 +56,12 @@ class _HomeScreenState extends State<HomeScreen> {
       selectedService = serviceName;
     });
     try {
-      final response = await ApiService().searchProviders(businessType: businessType, query: query);
+      final response = await ApiService().searchProviders(
+        businessType: businessType,
+        query: query,
+        lat: _latitude,
+        lng: _longitude,
+      );
       final payload = response.data;
       final rawList = payload is Map<String, dynamic> ? payload['data'] : null;
       final result = rawList is List
@@ -70,6 +79,43 @@ class _HomeScreenState extends State<HomeScreen> {
         loading = false;
         errorMessage = 'We could not load providers. Check your connection and try again.';
       });
+    }
+  }
+
+  Future<void> _useCurrentLocation() async {
+    setState(() => _locationLoading = true);
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        throw Exception('Please enable location services on your device.');
+      }
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        throw Exception('Location permission was not granted.');
+      }
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
+      );
+      if (!mounted) return;
+      setState(() {
+        _latitude = position.latitude;
+        _longitude = position.longitude;
+      });
+      await _loadProviders(
+        serviceName: selectedService,
+        businessType: _selectedCategory?.businessType,
+        query: _selectedCategory?.searchTerm,
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.toString().replaceFirst('Exception: ', ''))),
+      );
+    } finally {
+      if (mounted) setState(() => _locationLoading = false);
     }
   }
 
@@ -133,16 +179,26 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           SvgPicture.asset('assets/brand/petwo-logo.svg', height: 38, fit: BoxFit.contain),
           const Spacer(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFFE8EAF0))),
-            child: Row(children: const [
-              Icon(Icons.location_on_outlined, color: PetwoTheme.primary, size: 17),
-              SizedBox(width: 5),
-              Text('Set location', style: TextStyle(color: PetwoTheme.textPrimary, fontSize: 12, fontWeight: FontWeight.w700)),
-              SizedBox(width: 2),
-              Icon(Icons.keyboard_arrow_down, size: 16, color: PetwoTheme.textSecondary),
-            ]),
+          InkWell(
+            borderRadius: BorderRadius.circular(14),
+            onTap: _locationLoading ? null : _useCurrentLocation,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFFE8EAF0))),
+              child: Row(children: [
+                const Icon(Icons.location_on_outlined, color: PetwoTheme.primary, size: 17),
+                const SizedBox(width: 5),
+                Text(
+                  _locationLoading ? 'Locating...' : (_latitude == null ? 'Use my location' : 'Near me'),
+                  style: const TextStyle(color: PetwoTheme.textPrimary, fontSize: 12, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(width: 2),
+                if (_locationLoading)
+                  const SizedBox(width: 13, height: 13, child: CircularProgressIndicator(strokeWidth: 1.5))
+                else
+                  const Icon(Icons.keyboard_arrow_down, size: 16, color: PetwoTheme.textSecondary),
+              ]),
+            ),
           ),
           const SizedBox(width: 4),
           IconButton(tooltip: 'Notifications', onPressed: () {}, icon: const Icon(Icons.notifications_none_rounded, color: PetwoTheme.textPrimary)),
@@ -369,7 +425,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ] else
                 const Text('New listing · No reviews yet', style: TextStyle(fontSize: 10, color: PetwoTheme.textSecondary)),
               const Spacer(),
-              const Text('Feedback-led ranking', style: TextStyle(fontSize: 9, color: PetwoTheme.textMuted)),
+              if (provider.distanceKm != null)
+                Text('${provider.distanceKm!.toStringAsFixed(1)} km away', style: const TextStyle(fontSize: 9, color: PetwoTheme.textMuted)),
             ]),
           ]),
         ),
