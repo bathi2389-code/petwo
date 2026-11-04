@@ -30,7 +30,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div>
           {/* Brand header */}
           <div className="h-16 flex items-center px-6 gap-3 border-b border-slate-800">
-            <img src="/petwo-logo.svg" alt="PETWO" className="h-10 w-auto max-w-[150px] object-contain transition-transform duration-300 hover:scale-[1.03]" />
+            <div className="rounded-lg bg-white px-2 py-1 shadow-sm">
+              <img src="/petwo-logo.svg" alt="PETWO" className="h-9 w-auto max-w-[150px] object-contain transition-transform duration-300 hover:scale-[1.03]" />
+            </div>
             <div>
               <span className="font-bold text-white text-base">PETWO</span>
               <span className="text-[10px] uppercase font-semibold tracking-wider text-teal-300 block">
