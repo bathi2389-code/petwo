@@ -62,11 +62,13 @@ class ApiService {
   }
 
   // ─── Search & Providers ───
-  Future<Response> searchProviders({String? category, String? businessType, String? query}) async {
+  Future<Response> searchProviders({String? category, String? businessType, String? query, double? lat, double? lng}) async {
     return dio.get('/providers/search', queryParameters: {
       if (category != null) 'category': category,
       if (businessType != null) 'businessType': businessType,
       if (query != null && query.trim().isNotEmpty) 'query': query.trim(),
+      if (lat != null) 'lat': lat,
+      if (lng != null) 'lng': lng,
       'sortBy': 'recommended',
       'limit': 20,
     });
