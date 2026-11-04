@@ -81,9 +81,7 @@ export default function RegisterPage() {
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-teal-50 via-slate-50 to-white px-4 py-10 sm:py-14">\n      <div className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-teal-200/40 blur-3xl" />\n      <div className="pointer-events-none absolute -bottom-24 -right-20 h-80 w-80 rounded-full bg-emerald-100/70 blur-3xl" />
       <div className="relative w-full max-w-2xl space-y-6 rounded-3xl border border-white/80 bg-white/95 p-6 shadow-2xl shadow-slate-900/10 backdrop-blur sm:p-9">
         <div>
-          <div className="h-10 w-10 rounded-xl bg-primary text-white font-black text-xl flex items-center justify-center mb-3">
-            P
-          </div>
+          <img src="/petwo-logo.svg" alt="PETWO" className="mb-4 h-10 w-auto object-contain" />
           <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Partner with PETWO</h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
             Grow your veterinary clinic, hospital, grooming or pet care business in Hyderabad.
