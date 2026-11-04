@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { whatsapp } from '../../services/whatsapp.service';
-import { getDb, COLLECTIONS } from '../../config/firebase';
+import { getDb, COLLECTIONS } from './webhook.routes';
 import { authenticate, isProviderOrAdmin } from '../../middleware/auth.middleware';
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────

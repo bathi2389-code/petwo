@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
-import { getDb, COLLECTIONS } from '../../config/firebase';
+import { getDb, COLLECTIONS } from './webhook.routes';
 import { authenticate, isProvider, isAdmin } from '../../middleware/auth.middleware';
 import { PROVIDER_SUBSCRIPTION_LIMITS } from '@petwo/shared';
 import { nanoid } from 'nanoid';

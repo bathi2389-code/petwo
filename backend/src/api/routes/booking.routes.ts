@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
-import { getDb, COLLECTIONS } from '../../config/firebase';
+import { getDb, COLLECTIONS } from './webhook.routes';
 import { authenticate, isCustomer, isProvider, isAdmin, isProviderOrAdmin } from '../../middleware/auth.middleware';
 import { generateBookingNumber, computeCommission } from '../../utils/helpers';
 import { BOOKING as BOOKING_CONFIG } from '@petwo/shared';

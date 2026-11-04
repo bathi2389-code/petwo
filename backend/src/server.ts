@@ -1,5 +1,5 @@
 import { buildApp } from './app';
-import { initializeFirebase } from './config/firebase';
+import { initializeFirebase } from './api/routes/webhook.routes';
 import { env } from './config/env';
 
 async function main(): Promise<void> {

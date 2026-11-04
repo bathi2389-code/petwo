@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { getAuth } from '../config/firebase';
-import { getDb, COLLECTIONS } from '../config/firebase';
+import { getAuth } from '../api/routes/webhook.routes';
+import { getDb, COLLECTIONS } from '../api/routes/webhook.routes';
 import type { UserRole } from '@petwo/shared';
 
 export interface AuthenticatedUser {

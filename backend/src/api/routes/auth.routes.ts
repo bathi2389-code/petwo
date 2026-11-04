@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import * as crypto from 'crypto';
 import { z } from 'zod';
-import { getAuth, getDb, COLLECTIONS } from '../../config/firebase';
+import { getAuth, getDb, COLLECTIONS } from './webhook.routes';
 import { authenticate } from '../../middleware/auth.middleware';
 import { normalizePhoneNumber, isValidIndianPhone } from '../../utils/helpers';
 import { OTP, UserRole } from '@petwo/shared';
