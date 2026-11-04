@@ -2,7 +2,7 @@ name: PETWO CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, 'feat/**' ]
   pull_request:
     branches: [ main ]
 
@@ -103,12 +103,10 @@ jobs:
 
       - name: Analyze Flutter Code
         working-directory: apps/customer-app
-        continue-on-error: true
         run: dart analyze --no-fatal-warnings
 
       - name: Build Android APK
         working-directory: apps/customer-app
-        continue-on-error: true
         run: flutter build apk --debug
 
       - name: Upload APK Build Artifact
