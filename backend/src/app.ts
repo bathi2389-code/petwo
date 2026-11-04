@@ -53,6 +53,17 @@ export async function buildApp(): Promise<FastifyInstance> {
     },
   });
 
+  // ─── Raw Body Parser (for Webhook HMAC verification) ────────────────────────
+  app.addContentTypeParser('application/json', { parseAs: 'buffer' }, (req: any, body: Buffer, done) => {
+    try {
+      req.rawBody = body;
+      const json = JSON.parse(body.toString('utf-8'));
+      done(null, json);
+    } catch (err: any) {
+      done(err, undefined);
+    }
+  });
+
   // ─── Security ───────────────────────────────────────────────────────────────
   await app.register(helmet, {
     contentSecurityPolicy: env.NODE_ENV === 'production',

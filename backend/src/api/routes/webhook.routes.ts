@@ -24,19 +24,24 @@ export default async function webhookRoutes(app: FastifyInstance): Promise<void>
       return reply.status(400).send({ error: 'Missing signature' });
     }
 
-    const payloadString = typeof request.body === 'string'
-      ? request.body
-      : JSON.stringify(request.body);
-
-    const expectedSignature = crypto
-      .createHmac('sha256', env.RAZORPAY_WEBHOOK_SECRET)
-      .update(payloadString)
-      .digest('hex');
+    const rawBody = (request as any).rawBody;
+    const hmac = crypto.createHmac('sha256', env.RAZORPAY_WEBHOOK_SECRET);
+    if (Buffer.isBuffer(rawBody)) {
+      hmac.update(rawBody);
+    } else if (typeof rawBody === 'string') {
+      hmac.update(rawBody);
+    } else {
+      const payloadString = typeof request.body === 'string'
+        ? request.body
+        : JSON.stringify(request.body);
+      hmac.update(payloadString);
+    }
+    const expectedSignature = hmac.digest('hex');
 
     // Constant-time signature verification in production
     if (env.NODE_ENV === 'production') {
-      const sigBuf = Buffer.from(signature);
-      const expBuf = Buffer.from(expectedSignature);
+      const sigBuf = Buffer.from(signature, 'utf-8');
+      const expBuf = Buffer.from(expectedSignature, 'utf-8');
       if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
         request.log.error('Invalid Razorpay webhook signature');
         return reply.status(400).send({ error: 'Invalid signature' });

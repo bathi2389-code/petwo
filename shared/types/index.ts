@@ -169,6 +169,8 @@ export type VerificationStatus =
   | 'rejected'
   | 'suspended';
 
+export type ProviderSortOption = 'recommended' | 'highest_rated' | 'nearest' | 'most_reviewed';
+
 export type Provider = {
   id: string;
   userId: string;
@@ -179,6 +181,9 @@ export type Provider = {
   logoURL?: string;
   coverPhotoURL?: string;
   contact: ContactInfo;
+  address?: Address;
+  coordinates?: GeoPoint;
+  geohash?: string;
   verificationStatus: VerificationStatus;
   verificationNotes?: string;
   verifiedAt?: string;
@@ -188,9 +193,16 @@ export type Provider = {
   gstNumber?: string;
   bankDetails?: BankDetails;
   subscription: ProviderSubscription;
-  rating?: number; // 1–5, computed
+  rating?: number; // 1–5, computed average
   reviewCount?: number;
+  weightedRating?: number; // Bayesian confidence-adjusted rating
+  reliabilityScore?: number; // 0–100, based on completion & cancellation rate
+  completedBookings?: number;
+  cancelledBookings?: number;
   totalBookings?: number;
+  recommendationScore?: number; // Multi-factor ranking score
+  isNewProvider?: boolean;
+  distanceKm?: number; // Calculated relative to customer location
   isFeatured: boolean;
   isActive: boolean;
   createdAt: string;

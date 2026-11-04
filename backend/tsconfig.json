@@ -16,9 +16,7 @@
     "moduleResolution": "node",
     "paths": {
       "@petwo/shared": ["../shared/dist/index.d.ts"],
-      "@petwo/constants": ["../shared/dist/constants/index.d.ts"],
-      "@petco/shared": ["../shared/dist/index.d.ts"],
-      "@petco/constants": ["../shared/dist/constants/index.d.ts"]
+      "@petwo/constants": ["../shared/dist/constants/index.d.ts"]
     }
   },
   "include": ["src/**/*"],

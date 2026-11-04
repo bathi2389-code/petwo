@@ -6,6 +6,7 @@ import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isCustomer, isAdmin } from '../../middleware/auth.middleware';
 import { env } from '../../config/env';
 import { nanoid } from 'nanoid';
+import dayjs from 'dayjs';
 import type { Booking, Payment } from '@petwo/shared';
 
 // ─── Razorpay Client ─────────────────────────────────────────────────────────
@@ -158,13 +159,17 @@ export default async function paymentRoutes(app: FastifyInstance): Promise<void>
 
     const { bookingId, razorpayOrderId, razorpayPaymentId, razorpaySignature } = parsed.data;
 
-    // Verify signature
+    // Verify signature with timing-safe comparison
     const expectedSignature = crypto
       .createHmac('sha256', env.RAZORPAY_KEY_SECRET)
       .update(`${razorpayOrderId}|${razorpayPaymentId}`)
       .digest('hex');
 
-    if (expectedSignature !== razorpaySignature) {
+    const sigBuf = Buffer.from(razorpaySignature, 'utf-8');
+    const expBuf = Buffer.from(expectedSignature, 'utf-8');
+    const isSignatureValid = sigBuf.length === expBuf.length && crypto.timingSafeEqual(sigBuf, expBuf);
+
+    if (!isSignatureValid) {
       return reply.status(400).send({
         success: false,
         error: { code: 'PAY_003', message: 'Payment signature verification failed.' },
@@ -233,6 +238,33 @@ export default async function paymentRoutes(app: FastifyInstance): Promise<void>
       }],
       updatedAt: now,
     });
+
+    // ── Dispatch Instant WhatsApp Alert to Doctor & Customer (Non-blocking) ──
+    try {
+      const { WhatsAppService } = await import('../../services/whatsapp.service');
+      const providerDoc = await db.collection(COLLECTIONS.PROVIDERS).doc(booking.providerId).get();
+      const customerDoc = await db.collection(COLLECTIONS.CUSTOMERS).doc(booking.customerId).get();
+      const petDoc = await db.collection(COLLECTIONS.PETS).doc(booking.petId).get();
+
+      const providerData = providerDoc.data();
+      const customerData = customerDoc.data();
+      const petData = petDoc.data();
+
+      const doctorPhone = providerData?.contactPhone || providerData?.phone;
+      if (doctorPhone) {
+        WhatsAppService.getInstance().sendBookingConfirmation({
+          recipientPhone: doctorPhone,
+          customerName: customerData?.name || 'Pet Parent',
+          petName: petData?.name || 'Pet',
+          bookingNumber: booking.bookingNumber,
+          providerName: providerData?.businessName || 'Your Clinic',
+          appointmentDate: dayjs(booking.scheduledAt).format('DD MMM YYYY'),
+          appointmentTime: dayjs(booking.scheduledAt).format('hh:mm A'),
+        }).catch((err) => request.log.warn({ err }, 'WhatsApp alert to doctor failed'));
+      }
+    } catch (notifyErr) {
+      request.log.warn({ notifyErr }, 'Non-blocking doctor notification error');
+    }
 
     return reply.send({
       success: true,

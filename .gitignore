@@ -53,3 +53,4 @@ coverage/
 *.pem
 *.key
 *.cert
+*.tsbuildinfo

@@ -4,6 +4,7 @@ import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isProvider, isAdmin } from '../../middleware/auth.middleware';
 import { nanoid } from 'nanoid';
 import type { Review, Booking } from '@petwo/shared';
+import { calculateBayesianRating, calculateReliabilityScore } from '../../utils/recommendation';
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -297,11 +298,11 @@ export default async function reviewRoutes(app: FastifyInstance): Promise<void> 
       updatedAt: now,
     });
 
-    // When a review is published, recompute provider's average rating asynchronously
-    if (parsed.data.status === 'published') {
-      const review = doc.data() as Review;
-      recomputeProviderRating(review.providerId, db).catch(() => {});
-    }
+    // Recompute provider's average and Bayesian rating upon review moderation
+    const review = doc.data() as Review;
+    recomputeProviderRating(review.providerId, db).catch((err) => {
+      request.log.warn({ err }, 'Failed to recompute provider rating');
+    });
 
     return reply.send({
       success: true,
@@ -337,25 +338,53 @@ export default async function reviewRoutes(app: FastifyInstance): Promise<void> 
   });
 }
 
-// ─── Helper: Recompute Provider Rating ────────────────────────────────────────
+// ─── Helper: Recompute Provider Rating & Reliability ─────────────────────────
 
-async function recomputeProviderRating(
+export async function recomputeProviderRating(
   providerId: string,
   db: FirebaseFirestore.Firestore,
 ): Promise<void> {
-  const snap = await db.collection(COLLECTIONS.REVIEWS)
+  const reviewsSnap = await db.collection(COLLECTIONS.REVIEWS)
     .where('providerId', '==', providerId)
     .where('status', '==', 'published')
     .get();
 
-  if (snap.empty) return;
+  let average = 0;
+  let reviewCount = 0;
 
-  const total = snap.docs.reduce((sum, doc) => sum + (doc.data() as Review).rating, 0);
-  const average = Math.round((total / snap.size) * 10) / 10;
+  if (!reviewsSnap.empty) {
+    const total = reviewsSnap.docs.reduce((sum, doc) => sum + (doc.data() as Review).rating, 0);
+    reviewCount = reviewsSnap.size;
+    average = Math.round((total / reviewCount) * 10) / 10;
+  }
+
+  const weightedRating = calculateBayesianRating(average, reviewCount);
+
+  // Fetch booking metrics to calculate provider reliability
+  let reliabilityScore = 95;
+  let completed = 0;
+  let totalBookings = 0;
+
+  try {
+    const bookingsSnap = await db.collection(COLLECTIONS.BOOKINGS)
+      .where('providerId', '==', providerId)
+      .get();
+
+    totalBookings = bookingsSnap.size;
+    completed = bookingsSnap.docs.filter(d => d.data().status === 'completed').length;
+    const cancelledByProvider = bookingsSnap.docs.filter(d => d.data().status === 'cancelled_by_provider').length;
+    reliabilityScore = calculateReliabilityScore(completed, cancelledByProvider, totalBookings);
+  } catch {
+    // Keep default baseline if bookings collection query is unavailable
+  }
 
   await db.collection(COLLECTIONS.PROVIDERS).doc(providerId).update({
     rating: average,
-    reviewCount: snap.size,
+    reviewCount,
+    weightedRating,
+    reliabilityScore,
+    completedBookings: completed,
+    totalBookings,
     updatedAt: new Date().toISOString(),
   });
 }
