@@ -10,6 +10,7 @@ class ProviderModel {
   final String verificationStatus;
   final double rating;
   final int reviewCount;
+  final double? distanceKm;
   final bool isFeatured;
 
   ProviderModel({
@@ -24,6 +25,7 @@ class ProviderModel {
     required this.verificationStatus,
     required this.rating,
     required this.reviewCount,
+    this.distanceKm,
     required this.isFeatured,
   });
 
@@ -42,6 +44,7 @@ class ProviderModel {
       // Never manufacture a rating for a provider without review data.
       rating: json['rating'] is num ? (json['rating'] as num).toDouble() : 0.0,
       reviewCount: json['reviewCount'] is num ? (json['reviewCount'] as num).toInt() : 0,
+      distanceKm: json['distanceKm'] is num ? (json['distanceKm'] as num).toDouble() : null,
       isFeatured: json['isFeatured'] ?? false,
     );
   }
