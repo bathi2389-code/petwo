@@ -138,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
           onRefresh: () => _loadProviders(
             serviceName: selectedService,
             businessType: _selectedCategory?.businessType,
-            query: _selectedCategory?.searchTerm,
+            query: null,
           ),
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
