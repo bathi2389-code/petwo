@@ -32,7 +32,7 @@ interface AuthContextValue {
   idToken: string | null;
   loading: boolean;
   sendOtp: (phone: string) => Promise<{ otp?: string }>;
-  verifyOtp: (phone: string, otp: string, displayName?: string) => Promise<void>;
+  verifyOtp: (phone: string, otp: string, displayName?: string) => Promise<{ role: string }>;
   signOut: () => Promise<void>;
 }
 
@@ -91,8 +91,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       displayName,
     });
 
-    const { customToken } = res.data.data;
-    await signInWithCustomToken(auth, customToken);
+    const { customToken, role } = res.data.data;
+    const credential = await signInWithCustomToken(auth, customToken);
+
+    // Ensure the next protected API request has a Firebase ID token.
+    const idToken = await credential.user.getIdToken();
+    setUser(credential.user);
+    setIdToken(idToken);
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${idToken}`;
+
+    return { role };
   };
 
   const signOut = async () => {
