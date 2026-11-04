@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const categories = <_ServiceCategory>[
     _ServiceCategory('Vet care', 'Check-ups & treatment', Icons.medical_services_outlined, Color(0xFFEAF3FF), Color(0xFF2864B4), businessType: 'veterinary_clinic'),
     _ServiceCategory('Grooming', 'Bath, trim & styling', Icons.content_cut_rounded, Color(0xFFFFF0E8), Color(0xFFE66A32), businessType: 'grooming_salon'),
-    _ServiceCategory('Physiotherapy', 'Mobility & recovery', Icons.accessibility_new_rounded, Color(0xFFEAF7F0), Color(0xFF26845A), searchTerm: 'physiotherapy'),
+    _ServiceCategory('Physiotherapy', 'Mobility & recovery', Icons.accessibility_new_rounded, Color(0xFFEAF7F0), Color(0xFF26845A), businessType: 'physiotherapy_centre'),
     _ServiceCategory('Boarding', 'A stay away from home', Icons.home_work_outlined, Color(0xFFF1EDFF), Color(0xFF7155B7), businessType: 'boarding_facility'),
     _ServiceCategory('Daycare', 'Play, care & company', Icons.wb_sunny_outlined, Color(0xFFFFF7DF), Color(0xFFB78318), businessType: 'daycare_facility'),
     _ServiceCategory('Training', 'Build good habits', Icons.school_outlined, Color(0xFFEAF5F7), Color(0xFF287A88), businessType: 'pet_trainer'),
