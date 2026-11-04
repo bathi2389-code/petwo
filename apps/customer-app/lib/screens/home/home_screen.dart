@@ -389,7 +389,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _providerCard(ProviderModel provider) {
-    final hasReviews = provider.reviewCount > 0;
+    final hasReviews = provider.reviewCount > 0 && provider.rating > 0;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFFE9ECF1))),
@@ -422,7 +422,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Icon(Icons.star_rounded, size: 15, color: Color(0xFFF2A900)),
                 const SizedBox(width: 3),
                 Text('${provider.rating.toStringAsFixed(1)} · ${provider.reviewCount} reviews', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
-              ] else
+              ] else if (provider.reviewCount > 0)
+                const Text('Reviews received · rating unavailable', style: TextStyle(fontSize: 10, color: PetwoTheme.textSecondary))
+              else
                 const Text('New listing · No reviews yet', style: TextStyle(fontSize: 10, color: PetwoTheme.textSecondary)),
               const Spacer(),
               if (provider.distanceKm != null)
