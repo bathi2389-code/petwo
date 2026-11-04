@@ -52,6 +52,9 @@ jobs:
       - name: Build Shared Types
         run: npm run build --workspace=@petwo/shared
 
+      - name: Type-Check Provider Web
+        run: npm run type-check --workspace=petwo-provider-web
+
       - name: Build Provider Web
         run: npm run build --workspace=petwo-provider-web
 
@@ -73,6 +76,9 @@ jobs:
 
       - name: Build Shared Types
         run: npm run build --workspace=@petwo/shared
+
+      - name: Type-Check Admin Web
+        run: npm run type-check --workspace=petwo-admin-web
 
       - name: Build Admin Web
         run: npm run build --workspace=petwo-admin-web
@@ -104,6 +110,10 @@ jobs:
       - name: Analyze Flutter Code
         working-directory: apps/customer-app
         run: dart analyze --no-fatal-warnings
+
+      - name: Run Flutter Unit Tests
+        working-directory: apps/customer-app
+        run: flutter test
 
       - name: Build Android APK
         working-directory: apps/customer-app
