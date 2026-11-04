@@ -344,7 +344,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: 'Could not load providers',
         message: errorMessage!,
         actionLabel: 'Try again',
-        onAction: () => _loadProviders(serviceName: selectedService, businessType: _selectedCategory?.businessType, query: _selectedCategory?.searchTerm),
+        onAction: () => _loadProviders(serviceName: selectedService, businessType: _selectedCategory?.businessType, query: null),
       );
     }
     if (providers.isEmpty) {
