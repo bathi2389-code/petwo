@@ -144,7 +144,7 @@ export function isNewlyVerifiedProvider(
 /**
  * Computes a holistic multi-factor Recommendation Score (0–100) for ranking:
  * - 50% Bayesian Rating (Quality & Feedback volume)
- * - 25% Reliability Score (Fulfillments vs cancellations)
+ * - 25% Reliability Score (Fulfillments vs cancellations; neutral when unavailable)
  * - 15% Verification (Credentials & licensure)
  * - 10% Distance Factor (Convenience & proximity)
  * + Fair New-Provider Exploration Boost (up to +8 points for newly verified practices)
@@ -172,10 +172,11 @@ export function calculateRecommendationScore(params: {
     cfg.minReviewsThreshold,
   );
 
-  const reliability =
-    params.reliabilityScore != null
-      ? params.reliabilityScore
-      : calculateReliabilityScore(params.reviewCount, 0, params.reviewCount);
+  // Reviews are not booking-completion evidence. Use a neutral score until
+  // verified booking reliability metrics are available.
+  const reliability = params.reliabilityScore != null
+    ? Math.max(0, Math.min(100, params.reliabilityScore))
+    : 50;
 
   const isVerified = params.verificationStatus === 'approved';
   const verificationScore = isVerified ? 1.0 : 0.0;
