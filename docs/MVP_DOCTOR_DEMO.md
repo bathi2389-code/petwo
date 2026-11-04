@@ -5,7 +5,7 @@
 ## Before the meeting
 
 - Start the backend with a non-production demo environment and a valid Firebase configuration.
-- Point the customer app at that backend; do not use localhost if presenting from another device.
+- Point the customer app at that backend; do not use localhost if presenting from another device. Build with `--dart-define=PETWO_API_BASE_URL=https://YOUR-RENDER-SERVICE/api/v1` after replacing the placeholder with your actual Render API URL.
 - Sign in with a prepared demo customer account.
 - Ensure at least one real provider profile is approved, active, has a correct clinic address, and has a business type matching the demo category. Use real review data only.
 - If there is no approved physiotherapy provider, show the physiotherapy category and its honest empty state. Explain that provider onboarding/approval is required before a listing appears.
