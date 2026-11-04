@@ -2,102 +2,113 @@
 
 import React from 'react';
 import {
-  TrendingUp, Users, Calendar, ShieldCheck,
-  CreditCard, IndianRupee, AlertCircle
+  TrendingUp, Users, Calendar, ShieldCheck, IndianRupee, AlertCircle,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 
+const sampleMetrics = [
+  {
+    label: 'Gross marketplace volume',
+    value: formatCurrency(124800000),
+    note: 'Sample value · Not live',
+    icon: IndianRupee,
+    iconStyle: 'bg-teal-50 text-teal-700',
+  },
+  {
+    label: 'Platform commission',
+    value: formatCurrency(18720000),
+    note: 'Sample value · Not live',
+    icon: TrendingUp,
+    iconStyle: 'bg-sky-50 text-sky-700',
+  },
+  {
+    label: 'Completed appointments',
+    value: '1,420',
+    note: 'Sample value · Not live',
+    icon: Calendar,
+    iconStyle: 'bg-indigo-50 text-indigo-700',
+  },
+  {
+    label: 'Verified care partners',
+    value: '48',
+    note: 'Sample value · Not live',
+    icon: ShieldCheck,
+    iconStyle: 'bg-emerald-50 text-emerald-700',
+  },
+  {
+    label: 'Pending verifications',
+    value: '6',
+    note: 'Sample value · Not live',
+    icon: AlertCircle,
+    iconStyle: 'bg-amber-50 text-amber-700',
+  },
+  {
+    label: 'Registered pet parents',
+    value: '3,890',
+    note: 'Sample value · Not live',
+    icon: Users,
+    iconStyle: 'bg-violet-50 text-violet-700',
+  },
+];
+
 export default function AdminOverviewPage() {
-  const kpis = {
-    grossMerchandiseValue: 124800000, // ₹1,248,000 (₹12.48 Lakhs)
-    platformCommission: 18720000, // ₹187,200 (15%)
-    totalBookings: 1420,
-    totalVerifiedProviders: 48,
-    pendingVerifications: 6,
-    activeCustomers: 3890,
-  };
-
   return (
-    <div className="mx-auto max-w-7xl space-y-7">
-      <div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">\n          <div><p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-teal-700">PETWO operations</p><h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Platform overview</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Marketplace performance and operational health
-        </p>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <div className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-lg sm:p-6">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
-            <span>Gross Marketplace Volume</span>
-            <IndianRupee className="h-4 w-4 text-emerald-600" />
-          </div>
-          <div className="mt-3 text-3xl font-extrabold text-slate-900">
-            {formatCurrency(kpis.grossMerchandiseValue)}
-          </div>
-          <p className="mt-2 text-xs text-emerald-600 font-medium flex items-center gap-1">
-            <TrendingUp className="h-3 w-3" /> +24.8% growth vs last month
+    <div className="space-y-7">
+      <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-teal-700">
+            PETWO operations
+          </p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+            Platform overview
+          </h1>
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            Marketplace performance and operational health
           </p>
         </div>
+        <span className="inline-flex w-fit items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
+          <span className="h-2 w-2 rounded-full bg-amber-500" />
+          Preview data · Not live
+        </span>
+      </section>
 
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
-            <span>Platform Commission Revenue</span>
-            <TrendingUp className="h-4 w-4 text-orange-600" />
-          </div>
-          <div className="mt-3 text-3xl font-extrabold text-orange-600">
-            {formatCurrency(kpis.platformCommission)}
-          </div>
-          <p className="mt-2 text-xs text-slate-500">Sample value · Not live</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
-            <span>Completed Appointments</span>
-            <Calendar className="h-4 w-4 text-blue-600" />
-          </div>
-          <div className="mt-3 text-3xl font-extrabold text-slate-900">
-            {kpis.totalBookings.toLocaleString()}
-          </div>
-          <p className="mt-2 text-xs text-slate-500">Sample value · Not live</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
-            <span>Verified Clinic & Vet Partners</span>
-            <ShieldCheck className="h-4 w-4 text-emerald-600" />
-          </div>
-          <div className="mt-3 text-3xl font-extrabold text-slate-900">
-            {kpis.totalVerifiedProviders}
-          </div>
-          <p className="mt-2 text-xs text-emerald-600 font-medium">Sample value · Not live</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
-            <span>Pending Provider Audits</span>
-            <AlertCircle className="h-4 w-4 text-amber-500" />
-          </div>
-          <div className="mt-3 text-3xl font-extrabold text-amber-600">
-            {kpis.pendingVerifications}
-          </div>
-          <p className="mt-2 text-xs text-amber-700 font-medium">
-            <a href="/providers" className="hover:underline">Review registrations →</a>
-          </p>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
-            <span>Registered Pet Parents</span>
-            <Users className="h-4 w-4 text-purple-600" />
-          </div>
-          <div className="mt-3 text-3xl font-extrabold text-slate-900">
-            {kpis.activeCustomers.toLocaleString()}
-          </div>
-          <p className="mt-2 text-xs text-slate-500">Sample value · Not live</p>
-        </div>
+      <div className="rounded-2xl border border-amber-200 bg-amber-50/80 px-4 py-3.5 text-sm leading-6 text-amber-950">
+        These figures are sample dashboard values, not live marketplace records. Live analytics will appear after secure admin authentication and API integration are completed.
       </div>
+
+      <section aria-label="Marketplace metrics" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {sampleMetrics.map(({ label, value, note, icon: Icon, iconStyle }) => (
+          <article
+            key={label}
+            className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-lg sm:p-6"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <p className="max-w-[220px] text-xs font-bold uppercase leading-5 tracking-[0.08em] text-slate-500">
+                {label}
+              </p>
+              <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconStyle}`}>
+                <Icon className="h-5 w-5" />
+              </span>
+            </div>
+            <p className="mt-5 text-3xl font-bold tracking-tight text-slate-950">{value}</p>
+            <p className="mt-2 text-xs font-medium text-slate-400">{note}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700">
+            <ShieldCheck className="h-5 w-5" />
+          </span>
+          <div>
+            <h2 className="font-semibold text-slate-900">Marketplace control centre</h2>
+            <p className="mt-1 text-sm leading-6 text-slate-500">
+              Use the navigation to review providers, bookings, commissions, promotions, support cases and audit history. Administrative actions must be authorized by the backend.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
