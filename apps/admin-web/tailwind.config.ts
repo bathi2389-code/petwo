@@ -10,12 +10,23 @@ const config: Config = {
     extend: {
       colors: {
         admin: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          800: '#1e293b',
-          900: '#0f172a',
+          50: '#f0fdfa',
+          100: '#ccfbf1',
+          800: '#164e63',
+          900: '#102f4d',
         },
-        primary: '#ea580c', // Orange brand accent
+        primary: {
+          DEFAULT: '#0b9f91',
+          foreground: '#ffffff',
+        },
+        petwo: {
+          navy: '#102f4d',
+          teal: '#0b9f91',
+          green: '#12b98f',
+        },
+      },
+      boxShadow: {
+        soft: '0 10px 30px -12px rgb(15 23 42 / 0.14)',
       },
     },
   },
