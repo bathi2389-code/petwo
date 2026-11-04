@@ -155,6 +155,7 @@ export type ProviderType =
   | 'veterinary_clinic'
   | 'veterinary_hospital'
   | 'grooming_salon'
+  | 'physiotherapy_centre'
   | 'boarding_facility'
   | 'daycare_facility'
   | 'diagnostic_centre'

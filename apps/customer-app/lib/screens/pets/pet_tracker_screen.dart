@@ -308,7 +308,7 @@ class _PetTrackerScreenState extends State<PetTrackerScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.between,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(title, style: const TextStyle(fontSize: 12, color: PetwoTheme.textSecondary, fontWeight: FontWeight.w600)),
               Icon(icon, size: 18, color: iconColor),

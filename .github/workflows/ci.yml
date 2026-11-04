@@ -1,8 +1,12 @@
 name: PETWO CI/CD Pipeline
 
+concurrency:
+  group: petwo-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, 'feat/**' ]
   pull_request:
     branches: [ main ]
 
@@ -52,6 +56,9 @@ jobs:
       - name: Build Shared Types
         run: npm run build --workspace=@petwo/shared
 
+      - name: Type-Check Provider Web
+        run: npm run type-check --workspace=petwo-provider-web
+
       - name: Build Provider Web
         run: npm run build --workspace=petwo-provider-web
 
@@ -73,6 +80,9 @@ jobs:
 
       - name: Build Shared Types
         run: npm run build --workspace=@petwo/shared
+
+      - name: Type-Check Admin Web
+        run: npm run type-check --workspace=petwo-admin-web
 
       - name: Build Admin Web
         run: npm run build --workspace=petwo-admin-web
@@ -103,18 +113,24 @@ jobs:
 
       - name: Analyze Flutter Code
         working-directory: apps/customer-app
-        continue-on-error: true
         run: dart analyze --no-fatal-warnings
+
+      - name: Run Flutter Unit Tests
+        working-directory: apps/customer-app
+        run: flutter test
 
       - name: Build Android APK
         working-directory: apps/customer-app
-        continue-on-error: true
         run: flutter build apk --debug
+
+      - name: Verify APK Artifact Exists
+        working-directory: apps/customer-app
+        run: test -s build/app/outputs/flutter-apk/app-debug.apk
 
       - name: Upload APK Build Artifact
         uses: actions/upload-artifact@v4
-        if: always()
+        if: success()
         with:
           name: petwo-customer-app-debug-apk
           path: apps/customer-app/build/app/outputs/flutter-apk/app-debug.apk
-          if-no-files-found: ignore
+          if-no-files-found: error

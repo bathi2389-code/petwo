@@ -56,9 +56,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-8 space-y-6">
         <div className="text-center space-y-2">
-          <div className="h-12 w-12 rounded-2xl bg-primary text-white font-black text-2xl flex items-center justify-center mx-auto shadow-md shadow-primary/20">
-            P
-          </div>
+          <img src="/petwo-logo.svg" alt="PETWO" className="mx-auto h-16 w-auto object-contain transition-transform duration-300 hover:scale-[1.03]" />
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">PETWO Provider Portal</h2>
           <p className="text-sm text-gray-500">Sign in with your registered business phone number</p>
         </div>

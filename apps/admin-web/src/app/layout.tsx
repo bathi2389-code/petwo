@@ -7,6 +7,7 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'PETWO Central Admin',
   description: 'Super Admin and Operations Portal for PETWO Marketplace',
+  icons: { icon: '/petwo-logo.svg' },
 };
 
 export default function RootLayout({

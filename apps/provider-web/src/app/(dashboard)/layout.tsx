@@ -58,10 +58,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Logo */}
         <div className="flex h-16 items-center justify-between px-6 border-b">
           <Link href="/overview" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white font-bold text-sm">
-              P
-            </div>
-            <span className="font-bold text-lg text-gray-900">PETWO</span>
+            <img src="/petwo-logo.svg" alt="PETWO" className="h-10 w-auto object-contain transition-transform duration-300 hover:scale-[1.03]" />
             <span className="text-xs text-muted-foreground">Provider</span>
           </Link>
           <button

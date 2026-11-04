@@ -6,7 +6,7 @@ class ApiService {
   factory ApiService() => _instance;
 
   late final Dio dio;
-  static const String baseUrl = 'http://localhost:4000/api/v1';
+  // Override for a hosted API with --dart-define=PETWO_API_BASE_URL=https://...\n  static const String baseUrl = String.fromEnvironment(\n    'PETWO_API_BASE_URL',\n    defaultValue: 'http://localhost:4000/api/v1',\n  );
 
   ApiService._internal() {
     dio = Dio(
@@ -62,10 +62,15 @@ class ApiService {
   }
 
   // ─── Search & Providers ───
-  Future<Response> searchProviders({String? category, String? query}) async {
+  Future<Response> searchProviders({String? category, String? businessType, String? query, double? lat, double? lng}) async {
     return dio.get('/providers/search', queryParameters: {
       if (category != null) 'category': category,
-      if (query != null) 'query': query,
+      if (businessType != null) 'businessType': businessType,
+      if (query != null && query.trim().isNotEmpty) 'query': query.trim(),
+      if (lat != null) 'lat': lat,
+      if (lng != null) 'lng': lng,
+      'sortBy': 'recommended',
+      'limit': 20,
     });
   }
 

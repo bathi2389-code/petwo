@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'PETWO Provider Portal',
   description: 'Manage your pet care business on PETWO',
-  icons: { icon: '/favicon.ico' },
+  icons: { icon: '/petwo-logo.svg' },
 };
 
 export default function RootLayout({

@@ -30,12 +30,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div>
           {/* Brand header */}
           <div className="h-16 flex items-center px-6 gap-3 border-b border-slate-800">
-            <div className="h-8 w-8 rounded-lg bg-orange-600 text-white font-bold flex items-center justify-center">
-              P
+            <div className="rounded-lg bg-white px-2 py-1 shadow-sm">
+              <img src="/petwo-logo.svg" alt="PETWO" className="h-9 w-auto max-w-[150px] object-contain transition-transform duration-300 hover:scale-[1.03]" />
             </div>
             <div>
               <span className="font-bold text-white text-base">PETWO</span>
-              <span className="text-[10px] uppercase font-semibold tracking-wider text-orange-400 block">
+              <span className="text-[10px] uppercase font-semibold tracking-wider text-teal-300 block">
                 Central Admin
               </span>
             </div>
@@ -52,7 +52,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   className={cn(
                     'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition',
                     active
-                      ? 'bg-orange-600 text-white shadow-md shadow-orange-600/20'
+                      ? 'bg-teal-600 text-white shadow-md shadow-teal-600/20'
                       : 'text-slate-400 hover:text-white hover:bg-slate-800'
                   )}
                 >

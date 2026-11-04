@@ -28,7 +28,7 @@ const RegisterProviderSchema = z.object({
   businessName: z.string().min(2).max(100),
   businessType: z.enum([
     'individual_vet', 'veterinary_clinic', 'veterinary_hospital',
-    'grooming_salon', 'boarding_facility', 'daycare_facility',
+    'grooming_salon', 'physiotherapy_centre', 'boarding_facility', 'daycare_facility',
     'diagnostic_centre', 'pet_trainer', 'pet_sitter', 'pet_walker',
   ]),
   description: z.string().max(2000).optional(),
@@ -300,9 +300,10 @@ export default async function providerRoutes(app: FastifyInstance): Promise<void
       }
 
       // Compute multi-factor recommendation score & Bayesian rating
+      const hasPublishedRating = typeof p.rating === 'number' && Number.isFinite(p.rating);
       const rec = calculateRecommendationScore({
-        averageRating: typeof p.rating === 'number' ? p.rating : 4.0,
-        reviewCount: typeof p.reviewCount === 'number' ? p.reviewCount : 0,
+        averageRating: hasPublishedRating ? p.rating! : 4.0,
+        reviewCount: hasPublishedRating && typeof p.reviewCount === 'number' ? p.reviewCount : 0,
         verificationStatus: p.verificationStatus,
         reliabilityScore: p.reliabilityScore,
         distanceKm,
