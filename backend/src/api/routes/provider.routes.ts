@@ -28,7 +28,7 @@ const RegisterProviderSchema = z.object({
   businessName: z.string().min(2).max(100),
   businessType: z.enum([
     'individual_vet', 'veterinary_clinic', 'veterinary_hospital',
-    'grooming_salon', 'boarding_facility', 'daycare_facility',
+    'grooming_salon', 'physiotherapy_centre', 'boarding_facility', 'daycare_facility',
     'diagnostic_centre', 'pet_trainer', 'pet_sitter', 'pet_walker',
   ]),
   description: z.string().max(2000).optional(),
