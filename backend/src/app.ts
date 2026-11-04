@@ -5,7 +5,6 @@ import rateLimit from '@fastify/rate-limit';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import { env } from './config/env';
-import { initializeFirebase } from './api/routes/webhook.routes';
 
 // Route plugins
 import authRoutes from './api/routes/auth.routes';
