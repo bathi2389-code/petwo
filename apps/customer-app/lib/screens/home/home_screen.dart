@@ -97,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
         throw Exception('Location permission was not granted.');
       }
       final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
+        desiredAccuracy: LocationAccuracy.medium,
       );
       if (!mounted) return;
       setState(() {
@@ -107,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
       await _loadProviders(
         serviceName: selectedService,
         businessType: _selectedCategory?.businessType,
-        query: _selectedCategory?.searchTerm,
+        query: null,
       );
     } catch (error) {
       if (!mounted) return;
@@ -121,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _selectCategory(_ServiceCategory category) {
     _searchController.clear();
-    _loadProviders(businessType: category.businessType, query: category.searchTerm, serviceName: category.name);
+    _loadProviders(businessType: category.businessType, query: null, serviceName: category.name);
   }
 
   void _search(String value) {
@@ -442,7 +442,6 @@ class _ServiceCategory {
   final Color background;
   final Color iconColor;
   final String? businessType;
-  final String? searchTerm;
 
-  const _ServiceCategory(this.name, this.subtitle, this.icon, this.background, this.iconColor, {this.businessType, this.searchTerm});
+  const _ServiceCategory(this.name, this.subtitle, this.icon, this.background, this.iconColor, {this.businessType});
 }
