@@ -78,32 +78,32 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 py-12">
-      <div className="max-w-xl w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-8 space-y-6">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-teal-50 via-slate-50 to-white px-4 py-10 sm:py-14">\n      <div className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-teal-200/40 blur-3xl" />\n      <div className="pointer-events-none absolute -bottom-24 -right-20 h-80 w-80 rounded-full bg-emerald-100/70 blur-3xl" />
+      <div className="relative w-full max-w-2xl space-y-6 rounded-3xl border border-white/80 bg-white/95 p-6 shadow-2xl shadow-slate-900/10 backdrop-blur sm:p-9">
         <div>
           <div className="h-10 w-10 rounded-xl bg-primary text-white font-black text-xl flex items-center justify-center mb-3">
             P
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">Partner with PETWO</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Partner with PETWO</h2>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
             Grow your veterinary clinic, hospital, grooming or pet care business in Hyderabad.
           </p>
         </div>
 
         {error && (
-          <div className="p-3 bg-red-50 text-red-700 text-xs rounded-lg border border-red-200">
+          <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
             {error}
           </div>
         )}
 
         {devOtp && (
-          <div className="p-3 bg-blue-50 text-blue-700 text-xs rounded-lg border border-blue-200">
+          <div className="rounded-xl border border-sky-200 bg-sky-50 p-3 text-sm text-sky-800">
             <strong>Development OTP:</strong> {devOtp}
           </div>
         )}
 
         {/* Step indicator */}
-        <div className="flex items-center justify-between text-xs font-semibold text-gray-500 border-b pb-4">
+        <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 px-4 py-4 text-xs font-semibold text-slate-500">
           <span className={step === 1 ? 'text-primary' : 'text-gray-400'}>1. Business Details</span>
           <span>→</span>
           <span className={step === 2 ? 'text-primary' : 'text-gray-400'}>2. Verification & OTP</span>
@@ -119,7 +119,7 @@ export default function RegisterPage() {
                 placeholder="e.g. Hyderabad Veterinary Specialty Hospital"
                 value={businessName}
                 onChange={e => setBusinessName(e.target.value)}
-                className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-primary"
+                className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary"
               />
             </div>
 
@@ -154,7 +154,7 @@ export default function RegisterPage() {
                     placeholder="98765 43210"
                     value={phone}
                     onChange={e => setPhone(e.target.value)}
-                    className="pl-11 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-primary"
+                    className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-3.5 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary"
                   />
                 </div>
               </div>
@@ -210,7 +210,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 bg-primary hover:bg-primary/90 text-white rounded-xl text-sm font-medium transition flex items-center justify-center gap-2"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-teal-900/15 transition hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? 'Sending OTP...' : 'Next: Verify Phone Number'}
               <ArrowRight className="h-4 w-4" />
@@ -235,7 +235,7 @@ export default function RegisterPage() {
                 placeholder="123456"
                 value={otp}
                 onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
-                className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-2.5 text-center font-mono text-lg tracking-widest focus:outline-primary"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-center font-mono text-2xl tracking-[0.45em] text-slate-900 placeholder:text-slate-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary"
               />
             </div>
 
@@ -250,14 +250,14 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="w-full text-center text-xs text-gray-500 hover:text-gray-700 underline"
+              className="w-full rounded-lg py-2 text-center text-sm font-medium text-slate-500 underline-offset-4 hover:text-primary hover:underline"
             >
               Back to Edit Business Details
             </button>
           </form>
         )}
 
-        <div className="border-t pt-4 text-center text-xs text-gray-500">
+        <div className="border-t border-slate-100 pt-5 text-center text-sm text-slate-500">
           Already registered?{' '}
           <Link href="/login" className="text-primary font-semibold hover:underline">
             Sign In here
