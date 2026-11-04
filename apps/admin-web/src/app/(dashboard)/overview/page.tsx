@@ -18,17 +18,17 @@ export default function AdminOverviewPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="mx-auto max-w-7xl space-y-7">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Platform Analytics Overview</h1>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">\n          <div><p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-teal-700">PETWO operations</p><h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Platform overview</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Real-time performance across the Hyderabad pet care ecosystem
+          Marketplace performance and operational health
         </p>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <div className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-lg sm:p-6">
           <div className="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
             <span>Gross Marketplace Volume</span>
             <IndianRupee className="h-4 w-4 text-emerald-600" />
@@ -49,7 +49,7 @@ export default function AdminOverviewPage() {
           <div className="mt-3 text-3xl font-extrabold text-orange-600">
             {formatCurrency(kpis.platformCommission)}
           </div>
-          <p className="mt-2 text-xs text-slate-500">Effective net commission rate: 15.0%</p>
+          <p className="mt-2 text-xs text-slate-500">Sample value · Not live</p>
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
@@ -60,7 +60,7 @@ export default function AdminOverviewPage() {
           <div className="mt-3 text-3xl font-extrabold text-slate-900">
             {kpis.totalBookings.toLocaleString()}
           </div>
-          <p className="mt-2 text-xs text-slate-500">96.4% fulfillment rate across Hyderabad</p>
+          <p className="mt-2 text-xs text-slate-500">Sample value · Not live</p>
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
@@ -71,7 +71,7 @@ export default function AdminOverviewPage() {
           <div className="mt-3 text-3xl font-extrabold text-slate-900">
             {kpis.totalVerifiedProviders}
           </div>
-          <p className="mt-2 text-xs text-emerald-600 font-medium">Banjara Hills, Jubilee Hills, Gachibowli</p>
+          <p className="mt-2 text-xs text-emerald-600 font-medium">Sample value · Not live</p>
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
@@ -95,7 +95,7 @@ export default function AdminOverviewPage() {
           <div className="mt-3 text-3xl font-extrabold text-slate-900">
             {kpis.activeCustomers.toLocaleString()}
           </div>
-          <p className="mt-2 text-xs text-slate-500">6,120 active pet profiles</p>
+          <p className="mt-2 text-xs text-slate-500">Sample value · Not live</p>
         </div>
       </div>
     </div>
