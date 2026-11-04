@@ -39,8 +39,9 @@ class ProviderModel {
       phone: contact['phone'] ?? '',
       email: contact['email'] ?? '',
       verificationStatus: json['verificationStatus'] ?? 'pending',
-      rating: json['rating'] != null ? (json['rating'] as num).toDouble() : 4.8,
-      reviewCount: json['reviewCount'] ?? 0,
+      // Never manufacture a rating for a provider without review data.
+      rating: json['rating'] is num ? (json['rating'] as num).toDouble() : 0.0,
+      reviewCount: json['reviewCount'] is num ? (json['reviewCount'] as num).toInt() : 0,
       isFeatured: json['isFeatured'] ?? false,
     );
   }
