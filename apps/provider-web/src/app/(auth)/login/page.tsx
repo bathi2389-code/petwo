@@ -9,7 +9,7 @@ import { apiClient } from '@/lib/api-client';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { sendOtp, verifyOtp } = useAuth();
+  const { sendOtp, verifyOtp, configError } = useAuth();
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
@@ -114,6 +114,7 @@ export default function LoginPage() {
                 {step === 'phone' ? 'Sign in with the mobile number registered to your clinic or pet-care business.' : 'Enter the 6-digit code sent to ' + formattedPhone + '.'}
               </p>
             </div>
+            {configError && <div role="alert" className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900"><strong>Setup required:</strong> {configError}</div>}
             {error && <div role="alert" className="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</div>}
             {devOtp && step === 'otp' && <div className="mb-5 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800"><strong>Development OTP:</strong> <span className="font-mono tracking-widest">{devOtp}</span></div>}
             {step === 'phone' ? (
@@ -126,7 +127,7 @@ export default function LoginPage() {
                   </div>
                   <p className="mt-2 text-xs text-slate-400">We’ll send a one-time verification code.</p>
                 </div>
-                <button type="submit" disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#087f70] px-5 py-4 text-sm font-bold text-white shadow-lg shadow-teal-900/15 transition hover:-translate-y-0.5 hover:bg-[#066b60] hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-teal-600/20 disabled:cursor-not-allowed disabled:opacity-60">
+                <button type="submit" disabled={loading || Boolean(configError)} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#087f70] px-5 py-4 text-sm font-bold text-white shadow-lg shadow-teal-900/15 transition hover:-translate-y-0.5 hover:bg-[#066b60] hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-teal-600/20 disabled:cursor-not-allowed disabled:opacity-60">
                   {loading ? 'Sending code…' : 'Send verification code'}<ArrowRight className="h-4 w-4" />
                 </button>
               </form>
