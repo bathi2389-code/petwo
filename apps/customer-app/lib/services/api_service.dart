@@ -6,7 +6,7 @@ class ApiService {
   factory ApiService() => _instance;
 
   late final Dio dio;
-  static const String baseUrl = 'http://localhost:4000/api/v1';
+  // Override for a hosted API with --dart-define=PETWO_API_BASE_URL=https://...\n  static const String baseUrl = String.fromEnvironment(\n    'PETWO_API_BASE_URL',\n    defaultValue: 'http://localhost:4000/api/v1',\n  );
 
   ApiService._internal() {
     dio = Dio(
