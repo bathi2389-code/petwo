@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 520" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="95" y1="30" x2="680" y2="500" gradientUnits="userSpaceOnUse"><stop stop-color="#D8F4E9"/><stop offset="1" stop-color="#8BD5C2"/></linearGradient>
+    <linearGradient id="fur" x1="170" y1="100" x2="400" y2="430" gradientUnits="userSpaceOnUse"><stop stop-color="#F8D9A8"/><stop offset="1" stop-color="#D99B62"/></linearGradient>
+    <linearGradient id="cat" x1="400" y1="120" x2="630" y2="420" gradientUnits="userSpaceOnUse"><stop stop-color="#F5F1E9"/><stop offset="1" stop-color="#B8C5C2"/></linearGradient>
+  </defs>
+  <circle cx="380" cy="260" r="218" fill="url(#bg)" opacity=".42"/>
+  <circle cx="105" cy="118" r="23" fill="#F4C76E" opacity=".8"/><circle cx="654" cy="108" r="14" fill="#F4C76E" opacity=".8"/>
+  <path d="M150 408c52-38 111-53 174-45 69 9 129 9 188-5 50-12 90-5 126 23v57H150v-30Z" fill="#5AAE96" opacity=".35"/>
+  <!-- dog -->
+  <path d="M190 208c-40-48-85-27-77 29 5 37 32 65 68 62l25-47-16-44Z" fill="#A96F4B"/>
+  <path d="M362 208c39-48 84-27 76 29-5 37-32 65-68 62l-25-47 17-44Z" fill="#A96F4B"/>
+  <path d="M178 210c10-58 56-91 107-91 62 0 109 37 116 101l-8 116c-5 73-52 117-111 117-61 0-107-47-111-119l7-124Z" fill="url(#fur)"/>
+  <path d="M209 285c-5-19 8-34 25-34s30 15 25 34c-4 16-16 25-25 25s-21-9-25-25Zm104 0c-5-19 8-34 25-34s30 15 25 34c-4 16-16 25-25 25s-21-9-25-25Z" fill="#fff"/>
+  <circle cx="245" cy="277" r="8" fill="#243B36"/><circle cx="338" cy="277" r="8" fill="#243B36"/>
+  <ellipse cx="292" cy="337" rx="55" ry="39" fill="#FFF0D9"/>
+  <path d="M282 323c0-9 8-15 17-15s17 6 17 15c0 8-8 13-17 13s-17-5-17-13Z" fill="#513B36"/>
+  <path d="M299 336v14m0 0c-9 11-20 10-27 3m27-3c9 11 20 10 27 3" stroke="#513B36" stroke-width="5" stroke-linecap="round"/>
+  <path d="M254 392c22 14 54 14 77 0" stroke="#A96F4B" stroke-width="7" stroke-linecap="round"/>
+  <path d="M263 397v37m59-37v37" stroke="#F4E3C8" stroke-width="16" stroke-linecap="round"/>
+  <!-- cat -->
+  <path d="m448 207 7-93c2-22 27-31 42-15l46 49 47-47c16-16 42-6 43 17l4 92-45 42H493l-45-45Z" fill="#AAB8B5"/>
+  <path d="m468 194 5-65 42 42-47 23Zm151-1-4-65-43 43 47 22Z" fill="#DDA9A0"/>
+  <path d="M450 213c0-60 43-103 102-103 60 0 103 43 103 103v125c0 65-41 107-103 107-61 0-102-42-102-107V213Z" fill="url(#cat)"/>
+  <path d="M479 274c0-18 13-31 29-31s29 13 29 31c0 16-13 26-29 26s-29-10-29-26Zm85 0c0-18 13-31 29-31s29 13 29 31c0 16-13 26-29 26s-29-10-29-26Z" fill="#fff"/>
+  <ellipse cx="508" cy="274" rx="7" ry="10" fill="#243B36"/><ellipse cx="593" cy="274" rx="7" ry="10" fill="#243B36"/>
+  <path d="m540 316 13-9 13 9-13 12-13-12Z" fill="#D58E91"/>
+  <path d="M553 328v12m0 0c-9 10-18 8-24 1m24-1c9 10 18 8 24 1" stroke="#667B77" stroke-width="4" stroke-linecap="round"/>
+  <path d="M486 326 440 319m48 21-47 4m168-18 45-7m-47 28 46 5" stroke="#84938F" stroke-width="3" stroke-linecap="round"/>
+  <!-- food bowl and care -->
+  <path d="M74 405h104l-13 56H87l-13-56Z" fill="#F1B95E"/><path d="M67 399c0-9 8-16 17-16h84c9 0 17 7 17 16v8H67v-8Z" fill="#F8D88E"/>
+  <path d="M108 380c-11-14-7-27 4-33 7 14 18 18 18 33m5 0c-2-17 8-29 21-30 1 15-6 25-15 30" stroke="#5A9E77" stroke-width="7" stroke-linecap="round"/>
+  <path d="M637 397h61l-8 55h-45l-8-55Z" fill="#E9F2EE"/><path d="M631 392h73v10h-73z" fill="#F1B95E"/>
+  <path d="M656 377c-8-11-5-22 4-28 6 11 14 14 14 28m4 0c-1-13 6-22 16-23 1 11-4 19-11 23" stroke="#5A9E77" stroke-width="6" stroke-linecap="round"/>
+  <path d="M391 75c-11-15-33-8-33 10 0 19 33 36 33 36s33-17 33-36c0-18-22-25-33-10Z" fill="#F4C76E"/>
+  <path d="M86 254c-7-10-22-5-22 7 0 13 22 25 22 25s22-12 22-25c0-12-15-17-22-7Z" fill="#F4C76E" opacity=".9"/>
+</svg>
