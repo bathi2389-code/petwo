@@ -203,6 +203,7 @@ export const INDIA = {
 export const SERVICE_CATEGORIES = [
   { slug: 'veterinary',     name: 'Veterinary Care',     icon: '🏥' },
   { slug: 'grooming',       name: 'Grooming & Spa',      icon: '✂️' },
+  { slug: 'physiotherapy',  name: 'Pet Physiotherapy',   icon: '🦴' },
   { slug: 'boarding',       name: 'Boarding & Stay',     icon: '🏨' },
   { slug: 'daycare',        name: 'Day Care',             icon: '🌞' },
   { slug: 'training',       name: 'Training',             icon: '🎓' },
