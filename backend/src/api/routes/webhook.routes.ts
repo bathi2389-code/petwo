@@ -3,7 +3,6 @@ import * as crypto from 'crypto';
 import { nanoid } from 'nanoid';
 import { env } from '../../config/env';
 import type { Payment, Booking, PaymentStatus, BookingStatus } from '@petwo/shared';
-import { Firestore } from '@google-cloud/firestore';
 import * as admin from 'firebase-admin';
 
 export default async function webhookRoutes(app: FastifyInstance): Promise<void> {
@@ -204,22 +203,22 @@ let _auth: admin.auth.Auth;
 let _messaging: admin.messaging.Messaging;
 
 export function initializeFirebase(): void {
-  if (admin.apps.length > 0) return;
+  if (admin.apps.length === 0) {
+    const serviceAccount: admin.ServiceAccount = {
+      projectId: env.FIREBASE_PROJECT_ID,
+      privateKey: env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      clientEmail: env.FIREBASE_CLIENT_EMAIL,
+    };
 
-  const serviceAccount: admin.ServiceAccount = {
-    projectId: env.FIREBASE_PROJECT_ID,
-    privateKey: env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-    clientEmail: env.FIREBASE_CLIENT_EMAIL,
-  };
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      storageBucket: env.FIREBASE_STORAGE_BUCKET,
+    });
+  }
 
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    storageBucket: env.FIREBASE_STORAGE_BUCKET,
-  });
-
+  // Bind handles even when the default Admin app was initialized elsewhere.
   _db = admin.firestore();
   _db.settings({ ignoreUndefinedProperties: true });
-
   _storage = admin.storage();
   _auth = admin.auth();
   _messaging = admin.messaging();
