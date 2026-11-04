@@ -2,18 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #f8fafc;
-  color: #0f172a;
-}
-
-
 :root {
+  color-scheme: light;
   --petwo-navy: #102f4d;
   --petwo-teal: #0b9f91;
   --petwo-green: #12b98f;
 }
 
+@layer base {
+  * { @apply border-slate-200; }
+  html { scroll-behavior: smooth; }
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  input, select, textarea {
+    @apply outline-none transition duration-150;
+  }
+  input:focus, select:focus, textarea:focus {
+    @apply border-teal-600 ring-2 ring-teal-600/15;
+  }
+  button:focus-visible, a:focus-visible {
+    @apply outline-none ring-2 ring-teal-600 ring-offset-2;
+  }
+  ::selection { background: rgb(13 148 136 / 18%); }
+}
+
+@layer components {
+  .admin-panel {
+    @apply rounded-2xl border border-slate-200/80 bg-white shadow-sm;
+  }
+  .admin-page-title {
+    @apply text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  a, button { transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease; }
+  a, button {
+    transition: color 180ms ease, background-color 180ms ease,
+      border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  }
 }
