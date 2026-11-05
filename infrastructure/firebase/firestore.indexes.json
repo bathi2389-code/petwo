@@ -191,16 +191,6 @@
       ]
     },
     {
-      "collectionGroup": "payments",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "gatewayOrderId",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
       "collectionGroup": "settlements",
       "queryScope": "COLLECTION",
       "fields": [
