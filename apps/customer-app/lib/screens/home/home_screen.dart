@@ -200,8 +200,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ]),
             ),
           ),
-          const SizedBox(width: 4),
-          IconButton(tooltip: 'Notifications', onPressed: () {}, icon: const Icon(Icons.notifications_none_rounded, color: PetwoTheme.textPrimary)),
         ],
       ),
     );
