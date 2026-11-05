@@ -2,195 +2,82 @@ import 'package:flutter/material.dart';
 import 'package:petwo_customer/config/theme.dart';
 import 'package:petwo_customer/models/pet_model.dart';
 import 'package:petwo_customer/screens/pets/add_pet_screen.dart';
+import 'package:petwo_customer/services/api_service.dart';
 
 class PetsListScreen extends StatefulWidget {
   const PetsListScreen({super.key});
-
   @override
   State<PetsListScreen> createState() => _PetsListScreenState();
 }
-
 class _PetsListScreenState extends State<PetsListScreen> {
-  List<Pet> pets = [
-    Pet(
-      id: 'pet-01',
-      ownerId: 'owner-01',
-      name: 'Simba',
-      species: 'dog',
-      breed: 'Golden Retriever',
-      gender: 'male',
-      dob: '2022-04-12',
-      weight: 28.5,
-      allergies: ['Chicken byproduct'],
-      specialNotes: 'Very friendly, likes ear scratches',
-    ),
-    Pet(
-      id: 'pet-02',
-      ownerId: 'owner-01',
-      name: 'Luna',
-      species: 'cat',
-      breed: 'Persian Longhair',
-      gender: 'female',
-      dob: '2023-01-08',
-      weight: 4.2,
-      allergies: [],
-    ),
-  ];
+  List<Pet> pets = [];
+  bool loading = true;
+  String? error;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Furry Family'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline, color: PetwoTheme.primary),
-            onPressed: () async {
-              final newPet = await Navigator.push<Pet>(
-                context,
-                MaterialPageRoute(builder: (context) => const AddPetScreen()),
-              );
-              if (newPet != null) {
-                if (!mounted) return;
-                setState(() => pets.add(newPet));
-              }
-            },
-          ),
-        ],
-      ),
-      body: pets.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('🐾', style: TextStyle(fontSize: 64)),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'No pets added yet',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Add your pet profiles to track vaccinations,\nmedical history & book appointments.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: PetwoTheme.textSecondary, fontSize: 13),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const AddPetScreen()),
-                      );
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add Your First Pet'),
-                  ),
-                ],
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: pets.length,
-              itemBuilder: (context, index) {
-                final pet = pets[index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: const BorderSide(color: Color(0xFFE2E8F0)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              height: 60,
-                              width: 60,
-                              decoration: BoxDecoration(
-                                color: PetwoTheme.primaryLight,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  pet.species == 'dog' ? '🐶' : pet.species == 'cat' ? '🐱' : '🐰',
-                                  style: const TextStyle(fontSize: 32),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    pet.name,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: PetwoTheme.textPrimary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${pet.breed} • ${pet.gender.toUpperCase()}',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: PetwoTheme.textSecondary,
-                                    ),
-                                  ),
-                                  if (pet.weight != null)
-                                    Text(
-                                      '${pet.weight} kg',
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        color: PetwoTheme.primary,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.edit_outlined, size: 20, color: PetwoTheme.textMuted),
-                              onPressed: () {},
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        const Divider(height: 1),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            TextButton.icon(
-                              onPressed: () {},
-                              icon: const Icon(Icons.vaccines, size: 16, color: PetwoTheme.primary),
-                              label: const Text(
-                                'Vaccines (Up to date)',
-                                style: TextStyle(fontSize: 12, color: PetwoTheme.primary),
-                              ),
-                            ),
-                            TextButton.icon(
-                              onPressed: () {},
-                              icon: const Icon(Icons.history, size: 16, color: PetwoTheme.textSecondary),
-                              label: const Text(
-                                'Medical History',
-                                style: TextStyle(fontSize: 12, color: PetwoTheme.textSecondary),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-    );
+  void initState() { super.initState(); _loadPets(); }
+
+  Future<void> _loadPets() async {
+    setState(() { loading = true; error = null; });
+    try {
+      final response = await ApiService().getMyPets();
+      final raw = response.data is Map ? response.data['data'] : null;
+      final loaded = raw is List ? raw.whereType<Map<String, dynamic>>().map(Pet.fromJson).toList() : <Pet>[];
+      if (!mounted) return;
+      setState(() { pets = loaded; loading = false; });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() { error = 'We could not load your pets. Check your connection and try again.'; loading = false; });
+    }
   }
+
+  Future<void> _addPet() async {
+    final saved = await Navigator.push<bool>(context, MaterialPageRoute(builder: (_) => const AddPetScreen()));
+    if (saved == true) _loadPets();
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('My Furry Family'), actions: [
+      IconButton(tooltip: 'Add pet', icon: const Icon(Icons.add_circle_outline, color: PetwoTheme.primary), onPressed: _addPet),
+    ]),
+    body: RefreshIndicator(
+      color: PetwoTheme.primary, onRefresh: _loadPets,
+      child: loading
+        ? const Center(child: CircularProgressIndicator())
+        : error != null
+          ? ListView(children: [const SizedBox(height: 100), Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(error!, textAlign: TextAlign.center))), Center(child: TextButton.icon(onPressed: _loadPets, icon: const Icon(Icons.refresh), label: const Text('Try again')))])
+          : pets.isEmpty
+            ? ListView(children: [
+                const SizedBox(height: 90),
+                const Icon(Icons.pets, size: 58, color: PetwoTheme.textMuted),
+                const SizedBox(height: 16),
+                const Center(child: Text('No pets added yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                const Padding(padding: EdgeInsets.all(18), child: Text('Add your pet profile to keep their details together and request appointments with trusted care providers.', textAlign: TextAlign.center, style: TextStyle(color: PetwoTheme.textSecondary))),
+                Center(child: ElevatedButton.icon(onPressed: _addPet, icon: const Icon(Icons.add), label: const Text('Add your first pet'))),
+              ])
+            : ListView.builder(
+                padding: const EdgeInsets.all(16), itemCount: pets.length,
+                itemBuilder: (context, index) {
+                  final pet = pets[index];
+                  final emoji = pet.species == 'dog' ? '🐶' : pet.species == 'cat' ? '🐱' : '🐾';
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 14), elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: const BorderSide(color: Color(0xFFE2E8F0))),
+                    child: Padding(padding: const EdgeInsets.all(16), child: Row(children: [
+                      Container(width: 58, height: 58, decoration: BoxDecoration(color: PetwoTheme.primaryLight, borderRadius: BorderRadius.circular(16)), child: Center(child: Text(emoji, style: const TextStyle(fontSize: 30)))),
+                      const SizedBox(width: 14),
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(pet.name, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                        Text('${pet.species} · ${pet.breed}', style: const TextStyle(color: PetwoTheme.textSecondary, fontSize: 13)),
+                        if (pet.weight != null) Text('${pet.weight} kg', style: const TextStyle(color: PetwoTheme.textMuted, fontSize: 12)),
+                      ])),
+                      const Icon(Icons.chevron_right, color: PetwoTheme.textMuted),
+                    ])),
+                  );
+                },
+              ),
+    ),
+    floatingActionButton: pets.isNotEmpty && !loading ? FloatingActionButton.extended(onPressed: _addPet, backgroundColor: PetwoTheme.primary, foregroundColor: Colors.white, icon: const Icon(Icons.add), label: const Text('Add pet')) : null,
+  );
 }
