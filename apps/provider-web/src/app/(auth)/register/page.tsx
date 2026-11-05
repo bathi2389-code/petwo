@@ -33,7 +33,7 @@ export default function RegisterPage() {
     setLoading(true);
     setError(null);
     try {
-      const digits = phone.replace(/\D/g, '').replace(/^91/, '');
+      const digits = phone.replace(/\D/g, '').slice(-10);
       if (!/^[6-9]\d{9}$/.test(digits)) throw new Error('Enter a valid 10-digit Indian mobile number.');
       const formatted = `+91${digits}`;
       const res = await sendOtp(formatted);
@@ -52,7 +52,7 @@ export default function RegisterPage() {
     setError(null);
 
     try {
-      const digits = phone.replace(/\D/g, '').replace(/^91/, '');
+      const digits = phone.replace(/\D/g, '').slice(-10);
       if (!/^[6-9]\d{9}$/.test(digits)) throw new Error('Enter a valid 10-digit Indian mobile number.');
       if (!/^\d{6}$/.test(otp)) throw new Error('Enter the 6-digit verification code.');
       const formatted = `+91${digits}`;
