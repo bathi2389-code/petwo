@@ -48,6 +48,7 @@ interface AuthContextValue {
   configError: string | null;
   sendOtp: (phone: string) => Promise<{ otp?: string }>;
   verifyOtp: (phone: string, otp: string, displayName?: string) => Promise<{ role: string }>;
+  verifyCustomerOtp: (phone: string, otp: string, displayName?: string) => Promise<{ role: string }>;
   signOut: () => Promise<void>;
 }
 
@@ -147,6 +148,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { role };
   };
 
+  const verifyCustomerOtp = async (phone: string, otp: string, displayName?: string) => {
+    if (!isFirebaseConfigured) throw new Error(FIREBASE_CONFIG_MESSAGE);
+    const res = await apiClient.post('/auth/otp/verify', {
+      phone, otp, role: 'customer', displayName,
+    });
+    const { customToken, role } = res.data.data;
+    const credential = await signInWithCustomToken(getFirebaseAuth(), customToken);
+    const token = await credential.user.getIdToken();
+    setUser(credential.user);
+    setIdToken(token);
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    return { role };
+  };
+
   const signOut = async () => {
     if (isFirebaseConfigured) await firebaseSignOut(getFirebaseAuth());
     setUser(null);
@@ -155,7 +170,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, idToken, loading, configError, sendOtp, verifyOtp, signOut }}>
+    <AuthContext.Provider value={{ user, idToken, loading, configError, sendOtp, verifyOtp, verifyCustomerOtp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
