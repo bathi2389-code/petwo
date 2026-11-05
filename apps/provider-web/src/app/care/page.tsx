@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, ArrowRight, MapPin, Search, ShieldCheck, Star, Stethoscope } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 
@@ -13,13 +12,15 @@ type Provider = {
 };
 
 export default function CareDirectoryPage() {
-  const searchParams = useSearchParams();
-  const initialSort = searchParams.get('sortBy') === 'highest_rated' ? 'highest_rated' : 'recommended';
   const [query, setQuery] = useState('');
-  const [sortBy, setSortBy] = useState(initialSort);
+  const [sortBy, setSortBy] = useState('recommended');
   const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('sortBy') === 'highest_rated') setSortBy('highest_rated');
+  }, []);
 
   useEffect(() => {
     let active = true;
