@@ -33,12 +33,14 @@ export default function RegisterPage() {
     setLoading(true);
     setError(null);
     try {
-      const formatted = phone.startsWith('+91') ? phone : `+91${phone.replace(/\D/g, '')}`;
+      const digits = phone.replace(/\D/g, '').replace(/^91/, '');
+      if (!/^[6-9]\d{9}$/.test(digits)) throw new Error('Enter a valid 10-digit Indian mobile number.');
+      const formatted = `+91${digits}`;
       const res = await sendOtp(formatted);
       if (res?.otp) setDevOtp(res.otp);
       setStep(2);
     } catch (err: any) {
-      setError(err.message || 'Failed to send OTP.');
+      setError(err?.message || 'Failed to send OTP.');
     } finally {
       setLoading(false);
     }
@@ -50,7 +52,10 @@ export default function RegisterPage() {
     setError(null);
 
     try {
-      const formatted = phone.startsWith('+91') ? phone : `+91${phone.replace(/\D/g, '')}`;
+      const digits = phone.replace(/\D/g, '').replace(/^91/, '');
+      if (!/^[6-9]\d{9}$/.test(digits)) throw new Error('Enter a valid 10-digit Indian mobile number.');
+      if (!/^\d{6}$/.test(otp)) throw new Error('Enter the 6-digit verification code.');
+      const formatted = `+91${digits}`;
       // Verify OTP and authenticate user session
       await verifyOtp(formatted, otp, businessName);
 
@@ -71,7 +76,7 @@ export default function RegisterPage() {
 
       router.push('/overview');
     } catch (err: any) {
-      setError(err.message || 'Registration failed.');
+      setError(err?.message || 'Registration failed.');
     } finally {
       setLoading(false);
     }
@@ -151,7 +156,7 @@ export default function RegisterPage() {
                     required
                     placeholder="98765 43210"
                     value={phone}
-                    onChange={e => setPhone(e.target.value)}
+                    onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                     className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-3.5 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary"
                   />
                 </div>
@@ -229,17 +234,20 @@ export default function RegisterPage() {
               <input
                 type="text"
                 required
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                minLength={6}
                 maxLength={6}
                 placeholder="123456"
                 value={otp}
-                onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
+                onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-center font-mono text-2xl tracking-[0.45em] text-slate-900 placeholder:text-slate-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary"
               />
             </div>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || otp.length !== 6}
               className="w-full py-2.5 bg-primary hover:bg-primary/90 text-white rounded-xl text-sm font-medium transition flex items-center justify-center gap-2"
             >
               {loading ? 'Submitting Application...' : 'Complete Registration'}
