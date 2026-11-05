@@ -77,7 +77,7 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
     }
 
     // Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = crypto.randomInt(100000, 1000000).toString();
     const expiresAt = dayjs().add(OTP.EXPIRES_MINUTES, 'minute').toISOString();
 
     // Store cryptographically salted OTP hash
@@ -90,19 +90,49 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
       sentAt: new Date().toISOString(),
     });
 
-    // Send OTP via MSG91 (non-blocking in development)
-    if (process.env.NODE_ENV === 'production') {
-      await sendOtpViaSms(normalizedPhone, otp);
+    // Use real SMS whenever MSG91 is configured, including local development.
+    // Only expose a development OTP when no MSG91 credentials are configured.
+    const { env } = await import('../../config/env');
+    const hasMsg91AuthKey = Boolean(env.MSG91_AUTH_KEY);
+    const hasMsg91Template = Boolean(env.MSG91_TEMPLATE_ID_OTP);
+    const msg91Configured = hasMsg91AuthKey && hasMsg91Template;
+    const msg91PartiallyConfigured = hasMsg91AuthKey !== hasMsg91Template;
+
+    if (msg91PartiallyConfigured || (!msg91Configured && env.NODE_ENV === 'production')) {
+      await otpRef.delete();
+      return reply.status(503).send({
+        success: false,
+        error: {
+          code: 'SMS_001',
+          message: 'SMS delivery is not configured. Set both MSG91_AUTH_KEY and MSG91_TEMPLATE_ID_OTP.',
+        },
+      });
     }
 
-    request.log.info({ phone: normalizedPhone }, 'OTP sent');
+    if (msg91Configured) {
+      try {
+        await sendOtpViaSms(normalizedPhone, otp);
+      } catch (error) {
+        await otpRef.delete();
+        request.log.error({ err: error }, 'MSG91 OTP delivery failed');
+        return reply.status(502).send({
+          success: false,
+          error: {
+            code: 'SMS_002',
+            message: 'MSG91 could not send the OTP. Check your MSG91 template and account configuration, then try again.',
+          },
+        });
+      }
+    }
+
+    request.log.info({ phone: normalizedPhone, delivery: msg91Configured ? 'msg91' : 'development' }, 'OTP requested');
 
     return reply.status(200).send({
       success: true,
       data: {
-        message: 'OTP sent successfully.',
+        message: msg91Configured ? 'OTP sent to your mobile number.' : 'Development OTP generated. Configure MSG91 to send real SMS.',
         expiresIn: OTP.EXPIRES_MINUTES * 60,
-        ...(process.env.NODE_ENV === 'development' && { otp }), // Only in dev!
+        ...(!msg91Configured && env.NODE_ENV === 'development' && { otp }),
       },
     });
   });
@@ -311,23 +341,31 @@ export function verifyOtpConstantTime(inputOtp: string, salt: string, storedHash
 
 async function sendOtpViaSms(phone: string, otp: string): Promise<void> {
   const { env } = await import('../../config/env');
-  if (!env.MSG91_AUTH_KEY) return;
+  if (!env.MSG91_AUTH_KEY || !env.MSG91_TEMPLATE_ID_OTP) {
+    throw new Error('MSG91 auth key and OTP template ID are both required.');
+  }
 
-  const response = await fetch('https://api.msg91.com/api/v5/flow/', {
+  // MSG91's OTP API accepts a caller-generated OTP, so the same code can be
+  // securely hashed in Firestore and verified by our backend.
+  const url = new URL('https://control.msg91.com/api/v5/otp');
+  url.searchParams.set('template_id', env.MSG91_TEMPLATE_ID_OTP);
+  url.searchParams.set('mobile', phone.replace('+', ''));
+  url.searchParams.set('otp', otp);
+  url.searchParams.set('otp_length', '6');
+  url.searchParams.set('otp_expiry', String(OTP.EXPIRES_MINUTES));
+
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
+      accept: 'application/json',
       'Content-Type': 'application/json',
       authkey: env.MSG91_AUTH_KEY,
     },
-    body: JSON.stringify({
-      template_id: env.MSG91_TEMPLATE_ID_OTP,
-      short_url: '0',
-      mobiles: phone.replace('+', ''),
-      otp,
-    }),
+    body: JSON.stringify({}),
   });
 
-  if (!response.ok) {
-    throw new Error(`MSG91 API error: ${response.status}`);
+  const payload = await response.json().catch(() => null) as { type?: string; message?: string } | null;
+  if (!response.ok || payload?.type?.toLowerCase() !== 'success') {
+    throw new Error(`MSG91 OTP request failed (HTTP ${response.status}).`);
   }
 }
