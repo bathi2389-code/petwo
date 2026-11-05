@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:petwo_customer/config/theme.dart';
-import 'package:petwo_customer/models/pet_model.dart';
 import 'package:petwo_customer/services/api_service.dart';
 
 class AddPetScreen extends StatefulWidget {
