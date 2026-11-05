@@ -46,7 +46,7 @@ interface AuthContextValue {
   idToken: string | null;
   loading: boolean;
   configError: string | null;
-  sendOtp: (phone: string) => Promise<{ otp?: string }>;
+  sendOtp: (phone: string) => Promise<{ otp?: string; message?: string; expiresIn?: number }>;
   verifyOtp: (phone: string, otp: string, displayName?: string) => Promise<{ role: string }>;
   verifyCustomerOtp: (phone: string, otp: string, displayName?: string) => Promise<{ role: string }>;
   signOut: () => Promise<void>;
