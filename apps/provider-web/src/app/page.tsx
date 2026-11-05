@@ -2,9 +2,9 @@ import Link from 'next/link';
 import { ArrowRight, CalendarCheck, HeartHandshake, MapPin, PawPrint, ShieldCheck, Star } from 'lucide-react';
 
 const services = [
-  { icon: HeartHandshake, title: 'Veterinary care', description: 'Find trusted professionals for checkups, treatment and ongoing pet wellness.' },
-  { icon: CalendarCheck, title: 'Easy appointments', description: 'A simpler way to discover care options and plan your pet’s next visit.' },
-  { icon: ShieldCheck, title: 'Care you can trust', description: 'Clear provider information helps pet parents make confident decisions.' },
+  { icon: HeartHandshake, title: 'Veterinary care', description: 'Find approved veterinary clinics and pet-care professionals.', href: '/care' },
+  { icon: CalendarCheck, title: 'Easy appointments', description: 'Explore clinic services and see the care options they offer.', href: '/care' },
+  { icon: ShieldCheck, title: 'Care you can trust', description: 'Browse approved providers and compare published ratings.', href: '/care?sortBy=highest_rated' },
 ];
 
 export default function HomePage() {
@@ -65,7 +65,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="max-w-2xl"><p className="text-xs font-extrabold uppercase tracking-[0.2em] text-teal-700">Made around their wellbeing</p><h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Care for every stage of their journey.</h2><p className="mt-4 leading-7 text-slate-600">A single place designed to make finding and managing pet care feel more straightforward.</p></div>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {services.map(({ icon: Icon, title, description }) => <article key={title} className="rounded-3xl border border-slate-100 bg-[#fbfdfc] p-7 transition hover:-translate-y-1 hover:border-teal-100 hover:shadow-xl hover:shadow-teal-900/5"><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-teal-800"><Icon className="h-6 w-6" /></div><h3 className="mt-6 text-lg font-extrabold">{title}</h3><p className="mt-3 text-sm leading-7 text-slate-600">{description}</p></article>)}
+            {services.map(({ icon: Icon, title, description, href }) => <Link key={title} href={href} className="group block rounded-3xl border border-slate-100 bg-[#fbfdfc] p-7 transition duration-200 hover:-translate-y-1 hover:border-teal-200 hover:shadow-xl hover:shadow-teal-900/5 focus:outline-none focus:ring-4 focus:ring-teal-600/20"><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-teal-800 transition group-hover:bg-teal-100"><Icon className="h-6 w-6" /></div><h3 className="mt-6 flex items-center justify-between text-lg font-extrabold">{title}<ArrowRight className="h-4 w-4 text-teal-700 transition group-hover:translate-x-1" /></h3><p className="mt-3 text-sm leading-7 text-slate-600">{description}</p><span className="mt-5 inline-flex text-xs font-bold text-teal-800">Explore now <ArrowRight className="ml-1 h-3.5 w-3.5" /></span></Link>)}
           </div>
         </div>
       </section>
