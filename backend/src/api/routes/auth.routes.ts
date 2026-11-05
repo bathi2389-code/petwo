@@ -125,7 +125,7 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
       }
     }
 
-    request.log.info({ phone: normalizedPhone, delivery: msg91Configured ? 'msg91' : 'development' }, 'OTP requested');
+    request.log.info({ phone: `${normalizedPhone.slice(0, 3)}******${normalizedPhone.slice(-2)}`, delivery: msg91Configured ? 'msg91' : 'development' }, 'OTP requested');
 
     return reply.status(200).send({
       success: true,
@@ -326,7 +326,8 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
 // ─── Cryptographic OTP Helpers ──────────────────────────────────────────────────
 
 export function hashOtp(otp: string, salt: string): string {
-  const secret = process.env.JWT_SECRET || 'petwo-secure-otp-pepper-secret-2024';
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret.length < 32) throw new Error('JWT_SECRET must be configured with at least 32 characters before generating OTP hashes.');
   return crypto.createHmac('sha256', secret).update(`${salt}:${otp}`).digest('hex');
 }
 
