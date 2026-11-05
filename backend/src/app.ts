@@ -182,7 +182,8 @@ export async function buildApp(): Promise<FastifyInstance> {
       success: false,
       error: {
         code: statusCode === 404 ? 'RES_001' : 'SYS_001',
-        message: statusCode < 500 ? error.message : 'An internal error occurred.',
+        message: statusCode < 500 || env.NODE_ENV !== 'production' ? error.message : 'An internal error occurred.',
+        ...(env.NODE_ENV !== 'production' && { debug: { name: error.name, code: (error as any).code } }),
       },
     });
   });
