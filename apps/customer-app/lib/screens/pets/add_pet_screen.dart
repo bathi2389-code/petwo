@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:petwo_customer/config/theme.dart';
 import 'package:petwo_customer/models/pet_model.dart';
+import 'package:petwo_customer/services/api_service.dart';
 
 class AddPetScreen extends StatefulWidget {
   const AddPetScreen({super.key});
@@ -19,6 +20,8 @@ class _AddPetScreenState extends State<AddPetScreen> {
   double? weight;
   String? allergies;
   String? notes;
+  bool saving = false;
+  String? errorMessage;
 
   final speciesOptions = [
     {'name': 'Dog', 'icon': '🐶', 'slug': 'dog'},
@@ -172,29 +175,36 @@ class _AddPetScreenState extends State<AddPetScreen> {
                 onSaved: (val) => notes = val,
               ),
 
+              if (errorMessage != null) ...[
+                const SizedBox(height: 16),
+                Text(errorMessage!, style: const TextStyle(color: PetwoTheme.error)),
+              ],
               const SizedBox(height: 32),
 
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      _formKey.currentState!.save();
-                      final pet = Pet(
-                        id: 'pet-${DateTime.now().millisecondsSinceEpoch}',
-                        ownerId: 'current-user',
-                        name: name,
-                        species: species,
-                        breed: breed,
-                        gender: gender,
-                        weight: weight,
-                        allergies: allergies != null && allergies!.isNotEmpty ? [allergies!] : [],
-                        specialNotes: notes,
-                      );
-                      Navigator.pop(context, pet);
+                  onPressed: saving ? null : () async {
+                    if (!_formKey.currentState!.validate()) return;
+                    _formKey.currentState!.save();
+                    setState(() { saving = true; errorMessage = null; });
+                    try {
+                      final response = await ApiService().createPet({
+                        'name': name, 'species': species, 'breed': breed, 'gender': gender,
+                        if (weight != null) 'weight': weight,
+                        if (allergies != null && allergies!.trim().isNotEmpty) 'allergies': [allergies!.trim()],
+                        if (notes != null && notes!.trim().isNotEmpty) 'specialNotes': notes!.trim(),
+                      });
+                      if (!mounted) return;
+                      if (response.data['success'] == false) throw StateError('The server could not save this pet.');
+                      Navigator.pop(context, true);
+                    } catch (error) {
+                      if (mounted) setState(() => errorMessage = error.toString());
+                    } finally {
+                      if (mounted) setState(() => saving = false);
                     }
                   },
-                  child: const Text('Save Pet Profile'),
+                  child: Text(saving ? 'Saving…' : 'Save Pet Profile'),
                 ),
               ),
             ],
