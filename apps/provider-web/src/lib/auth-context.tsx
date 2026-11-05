@@ -154,6 +154,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       phone, otp, role: 'customer', displayName,
     });
     const { customToken, role } = res.data.data;
+    if (role !== 'customer') throw new Error('This mobile number belongs to a provider account. Please use provider login.');
     const credential = await signInWithCustomToken(getFirebaseAuth(), customToken);
     const token = await credential.user.getIdToken();
     setUser(credential.user);
