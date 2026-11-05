@@ -79,18 +79,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const unsubscribe = onAuthStateChanged(
         auth,
         async (firebaseUser) => {
-          setUser(firebaseUser);
           if (firebaseUser) {
             try {
               const token = await firebaseUser.getIdToken();
               setIdToken(token);
               apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+              // Publish the authenticated user only after the API token is ready.
+              setUser(firebaseUser);
             } catch {
               setIdToken(null);
+              setUser(null);
               delete apiClient.defaults.headers.common['Authorization'];
             }
           } else {
             setIdToken(null);
+            setUser(null);
             delete apiClient.defaults.headers.common['Authorization'];
           }
           setLoading(false);
