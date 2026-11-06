@@ -33,15 +33,24 @@ export default function RegisterPage() {
   useEffect(() => {
     if (!user) return;
     if (user.email) setEmail(user.email);
-    if (!user.emailVerified) return;
     try {
       const saved = sessionStorage.getItem('petwo:provider-registration');
       if (!saved) return;
       const draft = JSON.parse(saved);
-      setContactName(draft.contactName || ''); setBusinessName(draft.businessName || '');
-      setBusinessType(draft.businessType || 'veterinary_clinic'); setPhone((draft.contact?.phone || '').replace(/^\+91/, ''));
-      setEmail(draft.contact?.email || user.email || ''); setRegistrationNo(draft.registrationNo || ''); setGstNumber(draft.gstNumber || '');
-    } catch { setError('Saved registration details could not be restored. Enter them again to continue.'); }
+      setContactName(draft.contactName || '');
+      setBusinessName(draft.businessName || '');
+      setBusinessType(draft.businessType || 'veterinary_clinic');
+      setPhone((draft.contact?.phone || '').replace(/^\\+91/, ''));
+      setEmail(draft.contact?.email || user.email || '');
+      setRegistrationNo(draft.registrationNo || '');
+      setGstNumber(draft.gstNumber || '');
+      setStep(2);
+      setNotice(user.emailVerified
+        ? 'Your email is verified. Complete your provider application below.'
+        : 'Your account already exists. Open the verification link sent to your email, then return here to continue.');
+    } catch {
+      setError('Saved registration details could not be restored. Enter them again to continue.');
+    }
   }, [user]);
 
   async function handleCreateAccount(e: React.FormEvent) {
