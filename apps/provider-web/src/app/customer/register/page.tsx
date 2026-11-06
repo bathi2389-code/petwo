@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ArrowRight, CheckCircle2, PawPrint, ShieldCheck, Lock } from 'lucide-react';
@@ -17,13 +17,38 @@ export default function CustomerRegisterPage() {
   const [pending, setPending] = useState(false); const [busy, setBusy] = useState(false); const [notice, setNotice] = useState(''); const [error, setError] = useState('');
   const cooldown = useResendCooldown();
   const pet: Pet = { name: petName.trim(), species, breed: breed.trim(), gender, ...(dob ? { dob } : {}) };
+  useEffect(() => {
+    if (!user) return;
+    const saved = sessionStorage.getItem('petwo:customer-registration');
+    if (!saved) return;
+    try {
+      const draft = JSON.parse(saved) as { displayName?: string; email?: string; pet?: Pet };
+      if (draft.email && draft.email.toLowerCase() !== (user.email || '').toLowerCase()) return;
+      setName(draft.displayName || user.displayName || '');
+      setEmail(user.email || draft.email || '');
+      if (draft.pet) {
+        setPetName(draft.pet.name || '');
+        setSpecies(draft.pet.species || 'dog');
+        setBreed(draft.pet.breed || '');
+        setGender(draft.pet.gender || 'unknown');
+        setDob(draft.pet.dob || '');
+      }
+      setPending(true);
+      setNotice(user.emailVerified
+        ? 'Your email is verified. Continue to activate your PETWO customer profile.'
+        : 'Your account already exists. Open the verification link sent to your email, then return here to continue.');
+    } catch {
+      setError('Saved registration details could not be restored. Please sign in or register again.');
+    }
+  }, [user]);
+
 
   async function create(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setError(''); setNotice('');
     try {
       if (password.length < 8) throw new Error('Use a password with at least 8 characters.');
       if (password !== confirmPassword) throw new Error('The passwords do not match.');
-      const draft = { displayName: name.trim(), pet };
+      const draft = { displayName: name.trim(), email: email.trim().toLowerCase(), pet };
       sessionStorage.setItem('petwo:customer-registration', JSON.stringify(draft));
       const account = await createAccount(email.trim().toLowerCase(), password, name.trim());
       await sendVerification(account); cooldown.start(60); setPending(true);
