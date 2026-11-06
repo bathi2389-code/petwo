@@ -29,32 +29,15 @@
 
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
-| `POST` | `/auth/otp/send` | Public | Dispatches 6-digit OTP to Indian mobile number |
-| `POST` | `/auth/otp/verify` | Public | Verifies OTP and returns Firebase Custom Auth Token |
-| `GET`  | `/auth/me` | Authenticated | Fetches profile of current session user |
-| `POST` | `/auth/logout` | Authenticated | Revokes Firebase refresh tokens |
+| `GET` | `/auth/me` | Authenticated user | Returns the trusted Firestore role/profile |
+| `POST` | `/auth/customer/profile` | Verified Firebase user | Creates or activates a customer Firestore profile idempotently |
+| `POST` | `/auth/logout` | Authenticated user | Revokes Firebase refresh tokens |
+| `POST` | `/providers/register` | Verified Firebase user | Creates a provider application with pending approval status |
 
-### Request: `POST /auth/otp/send`
-```json
-{
-  "phone": "+919876543210"
-}
-```
 
-### Response: `POST /auth/otp/verify`
-```json
-{
-  "success": true,
-  "data": {
-    "customToken": "eyJhbGciOi...",
-    "uid": "usr_99812",
-    "role": "customer",
-    "isNewUser": false
-  }
-}
-```
+### Customer profile bootstrap: `POST /auth/customer/profile`
 
----
+Requires a Firebase ID token whose trusted `email_verified` claim is true. The server derives UID and email from that token; clients cannot choose the profile identity or role. The body accepts `displayName` and an optional first `pet` object. Repeated calls update the same profile and do not add duplicate pets.
 
 ## 2. Customer Management (`/customers`)
 

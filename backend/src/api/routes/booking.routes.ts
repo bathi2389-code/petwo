@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
-import { getDb, COLLECTIONS } from './webhook.routes';
+import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isCustomer, isProvider, isAdmin, isProviderOrAdmin } from '../../middleware/auth.middleware';
 import { generateBookingNumber, computeCommission } from '../../utils/helpers';
 import { BOOKING as BOOKING_CONFIG } from '@petwo/shared';
@@ -90,7 +90,7 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
     }
 
     const provider = providerDoc.data() as Provider;
-    if (provider.verificationStatus !== 'approved') {
+    if (provider.verificationStatus !== 'approved' || !provider.isActive) {
       return reply.status(400).send({
         success: false,
         error: { code: 'PRV_001', message: 'Provider is not verified.' },
@@ -107,6 +107,27 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
     }
 
     const service = serviceDoc.data() as Service;
+    if (service.providerId !== data.providerId || service.locationId !== data.locationId) {
+      return reply.status(400).send({
+        success: false,
+        error: { code: 'BKG_005', message: 'The selected service is not offered by this provider at this location.' },
+      });
+    }
+
+    const locationDoc = await db.collection(COLLECTIONS.PROVIDER_LOCATIONS).doc(data.locationId).get();
+    if (!locationDoc.exists || locationDoc.data()?.providerId !== data.providerId || locationDoc.data()?.isActive === false) {
+      return reply.status(400).send({
+        success: false,
+        error: { code: 'BKG_005', message: 'The selected provider location is unavailable.' },
+      });
+    }
+
+    if (data.staffId && service.staffIds?.length && !service.staffIds.includes(data.staffId)) {
+      return reply.status(400).send({
+        success: false,
+        error: { code: 'BKG_005', message: 'The selected staff member is not assigned to this service.' },
+      });
+    }
 
     // ── Check slot availability ──
     const scheduledAt = dayjs(data.scheduledAt);
@@ -230,17 +251,24 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
         if (slotDoc.exists) {
           const slotData = slotDoc.data();
           const lockExpires = slotData?.expiresAt ? dayjs(slotData.expiresAt) : null;
-          if (lockExpires && lockExpires.isAfter(dayjs()) && slotData?.status !== 'released') {
-            throw new Error('SLOT_LOCKED');
+          if (lockExpires && lockExpires.isAfter(dayjs()) && slotData?.status !== 'released' && slotData?.bookingId) {
+            const heldBooking = await transaction.get(
+              db.collection(COLLECTIONS.BOOKINGS).doc(slotData.bookingId),
+            );
+            const held = heldBooking.data() as Booking | undefined;
+            if (held && held.scheduledAt === slotData.scheduledAt &&
+              ['pending_confirmation', 'confirmed', 'in_progress'].includes(held.status)) {
+              throw new Error('SLOT_LOCKED');
+            }
           }
         }
 
         // Query active overlapping bookings
-        const conflictingSnapshot = await db.collection(COLLECTIONS.BOOKINGS)
+        const conflictingQuery = db.collection(COLLECTIONS.BOOKINGS)
           .where('providerId', '==', data.providerId)
           .where('locationId', '==', data.locationId)
-          .where('status', 'in', ['confirmed', 'in_progress'])
-          .get();
+          .where('status', 'in', ['pending_confirmation', 'confirmed', 'in_progress']);
+        const conflictingSnapshot = await transaction.get(conflictingQuery);
 
         const hasConflict = conflictingSnapshot.docs.some(doc => {
           const b = doc.data() as Booking;
@@ -556,25 +584,71 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
     }
 
     const serviceDoc = await db.collection(COLLECTIONS.SERVICES).doc(booking.serviceId).get();
+    if (!serviceDoc.exists) {
+      return reply.status(409).send({ success: false, error: { code: 'BKG_004', message: 'The booking service is no longer available.' } });
+    }
     const service = serviceDoc.data() as Service;
     const newStart = dayjs(parsed.data.scheduledAt);
     const newEnd = newStart.add(service.duration || 60, 'minute');
+    if (newStart.isBefore(dayjs()) || newStart.isAfter(dayjs().add(BOOKING_CONFIG.ADVANCE_BOOKING_DAYS, 'day'))) {
+      return reply.status(400).send({
+        success: false,
+        error: { code: 'BKG_001', message: `Choose a future time within ${BOOKING_CONFIG.ADVANCE_BOOKING_DAYS} days.` },
+      });
+    }
+    const newStaffId = parsed.data.staffId ?? booking.staffId;
+    if (newStaffId && service.staffIds?.length && !service.staffIds.includes(newStaffId)) {
+      return reply.status(400).send({ success: false, error: { code: 'BKG_005', message: 'The selected staff member is not assigned to this service.' } });
+    }
 
     const now = new Date().toISOString();
+    try {
+      await db.runTransaction(async (transaction) => {
+        const freshDoc = await transaction.get(bookingRef);
+        if (!freshDoc.exists) throw new Error('BOOKING_NOT_FOUND');
+        const freshBooking = freshDoc.data() as Booking;
+        if (freshBooking.customerId !== request.user!.uid || !['pending_confirmation', 'confirmed'].includes(freshBooking.status)) {
+          throw new Error('BOOKING_CHANGED');
+        }
 
-    await bookingRef.update({
-      scheduledAt: newStart.toISOString(),
-      scheduledEnd: newEnd.toISOString(),
-      staffId: parsed.data.staffId ?? booking.staffId,
-      status: 'pending_confirmation', // Requires provider re-confirmation
-      history: [...booking.history, {
-        status: 'pending_confirmation' as BookingStatus,
-        timestamp: now,
-        actor: request.user!.uid,
-        note: 'rescheduled',
-      }],
-      updatedAt: now,
-    });
+        const activeBookings = await transaction.get(
+          db.collection(COLLECTIONS.BOOKINGS)
+            .where('providerId', '==', freshBooking.providerId)
+            .where('locationId', '==', freshBooking.locationId)
+            .where('status', 'in', ['pending_confirmation', 'confirmed', 'in_progress']),
+        );
+        const hasConflict = activeBookings.docs.some((candidate) => {
+          if (candidate.id === bookingRef.id) return false;
+          const other = candidate.data() as Booking;
+          if (newStaffId && other.staffId && newStaffId !== other.staffId) return false;
+          return newStart.isBefore(dayjs(other.scheduledEnd)) && newEnd.isAfter(dayjs(other.scheduledAt));
+        });
+        if (hasConflict) throw new Error('SLOT_CONFLICT');
+
+        transaction.update(bookingRef, {
+          scheduledAt: newStart.toISOString(),
+          scheduledEnd: newEnd.toISOString(),
+          staffId: newStaffId,
+          status: 'pending_confirmation', // Requires provider re-confirmation
+          history: [...(freshBooking.history || []), {
+            status: 'pending_confirmation' as BookingStatus,
+            timestamp: now,
+            actor: request.user!.uid,
+            note: 'rescheduled',
+          }],
+          updatedAt: now,
+        });
+      });
+    } catch (error) {
+      const message = (error as Error).message;
+      if (message === 'SLOT_CONFLICT') {
+        return reply.status(409).send({ success: false, error: { code: 'BKG_001', message: 'Selected time slot is not available.' } });
+      }
+      if (message === 'BOOKING_CHANGED' || message === 'BOOKING_NOT_FOUND') {
+        return reply.status(409).send({ success: false, error: { code: 'BKG_004', message: 'Booking changed while it was being rescheduled. Refresh and try again.' } });
+      }
+      throw error;
+    }
 
     return reply.send({ success: true, data: { message: 'Booking rescheduled. Awaiting provider confirmation.' } });
   });
@@ -607,6 +681,18 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
 
     if (user.role === 'provider' && booking.providerId !== user.uid) {
       return reply.status(403).send({ success: false, error: { code: 'AUTH_003', message: 'Access denied.' } });
+    }
+
+    const allowedTransitions: Record<string, BookingStatus[]> = {
+      pending_confirmation: ['confirmed'],
+      confirmed: ['in_progress', 'no_show'],
+      in_progress: ['completed'],
+    };
+    if (user.role === 'provider' && !allowedTransitions[booking.status]?.includes(parsed.data.status)) {
+      return reply.status(409).send({
+        success: false,
+        error: { code: 'BKG_002', message: `Cannot move booking from ${booking.status} to ${parsed.data.status}.` },
+      });
     }
 
     const now = new Date().toISOString();

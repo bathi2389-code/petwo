@@ -175,6 +175,7 @@ export type ProviderSortOption = 'recommended' | 'highest_rated' | 'nearest' | '
 export type Provider = {
   id: string;
   userId: string;
+  contactName?: string;
   businessName: string;
   businessType: ProviderType;
   description?: string;
@@ -182,6 +183,7 @@ export type Provider = {
   logoURL?: string;
   coverPhotoURL?: string;
   contact: ContactInfo;
+  emailVerified?: boolean;
   address?: Address;
   coordinates?: GeoPoint;
   geohash?: string;

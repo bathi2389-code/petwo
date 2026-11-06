@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Calendar, Percent, Ticket, Headphones, FileText,
   ShieldCheck, Menu, X, PawPrint,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ADMIN_SESSION_KEY, apiClient } from '@/lib/api-client';
 
 const adminNav = [
   { href: '/overview', label: 'Platform Overview', icon: LayoutDashboard },
@@ -21,7 +22,41 @@ const adminNav = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
+
+  useEffect(() => {
+    const token = sessionStorage.getItem(ADMIN_SESSION_KEY);
+    if (!token) {
+      router.replace('/login');
+      return;
+    }
+    apiClient.get('/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+      .then((response) => {
+        const role = response.data?.data?.role;
+        if (role !== 'admin' && role !== 'super_admin') {
+          sessionStorage.removeItem(ADMIN_SESSION_KEY);
+          router.replace('/login');
+          return;
+        }
+        setAuthReady(true);
+      })
+      .catch(() => {
+        sessionStorage.removeItem(ADMIN_SESSION_KEY);
+        router.replace('/login');
+      });
+  }, [router]);
+
+  async function signOut() {
+    const token = sessionStorage.getItem(ADMIN_SESSION_KEY);
+    try {
+      if (token) await apiClient.post('/logout', {}, { headers: { Authorization: `Bearer ${token}` } });
+    } finally {
+      sessionStorage.removeItem(ADMIN_SESSION_KEY);
+      router.replace('/login');
+    }
+  }
 
   const navigation = (
     <nav className="space-y-1 px-3 py-5">
@@ -77,10 +112,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             Marketplace administration workspace
           </p>
         </div>
+        <button type="button" onClick={signOut} className="mt-3 w-full rounded-lg border border-white/15 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10">
+          Sign out
+        </button>
         <p className="mt-3 text-center text-[10px] text-slate-500">PETWO · Admin Portal</p>
       </div>
     </div>
   );
+
+  if (!authReady) {
+    return <main className="flex min-h-screen items-center justify-center bg-slate-50 text-sm font-medium text-slate-600">Checking administrator access…</main>;
+  }
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -129,7 +171,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
 
         <main className="w-full flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-9">
-          <div className="mx-auto w-full max-w-[1440px]">{children}</div>
+          <div className="mx-auto w-full max-w-[1440px]">
+            <p role="status" className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">
+              Admin data panels are preview-only and are not connected to live marketplace records yet.
+            </p>
+            {children}
+          </div>
         </main>
       </div>
     </div>

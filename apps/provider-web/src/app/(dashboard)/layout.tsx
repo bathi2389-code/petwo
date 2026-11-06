@@ -34,6 +34,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       setCheckingRole(false);
       return;
     }
+    if (!user.emailVerified) {
+      router.replace('/login');
+      setCheckingRole(false);
+      return;
+    }
     apiClient.get('/auth/me')
       .then(({ data }) => {
         if (active && data?.data?.role !== 'provider') router.replace('/my-pets');

@@ -54,3 +54,6 @@ coverage/
 *.key
 *.cert
 *.tsbuildinfo
+
+# Local Android SDK configuration
+**/local.properties

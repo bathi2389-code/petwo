@@ -24,20 +24,11 @@ class ApiService {
     }, onError: (error, handler) => handler.next(error)));
   }
 
-  Future<Response> sendOtp(String phone) => dio.post('/auth/otp/send', data: {'phone': phone});
-
-  Future<Response> verifyOtp(String phone, String otp, {String? displayName}) async {
-    final response = await dio.post('/auth/otp/verify', data: {'phone': phone, 'otp': otp, 'role': 'customer', if (displayName != null && displayName.trim().isNotEmpty) 'displayName': displayName.trim()});
-    final data = response.data['data'] as Map<String, dynamic>?;
-    final customToken = data?['customToken'] as String?;
-    if (data?['role'] != 'customer') throw StateError('This number belongs to a provider account. Please use provider login.');
-    if (customToken == null || customToken.isEmpty) throw StateError('The server did not return a Firebase sign-in token.');
-    final credential = await FirebaseAuth.instance.signInWithCustomToken(customToken);
-    final idToken = await credential.user?.getIdToken(true);
-    if (idToken == null) throw StateError('Firebase could not create a sign-in session.');
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('auth_token', idToken);
-    return response;
+  Future<Response> activateCustomerProfile(String displayName) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw StateError('Sign in to activate your PETWO profile.');
+    await user.getIdToken(true);
+    return dio.post('/auth/customer/profile', data: {'displayName': displayName});
   }
 
   Future<void> signOut() async {

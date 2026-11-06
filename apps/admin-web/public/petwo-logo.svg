@@ -1,24 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 132" role="img" aria-labelledby="petwo-title petwo-desc">
-  <title id="petwo-title">PETWO</title>
-  <desc id="petwo-desc">PETWO pet care logo with a heart, dog and cat, and a veterinary paw cross.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 112" role="img" aria-labelledby="title desc">
+  <title id="title">PETWO</title>
+  <desc id="desc">PETWO — care for every paw.</desc>
   <defs>
-    <linearGradient id="petwo-teal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#12C6A0"/><stop offset="1" stop-color="#078B91"/></linearGradient>
-    <linearGradient id="petwo-blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#173D65"/><stop offset="1" stop-color="#0B2947"/></linearGradient>
+    <linearGradient id="mark" x1="8" y1="8" x2="92" y2="100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#13B99A"/>
+      <stop offset="1" stop-color="#087F70"/>
+    </linearGradient>
   </defs>
-  <g transform="translate(4 8)">
-    <path d="M55 105C38 91 10 70 10 43 10 20 28 7 48 13c8 2 14 8 18 16 8-14 20-20 34-17 19 4 28 20 24 39-5 24-34 44-58 58-4 2-7 1-11-2Z" fill="none" stroke="url(#petwo-teal)" stroke-width="9" stroke-linecap="round"/>
-    <path d="M34 58c-8-8-10-20-5-29 8 2 14 8 16 16 5-7 13-11 22-10 1 11-5 21-15 26-1 13-7 23-17 29-5-8-6-19-1-32Z" fill="url(#petwo-blue)"/>
-    <path d="M75 72c-1-10 5-19 14-22l9-12 9 13c8 4 12 12 10 21-2 11-12 19-23 18-11-1-18-8-19-18Z" fill="url(#petwo-blue)"/>
-    <path d="M78 73c7 5 15 5 22 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="88" cy="64" r="2.6" fill="#fff"/><circle cx="103" cy="64" r="2.6" fill="#fff"/>
-    <g transform="translate(89 0)">
-      <rect x="0" y="0" width="34" height="34" rx="10" fill="url(#petwo-teal)"/>
-      <path d="M17 7v20M7 17h20" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
-      <ellipse cx="11" cy="8" rx="3" ry="4" fill="#fff"/><ellipse cx="23" cy="8" rx="3" ry="4" fill="#fff"/>
-    </g>
-  </g>
-  <text x="154" y="78" fill="url(#petwo-blue)" font-family="Arial, Helvetica, sans-serif" font-size="68" font-weight="800" letter-spacing="1.5">PET</text>
-  <text x="306" y="78" fill="url(#petwo-teal)" font-family="Arial, Helvetica, sans-serif" font-size="68" font-weight="800" letter-spacing="1.5">WO</text>
-  <path d="M158 99h26m245 0h26" stroke="#12B99B" stroke-width="2" stroke-linecap="round"/>
-  <text x="198" y="105" fill="#31536D" font-family="Arial, Helvetica, sans-serif" font-size="17" font-style="italic" letter-spacing=".3">Healthy Pets. Happier Lives.</text>
+  <rect x="4" y="6" width="100" height="100" rx="31" fill="url(#mark)"/>
+  <path d="M26 42c-5-3-8-8-7-13 1-5 5-8 10-7 5 1 8 7 7 13-1 6-5 10-10 7Zm21-10c-5 0-9-4-9-10 0-5 3-9 8-9s9 5 9 10c0 6-3 9-8 9Zm21 1c-5 2-10 0-12-5-2-5 0-10 5-12 4-2 9 1 11 6 2 5 1 9-4 11Zm12 17c-5 3-10 2-13-2-3-4-2-10 2-13 4-3 9-2 12 3 3 4 3 9-1 12Z" fill="#fff"/>
+  <path d="M31 63c0-10 8-18 19-18 8 0 13 5 17 10 3-4 7-6 12-6 9 0 15 7 15 16 0 11-9 20-21 25-5 2-9 2-14 0-16-6-28-15-28-27Z" fill="#fff"/>
+  <path d="M50 68c4-5 11-5 15 0l2 2 2-2c4-5 11-5 15 0 4 5 2 11-2 15l-15 13-15-13c-5-4-6-10-2-15Z" fill="#D9FFF3"/>
+  <text x="124" y="68" fill="#123B3A" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="800" letter-spacing="-2">PET<tspan fill="#087F70">WO</tspan></text>
+  <path d="M127 83h31" stroke="#13B99A" stroke-width="3" stroke-linecap="round"/>
+  <text x="168" y="90" fill="#54716D" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="2.3">CARE FOR EVERY PAW</text>
 </svg>

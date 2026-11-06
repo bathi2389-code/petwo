@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
-import { getDb, COLLECTIONS } from './webhook.routes';
-import { authenticate, isProvider, isAdmin, isProviderOrAdmin } from '../../middleware/auth.middleware';
+import { getAuth, getDb, COLLECTIONS } from '../../config/firebase';
+import { authenticate, authenticateVerifiedFirebaseUser, isProvider, isAdmin, isProviderOrAdmin } from '../../middleware/auth.middleware';
 import { nanoid } from 'nanoid';
 import type { Provider, ProviderType, VerificationStatus, ProviderDocument, ProviderSortOption } from '@petwo/shared';
 import { haversineDistanceKm, isValidCoordinates, encodeGeohash } from '../../utils/geospatial';
@@ -25,6 +25,7 @@ const AddressSchema = z.object({
 });
 
 const RegisterProviderSchema = z.object({
+  contactName: z.string().trim().min(2).max(100),
   businessName: z.string().min(2).max(100),
   businessType: z.enum([
     'individual_vet', 'veterinary_clinic', 'veterinary_hospital',
@@ -41,9 +42,10 @@ const RegisterProviderSchema = z.object({
   address: AddressSchema.optional(),
   coordinates: CoordinatesSchema.optional(),
   registrationNo: z.string().optional(),
-  panNumber: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/).optional(),
-  gstNumber: z.string().optional(),
+  panNumber: z.string().trim().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/).optional(),
+  gstNumber: z.string().trim().optional(),
 });
+
 
 const UpdateProviderSchema = RegisterProviderSchema.partial().extend({
   description: z.string().max(2000).optional(),
@@ -93,28 +95,32 @@ export default async function providerRoutes(app: FastifyInstance): Promise<void
    * POST /providers/register — Register as a new provider
    */
   app.post('/register', {
-    preHandler: [authenticate],
+    preHandler: [authenticateVerifiedFirebaseUser],
     schema: { tags: ['Providers'], security: [{ bearerAuth: [] }] },
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     const parsed = RegisterProviderSchema.safeParse(request.body);
     if (!parsed.success) {
+      const firstIssue = parsed.error.issues[0];
       return reply.status(422).send({
         success: false,
-        error: { code: 'VAL_001', message: 'Validation failed', details: parsed.error.format() },
+        error: {
+          code: 'VAL_001',
+          message: firstIssue ? `${firstIssue.path.join('.') || 'Request'}: ${firstIssue.message}` : 'Registration details are invalid.',
+          details: parsed.error.issues.map((issue) => ({ field: issue.path.join('.'), message: issue.message })),
+        },
       });
     }
 
     const db = getDb();
     const { getAuth } = await import('../../config/firebase');
-    const userId = request.user!.uid;
-
-    // Check if already registered as provider
-    const existing = await db.collection(COLLECTIONS.PROVIDERS).doc(userId).get();
-    if (existing.exists) {
-      return reply.status(409).send({
-        success: false,
-        error: { code: 'RES_002', message: 'Provider profile already exists.' },
-      });
+    const identity = request.firebaseIdentity!;
+    const userId = identity.uid;
+    if (parsed.data.contact.email.trim().toLowerCase() !== identity.email) {
+      return reply.status(403).send({ success: false, error: { code: 'AUTH_EMAIL_MISMATCH', message: 'The provider email must match the verified Firebase account.' } });
+    }
+    const emailMatch = await db.collection(COLLECTIONS.PROVIDERS).where('contact.email', '==', identity.email).limit(1).get();
+    if (!emailMatch.empty && emailMatch.docs[0].id !== userId) {
+      return reply.status(409).send({ success: false, error: { code: 'AUTH_003', message: 'A provider profile already exists for this verified email. Sign in or contact PETWO support to recover the existing account.' } });
     }
 
     const now = new Date().toISOString();
@@ -122,10 +128,15 @@ export default async function providerRoutes(app: FastifyInstance): Promise<void
       id: userId,
       userId,
       businessName: parsed.data.businessName,
+      contactName: parsed.data.contactName,
       businessType: parsed.data.businessType as ProviderType,
       description: parsed.data.description,
       tagline: parsed.data.tagline,
-      contact: parsed.data.contact,
+      contact: {
+        ...parsed.data.contact,
+        email: parsed.data.contact.email.trim().toLowerCase(),
+      },
+      emailVerified: true,
       verificationStatus: 'pending',
       documents: [],
       registrationNo: parsed.data.registrationNo,
@@ -141,16 +152,46 @@ export default async function providerRoutes(app: FastifyInstance): Promise<void
       updatedAt: now,
     };
 
-    await db.collection(COLLECTIONS.PROVIDERS).doc(userId).set(provider);
-
-    // Update user role to 'provider'
-    await db.collection(COLLECTIONS.USERS).doc(userId).update({
-      role: 'provider',
-      updatedAt: now,
+    const providerRef = db.collection(COLLECTIONS.PROVIDERS).doc(userId);
+    const userRef = db.collection(COLLECTIONS.USERS).doc(userId);
+    const registrationResult = await db.runTransaction(async (transaction) => {
+      const existing = await transaction.get(providerRef);
+      const userDoc = await transaction.get(userRef);
+      if (existing.exists) return 'exists' as const;
+      if (userDoc.exists && userDoc.data()?.role !== 'provider') return 'account-conflict' as const;
+      if (userDoc.exists && userDoc.data()?.isActive === false) return 'inactive' as const;
+      transaction.create(providerRef, provider);
+      transaction.set(userRef, {
+        id: userId,
+        email: identity.email,
+        displayName: parsed.data.contactName,
+        isEmailVerified: true,
+        role: 'provider',
+        isActive: true,
+        providerRegistrationPending: false,
+        ...(userDoc.exists ? { updatedAt: now } : { createdAt: now, updatedAt: now }),
+      }, { merge: true });
+      return 'created' as const;
     });
 
+    if (registrationResult === 'exists') {
+      return reply.status(409).send({ success: false, error: { code: 'RES_002', message: 'Provider profile already exists.' } });
+    }
+    if (registrationResult === 'account-conflict') {
+      return reply.status(409).send({ success: false, error: { code: 'AUTH_003', message: 'This Firebase account belongs to another PETWO role.' } });
+    }
+    if (registrationResult === 'inactive') {
+      return reply.status(403).send({ success: false, error: { code: 'AUTH_004', message: 'This account is deactivated. Contact PETWO support.' } });
+    }
+
     // Update Firebase custom claims
-    await getAuth().setCustomUserClaims(userId, { role: 'provider' });
+    try {
+      await getAuth().setCustomUserClaims(userId, { role: 'provider' });
+    } catch (error) {
+      // API authorization reads the Firestore role. A claims sync failure must
+      // not turn a successfully persisted provider application into an HTTP 500.
+      request.log.warn({ err: error, userId }, 'Provider role claim sync failed');
+    }
 
     return reply.status(201).send({ success: true, data: provider });
   });
@@ -648,3 +689,4 @@ export default async function providerRoutes(app: FastifyInstance): Promise<void
     return reply.send({ success: true, data: { slots, date: dateStr } });
   });
 }
+

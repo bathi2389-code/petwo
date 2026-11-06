@@ -47,7 +47,7 @@ describe('QA API Integration — Security Headers & Middleware Enforcement', () 
   it('handles CORS preflight OPTIONS request for authorized origins', async () => {
     const res = await app.inject({
       method: 'OPTIONS',
-      url: '/api/v1/auth/otp/send',
+      url: '/api/v1/auth/customer/profile',
       headers: {
         origin: 'http://localhost:3000',
         'access-control-request-method': 'POST',

@@ -1,0 +1,31 @@
+{
+  "root": true,
+  "env": {
+    "es2022": true,
+    "browser": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended"],
+  "overrides": [
+    {
+      "files": ["backend/**/*.ts"],
+      "parser": "@typescript-eslint/parser",
+      "plugins": ["@typescript-eslint"],
+      "extends": ["plugin:@typescript-eslint/recommended"],
+      "parserOptions": { "sourceType": "module" }
+    },
+    {
+      "files": ["apps/provider-web/**/*.{ts,tsx}", "apps/admin-web/**/*.{ts,tsx}"],
+      "extends": ["next/core-web-vitals"],
+      "plugins": ["@typescript-eslint"],
+      "rules": {
+        "no-undef": "off",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "warn",
+        "react/no-unescaped-entities": "warn"
+      },
+      "parserOptions": { "sourceType": "module" }
+    }
+  ],
+  "ignorePatterns": ["**/node_modules/**", "**/.next/**", "**/dist/**", "**/build/**"]
+}

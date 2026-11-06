@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:petwo_customer/config/theme.dart';
 import 'package:petwo_customer/models/provider_model.dart';
 import 'package:petwo_customer/services/api_service.dart';
+import 'package:petwo_customer/screens/providers/provider_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -388,7 +389,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _providerCard(ProviderModel provider) {
     final hasReviews = provider.reviewCount > 0 && provider.rating > 0;
-    return Container(
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<bool>(
+          builder: (_) => ProviderDetailsScreen(providerId: provider.id),
+        ),
+      ),
+      child: Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFFE9ECF1))),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -431,6 +439,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ]),
         ),
       ]),
+      ),
     );
   }
 }

@@ -88,37 +88,4 @@ describe('Security & Cryptography Utilities', () => {
     });
   });
 
-  describe('Cryptographic OTP Authentication & Replay Prevention', () => {
-    // Standard HMAC salt and pepper
-    const phone = '+919876543210';
-    const otp = '482910';
-
-    it('generates consistent HMAC-SHA256 salted hashes and verifies in constant time', async () => {
-      const { hashOtp, verifyOtpConstantTime } = await import('../api/routes/auth.routes');
-      const hash = hashOtp(otp, phone);
-      expect(hash).toBeDefined();
-      expect(hash).toHaveLength(64); // SHA256 hex string
-
-      const valid = verifyOtpConstantTime(otp, phone, hash);
-      expect(valid).toBe(true);
-    });
-
-    it('rejects incorrect OTPs safely', async () => {
-      const { hashOtp, verifyOtpConstantTime } = await import('../api/routes/auth.routes');
-      const hash = hashOtp(otp, phone);
-
-      const invalid = verifyOtpConstantTime('999999', phone, hash);
-      expect(invalid).toBe(false);
-    });
-
-    it('prevents replay attacks on different phone numbers with same OTP', async () => {
-      const { hashOtp, verifyOtpConstantTime } = await import('../api/routes/auth.routes');
-      const hash = hashOtp(otp, phone);
-
-      // Attempt to use same hash for another phone number
-      const wrongPhone = '+919123456789';
-      const replayValid = verifyOtpConstantTime(otp, wrongPhone, hash);
-      expect(replayValid).toBe(false);
-    });
-  });
 });

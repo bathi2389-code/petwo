@@ -20,7 +20,8 @@ export default function HomePage() {
           <a href="#providers" className="transition hover:text-teal-800">For providers</a>
         </nav>
         <div className="flex items-center gap-2">
-          <Link href="/customer/login" className="rounded-xl px-3 py-2.5 text-sm font-bold text-teal-800 transition hover:bg-teal-50 sm:px-4">Pet parent sign in</Link>
+          <Link href="/customer/register" className="rounded-xl px-3 py-2.5 text-sm font-bold text-teal-800 transition hover:bg-teal-50 sm:px-4">Create pet account</Link>
+          <Link href="/customer/login" className="hidden rounded-xl px-3 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-100 sm:inline-flex">Pet parent sign in</Link>
           <Link href="/login" className="hidden rounded-xl px-3 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-100 sm:inline-flex">Provider login</Link>
           <a href="#services" className="hidden rounded-xl bg-[#087f70] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-teal-900/10 transition hover:-translate-y-0.5 hover:bg-[#066b60] sm:inline-flex">Explore PETWO <ArrowRight className="ml-2 h-4 w-4" /></a>
         </div>
@@ -40,7 +41,7 @@ export default function HomePage() {
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <a href="#services" className="inline-flex items-center justify-center rounded-xl bg-[#087f70] px-6 py-4 text-sm font-bold text-white shadow-xl shadow-teal-900/15 transition hover:-translate-y-0.5 hover:bg-[#066b60]">Explore pet care <ArrowRight className="ml-2 h-4 w-4" /></a>
-            <Link href="/customer/login" className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-4 text-sm font-bold text-slate-700 transition hover:border-teal-200 hover:bg-teal-50">I'm a pet parent</Link>
+            <Link href="/customer/register" className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-4 text-sm font-bold text-slate-700 transition hover:border-teal-200 hover:bg-teal-50">Create a pet-parent account</Link>
           </div>
           <div className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-slate-500">
             <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-teal-700" /> Pet-first experience</span>

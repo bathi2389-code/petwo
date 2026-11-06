@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" role="img" aria-labelledby="title">
+  <title id="title">PETWO</title>
+  <defs>
+    <linearGradient id="mark" x1="8" y1="8" x2="100" y2="102" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#13B99A"/>
+      <stop offset="1" stop-color="#087F70"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="100" height="100" rx="31" fill="url(#mark)"/>
+  <path d="M26 42c-5-3-8-8-7-13 1-5 5-8 10-7 5 1 8 7 7 13-1 6-5 10-10 7Zm21-10c-5 0-9-4-9-10 0-5 3-9 8-9s9 5 9 10c0 6-3 9-8 9Zm21 1c-5 2-10 0-12-5-2-5 0-10 5-12 4-2 9 1 11 6 2 5 1 9-4 11Zm12 17c-5 3-10 2-13-2-3-4-2-10 2-13 4-3 9-2 12 3 3 4 3 9-1 12Z" fill="#fff"/>
+  <path d="M31 63c0-10 8-18 19-18 8 0 13 5 17 10 3-4 7-6 12-6 9 0 15 7 15 16 0 11-9 20-21 25-5 2-9 2-14 0-16-6-28-15-28-27Z" fill="#fff"/>
+  <path d="M50 68c4-5 11-5 15 0l2 2 2-2c4-5 11-5 15 0 4 5 2 11-2 15l-15 13-15-13c-5-4-6-10-2-15Z" fill="#D9FFF3"/>
+</svg>

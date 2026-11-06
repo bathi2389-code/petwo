@@ -1,12 +1,12 @@
 import 'dotenv/config';
 import { z } from 'zod';
 
-const envSchema = z.object({
+export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().default(4000),
   HOST: z.string().default('0.0.0.0'),
   API_VERSION: z.string().default('v1'),
-  CORS_ORIGINS: z.string().default('http://localhost:3000'),
+  CORS_ORIGINS: z.string().optional(),
 
   FIREBASE_PROJECT_ID: z.string().min(1),
   FIREBASE_PRIVATE_KEY: z.string().min(1),
@@ -20,9 +20,11 @@ const envSchema = z.object({
   RAZORPAY_KEY_SECRET: z.string().min(1),
   RAZORPAY_WEBHOOK_SECRET: z.string().min(1),
 
-  MSG91_AUTH_KEY: z.string().optional(),
-  MSG91_TEMPLATE_ID_OTP: z.string().optional(),
-  MSG91_SENDER_ID: z.string().default('PETWOI'),
+  GEMINI_API_KEY: z.string().optional(),
+
+  WHATSAPP_API_KEY: z.string().optional(),
+  WHATSAPP_PHONE_NUMBER_ID: z.string().optional(),
+  WHATSAPP_VERIFY_TOKEN: z.string().optional(),
 
   ALGOLIA_APP_ID: z.string().optional(),
   ALGOLIA_ADMIN_API_KEY: z.string().optional(),
@@ -34,6 +36,21 @@ const envSchema = z.object({
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(60000),
 
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+}).superRefine((values, context) => {
+  if (values.NODE_ENV === 'production' && !values.CORS_ORIGINS) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['CORS_ORIGINS'],
+      message: 'Set CORS_ORIGINS to the exact production web app origins.',
+    });
+  }
+  if (Boolean(values.WHATSAPP_API_KEY) !== Boolean(values.WHATSAPP_PHONE_NUMBER_ID)) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['WHATSAPP_PHONE_NUMBER_ID'],
+      message: 'Set both WHATSAPP_API_KEY and WHATSAPP_PHONE_NUMBER_ID to enable outbound WhatsApp messages.',
+    });
+  }
 });
 
 // In test mode, provide safe fallback values for integration testing

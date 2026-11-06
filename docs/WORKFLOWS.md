@@ -12,25 +12,18 @@ sequenceDiagram
     actor Customer as 📱 Pet Owner
     participant App as Flutter App
     participant Gateway as Fastify API
-    participant SMS as MSG91 SMS Gateway
     participant Auth as Firebase Auth
     participant DB as Cloud Firestore
 
-    Customer->>App: Enters Phone (+91 98765 43210)
-    App->>Gateway: POST /api/v1/auth/otp/send
-    Gateway->>DB: Check rate limits (30s cooldown)
-    Gateway->>SMS: Dispatch 6-digit OTP
-    Gateway-->>App: { expiresIn: 600s }
+    Customer->>App: Enters name and email address
+    App->>Gateway: Firebase createUserWithEmailAndPassword + sendEmailVerification
+    Firebase->>Customer: Send verification link
+    Customer->>Firebase: Open verification link
 
-    Customer->>App: Enters OTP (e.g. 123456)
-    App->>Gateway: POST /api/v1/auth/otp/verify
-    Gateway->>DB: Verify OTP hash & attempt count
-    Gateway->>Auth: Create/Fetch User UID
-    Gateway->>DB: Upsert users/{uid} & customers/{uid}
-    Gateway->>Auth: Mint Custom Auth Token
-    Gateway-->>App: { customToken, role: "customer" }
-    App->>Auth: signInWithCustomToken()
-    Auth-->>App: Firebase ID Token
+    Customer->>App: Return to PETWO and refresh emailVerified
+    App->>Gateway: POST /api/v1/auth/customer/profile with Firebase ID token
+    Gateway->>Firebase: Verify signed ID token and email_verified claim
+    Gateway->>DB: Upsert users/{uid} & customers/{uid} idempotently
 
     Customer->>App: Fills Pet Profile (Name, Species, Breed, Allergies)
     App->>Gateway: POST /api/v1/pets

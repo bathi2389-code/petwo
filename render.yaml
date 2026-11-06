@@ -4,9 +4,8 @@ services:
     env: node
     plan: free
     region: singapore
-    rootDir: backend
-    buildCommand: npm install && npm run build --workspace=@petwo/shared && npm run build
-    startCommand: node dist/server.js
+    buildCommand: npm ci && npm run build --workspace=@petwo/shared && npm run build --workspace=@petwo/backend
+    startCommand: npm run start --workspace=@petwo/backend
     envVars:
       - key: NODE_ENV
         value: production
@@ -14,49 +13,79 @@ services:
         value: 10000
       - key: API_VERSION
         value: v1
+      - key: CORS_ORIGINS
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: RAZORPAY_KEY_ID
-        value: rzp_test_placeholder
+        sync: false
       - key: RAZORPAY_KEY_SECRET
-        value: rzp_secret_placeholder
+        sync: false
       - key: RAZORPAY_WEBHOOK_SECRET
-        value: rzp_webhook_secret_placeholder
+        sync: false
       - key: FIREBASE_PROJECT_ID
-        value: petwo-prod
+        value: petwo-95436
       - key: FIREBASE_CLIENT_EMAIL
-        value: mock@petwo-prod.iam.gserviceaccount.com
+        sync: false
       - key: FIREBASE_STORAGE_BUCKET
-        value: petwo-prod.appspot.com
+        sync: false
       - key: FIREBASE_PRIVATE_KEY
-        value: "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEA0mockkey...\n-----END RSA PRIVATE KEY-----\n"
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: WHATSAPP_API_KEY
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: WHATSAPP_VERIFY_TOKEN
+        sync: false
+      - key: ALGOLIA_APP_ID
+        sync: false
+      - key: ALGOLIA_ADMIN_API_KEY
+        sync: false
+      - key: ALGOLIA_INDEX_PROVIDERS
+        value: petwo_providers
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
 
   - type: web
     name: petwo-provider-web
     env: node
     plan: free
     region: singapore
-    rootDir: apps/provider-web
-    buildCommand: npm install && npm run build --workspace=@petwo/shared && npm run build
-    startCommand: npm start
+    buildCommand: npm ci && npm run build --workspace=@petwo/shared && npm run build --workspace=petwo-provider-web
+    startCommand: npm run start --workspace=petwo-provider-web
     envVars:
       - key: NEXT_PUBLIC_API_URL
         fromService:
           name: petwo-backend
           type: web
           property: host
+      - key: NEXT_PUBLIC_FIREBASE_API_KEY
+        sync: false
+      - key: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+        sync: false
+      - key: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+        value: petwo-95436
+      - key: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+        sync: false
+      - key: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+        sync: false
+      - key: NEXT_PUBLIC_FIREBASE_APP_ID
+        sync: false
 
   - type: web
     name: petwo-admin-web
     env: node
     plan: free
     region: singapore
-    rootDir: apps/admin-web
-    buildCommand: npm install && npm run build --workspace=@petwo/shared && npm run build
-    startCommand: npm start
+    buildCommand: npm ci && npm run build --workspace=@petwo/shared && npm run build --workspace=petwo-admin-web
+    startCommand: npm run start --workspace=petwo-admin-web
     envVars:
       - key: NEXT_PUBLIC_API_URL
         fromService:
           name: petwo-backend
           type: web
           property: host
+      - key: NEXT_PUBLIC_FIREBASE_API_KEY
+        sync: false

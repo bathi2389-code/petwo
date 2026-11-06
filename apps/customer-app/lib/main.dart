@@ -31,13 +31,73 @@ class PetwoApp extends StatelessWidget {
   Widget build(BuildContext context) => MaterialApp(
     title: 'PETWO', debugShowCheckedModeBanner: false, theme: PetwoTheme.lightTheme,
     home: firebaseConfigured ? StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
+      stream: FirebaseAuth.instance.userChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) return const Scaffold(body: Center(child: CircularProgressIndicator()));
-        return snapshot.data == null ? const CustomerLoginScreen() : const MainNavigationShell();
+        final user = snapshot.data;
+        if (user == null) return const CustomerLoginScreen();
+        if (!user.emailVerified) return const CustomerLoginScreen(verificationPending: true);
+        return CustomerProfileGate(key: ValueKey(user.uid), user: user);
       },
     ) : const FirebaseSetupScreen(),
   );
+}
+
+class CustomerProfileGate extends StatefulWidget {
+  const CustomerProfileGate({super.key, required this.user});
+  final User user;
+  @override
+  State<CustomerProfileGate> createState() => _CustomerProfileGateState();
+}
+
+class _CustomerProfileGateState extends State<CustomerProfileGate> {
+  late Future<void> _profileFuture;
+  @override
+  void initState() { super.initState(); _profileFuture = _activate(); }
+  Future<void> _activate() async {
+    await widget.user.reload();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null || !user.emailVerified) throw StateError('Verify your email before using PETWO.');
+    final name = user.displayName?.trim().isNotEmpty == true ? user.displayName!.trim() : (user.email?.split('@').first ?? 'PETWO Customer');
+    await ApiService().activateCustomerProfile(name);
+  }
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _profileFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+        if (!snapshot.hasError) return const MainNavigationShell();
+        return Scaffold(
+          body: SafeArea(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(28),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 460),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.pets, size: 48, color: PetwoTheme.primary),
+                      const SizedBox(height: 18),
+                      const Text('Finish setting up PETWO', style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 10),
+                      Text(snapshot.error.toString().replaceFirst('Exception: ', ''), textAlign: TextAlign.center, style: const TextStyle(color: PetwoTheme.textSecondary)),
+                      const SizedBox(height: 18),
+                      FilledButton(onPressed: () => setState(() => _profileFuture = _activate()), child: const Text('Try again')),
+                      TextButton(onPressed: () async => ApiService().signOut(), child: const Text('Sign out')),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 class FirebaseSetupScreen extends StatelessWidget {

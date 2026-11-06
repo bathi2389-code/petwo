@@ -32,7 +32,7 @@ flowchart TD
     end
 
     subgraph CoreBackend["Central API Engine (Node.js / Fastify / TypeScript)"]
-        D["Auth & Security Engine<br/>(Salted HMAC-SHA256 OTP)"]
+        D["Auth & Security Engine<br/>(Firebase email verification links)"]
         E["Atomic Booking Engine<br/>(Transaction Slot Locks)"]
         F["Financial Engine<br/>(Razorpay UPI Split & Escrow)"]
         G["IoT Telemetry Engine<br/>(GPS Geofence & Health)"]

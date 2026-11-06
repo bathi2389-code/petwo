@@ -28,9 +28,6 @@ export const ERROR_CODES = {
   AUTH_TOKEN_EXPIRED: 'AUTH_002',
   AUTH_INSUFFICIENT_PERMISSIONS: 'AUTH_003',
   AUTH_USER_INACTIVE: 'AUTH_004',
-  AUTH_OTP_EXPIRED: 'AUTH_005',
-  AUTH_OTP_INVALID: 'AUTH_006',
-  AUTH_OTP_MAX_ATTEMPTS: 'AUTH_007',
 
   // Validation
   VALIDATION_FAILED: 'VAL_001',
@@ -110,13 +107,6 @@ export const BOOKING = {
   REMINDER_MINUTES_BEFORE: 60,    // Send reminder 60min before
   MAX_RESCHEDULES: 2,
   AUTO_COMPLETE_HOURS: 2,         // Auto-complete booking N hours after scheduled end
-} as const;
-
-export const OTP = {
-  LENGTH: 6,
-  EXPIRES_MINUTES: 10,
-  MAX_ATTEMPTS: 3,
-  RESEND_COOLDOWN_SECONDS: 30,
 } as const;
 
 export const PAGINATION = {

@@ -15,39 +15,11 @@ describe('QA Security Audit — OWASP Top 10 Resilience Tests', () => {
   });
 
   describe('A03:2021 — Injection Flaw Resistance', () => {
-    it('rejects SQL injection payloads in phone authentication fields', async () => {
-      const sqlInjectionPayloads = [
-        "' OR '1'='1",
-        "admin'--",
-        "'; DROP TABLE users; --",
-        "1' UNION SELECT * FROM users--",
-      ];
-
-      for (const payload of sqlInjectionPayloads) {
-        const res = await app.inject({
-          method: 'POST',
-          url: '/api/v1/auth/otp/send',
-          payload: { phone: payload },
-        });
-
-        // Must reject with validation failure (422) or client error (400)
-        expect([400, 422]).toContain(res.statusCode);
-        const body = JSON.parse(res.body);
-        expect(body.success).toBe(false);
+    it('does not expose retired OTP authentication endpoints', async () => {
+      for (const url of ['/api/v1/auth/otp/send', '/api/v1/auth/otp/verify', '/api/v1/auth/customer-email/otp/send']) {
+        const res = await app.inject({ method: 'POST', url, payload: { email: { $gt: '' }, phone: '+919876543210' } });
+        expect(res.statusCode).toBe(404);
       }
-    });
-
-    it('rejects NoSQL injection operator objects in place of primitive strings', async () => {
-      const res = await app.inject({
-        method: 'POST',
-        url: '/api/v1/auth/otp/send',
-        payload: { phone: { $gt: '' } }, // Attempting Mongo/NoSQL operator injection
-      });
-
-      expect([400, 422]).toContain(res.statusCode);
-      const body = JSON.parse(res.body);
-      // Fastify or custom envelope
-      expect(body.success === false || body.statusCode === 400 || body.statusCode === 422 || body.error !== undefined).toBe(true);
     });
   });
 
@@ -97,7 +69,7 @@ describe('QA Security Audit — OWASP Top 10 Resilience Tests', () => {
       expect(res.statusCode).toBe(401);
     });
 
-    it('rejects OTP verification without required 6-digit length', async () => {
+    it('does not expose legacy OTP verification', async () => {
       const res = await app.inject({
         method: 'POST',
         url: '/api/v1/auth/otp/verify',
@@ -107,7 +79,7 @@ describe('QA Security Audit — OWASP Top 10 Resilience Tests', () => {
         },
       });
 
-      expect([400, 422]).toContain(res.statusCode);
+      expect(res.statusCode).toBe(404);
     });
   });
 

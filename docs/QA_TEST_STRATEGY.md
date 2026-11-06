@@ -71,7 +71,7 @@ graph TD
 3. **OWASP Top 10 Resilience** ([`tests/security/owasp-audit.test.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/tests/security/owasp-audit.test.ts)):
    - **A03: Injection**: Rejects SQL injection payloads (`' OR '1'='1`) and NoSQL operator injections (`{ $gt: '' }`).
    - **A01: Broken Access Control**: Denies unauthenticated calls to `/api/v1/admin/*` and `/api/v1/health-passport/*` with HTTP 401.
-   - **A07: Identification & Auth**: Rejects forged JWT tokens and invalid OTP lengths.
+   - **A07: Identification & Auth**: Rejects forged Firebase ID tokens and unverified customer/provider tokens.
    - **A05: Security Misconfiguration**: Verifies no internal stack traces or database driver paths leak in error payloads.
 4. **Accessibility (a11y) & WCAG 2.1 AA** ([`tests/a11y/a11y-audit.test.ts`](file:///c:/Users/shaik/OneDrive/Desktop/PETWO/tests/a11y/a11y-audit.test.ts)):
    - Validates touch targets are $\ge 44\times 44\text{px}$ on mobile devices ($56\text{px}$ for 24/7 SOS Emergency Button).

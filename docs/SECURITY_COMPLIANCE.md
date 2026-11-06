@@ -83,4 +83,4 @@ PETWO implements a **Deny-by-Default** security posture in `infrastructure/fireb
 
 - **Fastify Helmet**: Secure HTTP response headers (Content-Security-Policy, Strict-Transport-Security, X-Frame-Options `DENY`).
 - **CORS Whitelist**: Explicit origin restrictions matching verified domains (`https://petwo.in`, `https://provider.petwo.in`, `https://admin.petwo.in`).
-- **Distributed Rate Limiting**: Enforced via `@fastify/rate-limit` (100 requests per minute per IP / authenticated user) with exponential penalties for brute-force OTP attempts.
+- **Distributed Rate Limiting**: Enforced via `@fastify/rate-limit` (100 requests per minute per IP / authenticated user) for authentication and verification endpoints.

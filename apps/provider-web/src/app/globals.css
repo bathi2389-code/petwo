@@ -48,6 +48,12 @@
   .petwo-field { @apply mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition focus:border-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-600/10; }
   .petwo-button-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-teal-800 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-teal-900 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50; }
   .petwo-button-secondary { @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:border-teal-200 hover:bg-teal-50 hover:text-teal-900; }
+  .provider-login-card { @apply w-full rounded-[1.75rem] border border-white/90 bg-white p-6 shadow-[0_28px_90px_-40px_rgba(15,65,60,0.32)] sm:p-9; }
+  .provider-login-field { @apply relative mt-2; }
+  .provider-login-icon { @apply pointer-events-none absolute left-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-slate-400; }
+  .provider-login-input { @apply h-14 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm font-medium text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-teal-700 focus:bg-white focus:ring-4 focus:ring-teal-700/10; }
+  .provider-login-submit { @apply flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#087f70] px-5 text-sm font-bold text-white shadow-lg shadow-teal-900/15 transition hover:-translate-y-0.5 hover:bg-[#066b60] hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-teal-600/20 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-55 disabled:shadow-none; }
+  .provider-login-label { @apply block text-sm font-semibold text-slate-700; }
 }
 
 @media (prefers-reduced-motion: no-preference) {

@@ -40,7 +40,7 @@ graph TD
 
     subgraph External["External Integrations"]
         RZP["Razorpay India\n(Orders, Route, Webhooks)"]
-        MSG["MSG91 / Twilio\n(SMS OTP Gateway)"]
+        FIREBASE_AUTH["Firebase Auth\n(Email verification links)"]
         GEMINI["Google Gemini API\n(gemini-3.8-flash)"]
         MAPS["Google Maps Platform\n(Geocoding & Places)"]
     end
@@ -97,7 +97,7 @@ PETWO implements a **Logical Multi-Tenancy Model** built on Cloud Firestore:
 
 1. **Transport Layer**: Strict HTTPS / TLS 1.3 encryption across all public endpoints with HTTP Strict Transport Security (HSTS).
 2. **Authentication**:
-   - Customer and Provider phone OTP authentication producing signed Firebase ID tokens.
+   - Customer and Provider Firebase Email/Password authentication with verification links and signed Firebase ID tokens. Phone numbers are contact details only.
    - JWT tokens verified in `auth.middleware.ts` on every privileged endpoint.
 3. **Authorization Matrix**:
    - `customer`: Access to own pets, own bookings, payment orders, public provider search, reviews authoring.

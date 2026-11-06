@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import axios from 'axios';
-import { getDb, COLLECTIONS } from './webhook.routes';
+import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isCustomer } from '../../middleware/auth.middleware';
 import { nanoid } from 'nanoid';
 import type { Pet } from '@petwo/shared';

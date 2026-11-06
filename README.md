@@ -67,7 +67,7 @@ PETWO/
 ### A. Customer Mobile Application (`apps/customer-app`)
 *Built with Flutter 3.x, Riverpod, Dio, and Razorpay SDK.*
 
-- **Authentication**: Phone number OTP sign-in with SMS auto-detection.
+- **Authentication**: Firebase Email/Password sign-in with Firebase email verification links.
 - **Multiple Pet Profiles**: Track name, breed, species, gender, weight, allergy alerts, and special behavioral notes.
 - **Health Records**: View vaccination due dates and veterinary consultation histories.
 - **Discovery**: Location-aware search across Hyderabad neighborhoods, filtering by ratings, facility type, and distance.
@@ -158,35 +158,9 @@ PETWO/
 
 ---
 
-### Local OTP / SMS setup
+### Firebase email verification
 
-The customer and provider web portals use the backend OTP endpoints. In development, the backend returns a visible test OTP only when MSG91 is not configured. If both `MSG91_AUTH_KEY` and `MSG91_TEMPLATE_ID_OTP` are present in `backend/.env`, the backend sends a real SMS through MSG91 even while `NODE_ENV=development`. A failed MSG91 request is returned as an error; the API does not report a false success.
-
-1. In the MSG91 dashboard, create an **OTP template** containing the `##OTP##` placeholder and complete the required Indian DLT sender/template approvals.
-2. Copy the MSG91 Auth Key and OTP Template ID into `backend/.env`:
-   ```dotenv
-   MSG91_AUTH_KEY=your_real_msg91_auth_key
-   MSG91_TEMPLATE_ID_OTP=your_otp_template_id
-   ```
-3. Restart the backend after changing environment variables.
-4. Open `http://localhost:3000/customer/login`, enter a real Indian mobile number, and request an OTP. The code is sent by MSG91 when configured. Enter the received code to complete backend validation and Firebase custom-token sign-in.
-
-Never commit `backend/.env`, paste the Auth Key into chat, or expose it in frontend variables. OTPs are short-lived, stored as keyed hashes, and deleted after successful verification. Local development OTPs are shown in the UI only when MSG91 credentials are absent.
-
-### Flutter Firebase setup
-
-Register an Android app (and an iOS app if needed) inside the same Firebase project. Supply the app's Firebase values at launch using Dart defines; do not hard-code private service-account credentials into the mobile app. Example:
-
-```bash
-flutter run \
-  --dart-define=PETWO_API_BASE_URL=http://10.0.2.2:4000/api/v1 \
-  --dart-define=PETWO_FIREBASE_API_KEY=YOUR_FIREBASE_APP_API_KEY \
-  --dart-define=PETWO_FIREBASE_APP_ID=YOUR_FIREBASE_ANDROID_APP_ID \
-  --dart-define=PETWO_FIREBASE_MESSAGING_SENDER_ID=965609244701 \
-  --dart-define=PETWO_FIREBASE_PROJECT_ID=petwo-95436
-```
-
-For an Android emulator, `10.0.2.2` reaches the host Mac's localhost. For a physical phone, use the Mac's LAN IP address; for an iOS simulator, use `http://localhost:4000/api/v1`. The mobile app signs in with the Firebase custom token returned by the backend and uses the resulting Firebase ID token for protected API requests.
+Customer and provider accounts use Firebase Authentication Email/Password. Firebase sends its built-in verification link; the backend trusts only a verified Firebase ID token and stores the application role/profile in Firestore. No Resend, MSG91, or development OTP is used for authentication. Add each local/production web host under Firebase Authentication → Settings → Authorized domains. Provider registration approval remains a separate Firestore workflow.
 
 ## 5. Automated Tests
 

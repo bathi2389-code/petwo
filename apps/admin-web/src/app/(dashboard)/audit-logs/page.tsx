@@ -27,7 +27,7 @@ export default function AdminAuditLogsPage() {
       id: 'AUD-88208',
       timestamp: '02 Nov 2026, 11:04:22',
       actor: 'system (security-engine)',
-      action: 'OTP_RATE_LIMIT_BLOCKED',
+      action: 'AUTH_RATE_LIMIT_BLOCKED',
       target: '+919999999999',
       ip: '103.21.144.90',
       status: 'blocked',

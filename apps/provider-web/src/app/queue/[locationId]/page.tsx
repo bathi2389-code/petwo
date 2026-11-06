@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Clock, ShieldAlert, Volume2, Sparkles, Building2, Stethoscope } from 'lucide-react';
-import axios from 'axios';
+import { apiClient } from '@/lib/api-client';
 
 interface QueuePayload {
   locationId: string;
@@ -31,6 +31,7 @@ export default function ReceptionQueueTVDisplay({ params }: { params: { location
   const [data, setData] = useState<QueuePayload | null>(null);
   const [currentTime, setCurrentTime] = useState<string>('');
   const [audioEnabled, setAudioEnabled] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // Live Clock
   useEffect(() => {
@@ -54,34 +55,15 @@ export default function ReceptionQueueTVDisplay({ params }: { params: { location
   useEffect(() => {
     async function fetchQueue() {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
-        const res = await axios.get(`${apiUrl}/queue/${params.locationId}`);
+        const res = await apiClient.get(`/queue/${encodeURIComponent(params.locationId)}`);
         if (res.data?.data) {
           setData(res.data.data);
+          setLoadError(null);
+        } else {
+          setLoadError('Queue data is not available.');
         }
-      } catch (e) {
-        // Fallback demo state for TV preview
-        setData({
-          locationId: params.locationId,
-          nowServing: {
-            tokenNumber: 'A-99A1',
-            room: 'Consultation Suite 1',
-            doctorName: 'Dr. Srinivas Rao, MVSc (Surgery)',
-            petName: 'Rocky (Golden Retriever)',
-            serviceName: 'Comprehensive Clinical Consultation',
-          },
-          upNext: [
-            { tokenNumber: 'A-44BC', scheduledTime: '11:15 AM', estimatedWaitMins: 12, status: 'confirmed' },
-            { tokenNumber: 'A-12EF', scheduledTime: '11:30 AM', estimatedWaitMins: 27, status: 'confirmed' },
-            { tokenNumber: 'A-88GH', scheduledTime: '11:45 AM', estimatedWaitMins: 42, status: 'confirmed' },
-          ],
-          stats: {
-            totalToday: 24,
-            completedToday: 14,
-            inWaitingRoom: 3,
-          },
-          announcement: 'PETWO 24/7 Emergency Care Active • Free Dental Checkups during Pet Health Month in Hyderabad',
-        });
+      } catch {
+        setLoadError('Could not load the live queue. Retrying shortly.');
       }
     }
 
@@ -102,12 +84,12 @@ export default function ReceptionQueueTVDisplay({ params }: { params: { location
             <div className="flex items-center gap-2">
               <h1 className="text-2xl lg:text-3xl font-extrabold tracking-tight">PETWO Healthcare Network</h1>
               <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full border border-emerald-500/20">
-                LIVE QUEUE
+                {loadError ? 'CONNECTION ISSUE' : 'LIVE QUEUE'}
               </span>
             </div>
             <p className="text-slate-400 text-sm mt-0.5 flex items-center gap-2">
               <Building2 className="h-4 w-4 text-orange-500" />
-              TailBlazers Specialty Pet Hospital • Banjara Hills, Hyderabad
+              Location {params.locationId}
             </p>
           </div>
         </div>
@@ -121,6 +103,8 @@ export default function ReceptionQueueTVDisplay({ params }: { params: { location
           </div>
         </div>
       </header>
+
+      {loadError && <p role="status" className="my-3 rounded-xl border border-amber-700/50 bg-amber-950/40 px-4 py-3 text-sm text-amber-200">{loadError}</p>}
 
       {/* Main Split Screen */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 my-auto py-6">
@@ -141,11 +125,11 @@ export default function ReceptionQueueTVDisplay({ params }: { params: { location
 
               <div className="space-y-2 pt-2">
                 <div className="text-2xl lg:text-3xl font-bold text-orange-300">
-                  {data?.nowServing.room || 'Consultation Suite'}
+                {data?.nowServing.room || 'No active appointment'}
                 </div>
                 <div className="text-lg lg:text-xl text-slate-200 font-medium flex items-center gap-2">
                   <Stethoscope className="h-5 w-5 text-orange-400" />
-                  {data?.nowServing.doctorName || 'Attending Doctor'}
+                  {data?.nowServing.doctorName || '—'}
                 </div>
               </div>
             </div>
@@ -154,7 +138,7 @@ export default function ReceptionQueueTVDisplay({ params }: { params: { location
           <div className="border-t border-slate-800 pt-6 mt-8 flex items-center justify-between">
             <div>
               <span className="text-xs uppercase tracking-wider text-slate-400 font-bold">Patient Name</span>
-              <div className="text-lg font-bold text-white mt-0.5">{data?.nowServing.petName || 'Patient'}</div>
+              <div className="text-lg font-bold text-white mt-0.5">{data?.nowServing.petName || '—'}</div>
             </div>
             <div className="text-right">
               <span className="text-xs uppercase tracking-wider text-slate-400 font-bold">Procedure</span>
@@ -221,7 +205,7 @@ export default function ReceptionQueueTVDisplay({ params }: { params: { location
           ANNOUNCEMENT:
         </div>
         <div className="text-sm font-medium text-orange-200 whitespace-nowrap overflow-hidden text-ellipsis">
-          {data?.announcement}
+          {data?.announcement || 'Live queue updates will appear here.'}
         </div>
       </footer>
     </div>

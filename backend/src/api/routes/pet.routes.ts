@@ -1,8 +1,9 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
-import { getDb, COLLECTIONS } from './webhook.routes';
+import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isCustomer, isAdmin } from '../../middleware/auth.middleware';
 import { nanoid } from 'nanoid';
+import dayjs from 'dayjs';
 import type { Pet, PetSpecies, PetGender, VaccinationRecord, MedicalRecord } from '@petwo/shared';
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
@@ -127,8 +128,32 @@ export default async function petRoutes(app: FastifyInstance): Promise<void> {
 
     const pet = doc.data() as Pet;
 
-    // Customers can only see their own pets; providers/admins can see authorized pets
-    if (request.user!.role === 'customer' && pet.ownerId !== request.user!.uid) {
+    const user = request.user!;
+    let isAuthorized = user.role === 'admin' || user.role === 'super_admin';
+    if (user.role === 'customer') {
+      isAuthorized = pet.ownerId === user.uid;
+    } else if (user.role === 'provider') {
+      const [booking, consents] = await Promise.all([
+        db.collection(COLLECTIONS.BOOKINGS)
+          .where('providerId', '==', user.uid)
+          .where('petId', '==', doc.id)
+          .limit(1)
+          .get(),
+        db.collection('medicalConsents')
+          .where('providerId', '==', user.uid)
+          .where('petId', '==', doc.id)
+          .where('ownerId', '==', pet.ownerId)
+          .where('status', '==', 'active')
+          .get(),
+      ]);
+      const hasCurrentConsent = consents.docs.some((consentDoc) => {
+        const expiresAt = consentDoc.data().expiresAt;
+        return typeof expiresAt === 'string' && dayjs(expiresAt).isAfter(dayjs());
+      });
+      isAuthorized = !booking.empty || hasCurrentConsent;
+    }
+
+    if (!isAuthorized) {
       return reply.status(403).send({
         success: false,
         error: { code: 'AUTH_003', message: 'Access denied.' },

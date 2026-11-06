@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { getDb, COLLECTIONS } from '../api/routes/webhook.routes';
+import { getDb, COLLECTIONS } from '../config/firebase';
 import type { AuditLog, UserRole } from '@petwo/shared';
 import { nanoid } from 'nanoid';
 

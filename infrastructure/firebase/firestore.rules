@@ -40,7 +40,13 @@ service cloud.firestore {
     }
 
     function hasMedicalConsent(petId) {
-      return isProvider() && exists(/databases/$(database)/documents/medicalConsents/$(request.auth.uid + '_' + petId));
+      return false; // Consent checks use the backend API because consent IDs are generated records.
+    }
+
+    function isApprovedProvider(providerId) {
+      return exists(/databases/$(database)/documents/providers/$(providerId)) &&
+        get(/databases/$(database)/documents/providers/$(providerId)).data.verificationStatus == 'approved' &&
+        get(/databases/$(database)/documents/providers/$(providerId)).data.isActive == true;
     }
 
     function isValidString(field, min, max) {
@@ -55,7 +61,8 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if isUser(userId) || isAdmin();
-      allow create: if isAuthenticated() && request.auth.uid == userId;
+      // User records and roles are created by the trusted backend only.
+      allow create: if false;
       allow update: if isUser(userId) && isActiveUser()
         && request.resource.data.role == resource.data.role  // Role can't self-change
         && request.resource.data.createdAt == resource.data.createdAt;
@@ -75,9 +82,7 @@ service cloud.firestore {
 
     match /pets/{petId} {
       allow read: if isAuthenticated() && (
-        resource.data.ownerId == request.auth.uid ||
-        isAdmin() ||
-        isProvider()  // Providers can read pets of customers they've served
+        resource.data.ownerId == request.auth.uid || isAdmin()
       );
       allow create: if isCustomer() && isActiveUser()
         && request.resource.data.ownerId == request.auth.uid;
@@ -91,41 +96,18 @@ service cloud.firestore {
 
     match /vaccinationRecords/{recordId} {
       allow read: if isAuthenticated() && (
-        get(/databases/$(database)/documents/pets/$(resource.data.petId)).data.ownerId == request.auth.uid ||
-        hasMedicalConsent(resource.data.petId) ||
-        resource.data.providerId == request.auth.uid ||
-        isAdmin()
+        get(/databases/$(database)/documents/pets/$(resource.data.petId)).data.ownerId == request.auth.uid || isAdmin()
       );
-      allow create: if isAuthenticated() && isActiveUser() && (
-        isCustomer() || hasMedicalConsent(request.resource.data.petId) || isAdmin()
-      );
-      allow update: if isAuthenticated() && (
-        get(/databases/$(database)/documents/pets/$(resource.data.petId)).data.ownerId == request.auth.uid ||
-        (resource.data.providerId == request.auth.uid && hasMedicalConsent(resource.data.petId)) ||
-        isAdmin()
-      );
-      allow delete: if isAdmin();
+      allow write: if false; // Managed by the backend API.
     }
 
     // ─── Medical Records (Hardened for DPDPA & Veterinary Confidentiality) ──────
 
     match /medicalRecords/{recordId} {
       allow read: if isAuthenticated() && (
-        get(/databases/$(database)/documents/pets/$(resource.data.petId)).data.ownerId == request.auth.uid ||
-        resource.data.providerId == request.auth.uid ||
-        hasMedicalConsent(resource.data.petId) ||
-        isAdmin()
+        get(/databases/$(database)/documents/pets/$(resource.data.petId)).data.ownerId == request.auth.uid || isAdmin()
       );
-      allow create: if isAuthenticated() && isActiveUser() && (
-        (isCustomer() && get(/databases/$(database)/documents/pets/$(request.resource.data.petId)).data.ownerId == request.auth.uid) ||
-        (isProvider() && hasMedicalConsent(request.resource.data.petId)) ||
-        isAdmin()
-      );
-      allow update: if isAuthenticated() && (
-        (resource.data.providerId == request.auth.uid && hasMedicalConsent(resource.data.petId)) ||
-        isAdmin()
-      );
-      allow delete: if isAdmin();
+      allow write: if false; // Managed by the backend API.
     }
 
     // ─── DPDPA Medical Consents ────────────────────────────────────────────────
@@ -136,12 +118,7 @@ service cloud.firestore {
         resource.data.providerId == request.auth.uid ||
         isAdmin()
       );
-      allow create: if isAuthenticated() && isCustomer() &&
-        request.resource.data.ownerId == request.auth.uid;
-      allow update, delete: if isAuthenticated() && (
-        resource.data.ownerId == request.auth.uid ||
-        isAdmin()
-      );
+      allow create, update, delete: if false; // Consent lifecycle is checked and written by the backend API.
     }
 
     // ─── Atomic Booking Slot Locks ─────────────────────────────────────────────
@@ -155,19 +132,9 @@ service cloud.firestore {
 
     match /providers/{providerId} {
       // Public can read approved/active providers
-      allow read: if resource.data.verificationStatus == 'approved'
-        && resource.data.isActive == true
-        || isUser(providerId)
-        || isAdmin();
-
-      allow create: if isAuthenticated() && request.auth.uid == providerId;
-
-      allow update: if (isUser(providerId) && isActiveUser()
-        // Provider cannot self-approve
-        && !('verificationStatus' in request.resource.data.diff(resource.data).affectedKeys()))
-        || isAdmin();
-
-      allow delete: if isAdmin();
+      allow read: if (resource.data.verificationStatus == 'approved' && resource.data.isActive == true)
+        || isUser(providerId) || isAdmin();
+      allow write: if isAdmin(); // Provider changes and approvals go through the backend API.
     }
 
     // ─── Provider Locations ───────────────────────────────────────────────────
@@ -177,13 +144,7 @@ service cloud.firestore {
         isAuthenticated() && (
           resource.data.providerId == request.auth.uid || isAdmin()
         );
-      allow create: if isProvider() && isActiveUser()
-        && request.resource.data.providerId == request.auth.uid;
-      allow update: if isAuthenticated() &&
-        resource.data.providerId == request.auth.uid && isActiveUser()
-        || isAdmin();
-      allow delete: if isAdmin() ||
-        (isProvider() && resource.data.providerId == request.auth.uid);
+      allow write: if isAdmin(); // Provider location writes go through the backend API.
     }
 
     // ─── Staff ────────────────────────────────────────────────────────────────
@@ -193,13 +154,7 @@ service cloud.firestore {
         isAuthenticated() && (
           resource.data.providerId == request.auth.uid || isAdmin()
         );
-      allow create: if isProvider() && isActiveUser()
-        && request.resource.data.providerId == request.auth.uid;
-      allow update: if isProvider() && isActiveUser()
-        && resource.data.providerId == request.auth.uid
-        || isAdmin();
-      allow delete: if isAdmin() ||
-        (isProvider() && resource.data.providerId == request.auth.uid);
+      allow write: if isAdmin(); // Staff writes go through the backend API.
     }
 
     // ─── Service Categories ───────────────────────────────────────────────────
@@ -212,17 +167,11 @@ service cloud.firestore {
     // ─── Services ────────────────────────────────────────────────────────────
 
     match /services/{serviceId} {
-      allow read: if resource.data.isActive == true
+      allow read: if (resource.data.isActive == true && isApprovedProvider(resource.data.providerId))
         || isAuthenticated() && (
           resource.data.providerId == request.auth.uid || isAdmin()
         );
-      allow create: if isProvider() && isActiveUser()
-        && request.resource.data.providerId == request.auth.uid;
-      allow update: if isProvider() && isActiveUser()
-        && resource.data.providerId == request.auth.uid
-        || isAdmin();
-      allow delete: if isAdmin() ||
-        (isProvider() && resource.data.providerId == request.auth.uid);
+      allow write: if isAdmin(); // Service writes go through the backend API.
     }
 
     // ─── Bookings ────────────────────────────────────────────────────────────
@@ -303,11 +252,7 @@ service cloud.firestore {
       allow read: if isAuthenticated() && (
         resource.data.userId == request.auth.uid || isAdmin()
       );
-      allow create: if isAuthenticated() && isActiveUser()
-        && request.resource.data.userId == request.auth.uid;
-      allow update: if isAuthenticated() && (
-        resource.data.userId == request.auth.uid || isAdmin()
-      );
+      allow create, update, delete: if false; // Ticket writes go through the backend API.
       allow delete: if isAdmin();
     }
 
@@ -327,7 +272,7 @@ service cloud.firestore {
     // ─── System Config ────────────────────────────────────────────────────────
 
     match /systemConfig/{configId} {
-      allow read: if isAuthenticated();
+      allow read: if isAdmin();
       allow write: if isAdmin();
     }
 

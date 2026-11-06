@@ -69,7 +69,10 @@ export async function buildApp(): Promise<FastifyInstance> {
   });
 
   await app.register(cors, {
-    origin: env.CORS_ORIGINS.split(',').map(o => o.trim()),
+    origin: (env.CORS_ORIGINS ?? 'http://localhost:3000,http://localhost:3001')
+      .split(',')
+      .map(o => o.trim())
+      .filter(Boolean),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
@@ -182,8 +185,7 @@ export async function buildApp(): Promise<FastifyInstance> {
       success: false,
       error: {
         code: statusCode === 404 ? 'RES_001' : 'SYS_001',
-        message: statusCode < 500 || env.NODE_ENV !== 'production' ? error.message : 'An internal error occurred.',
-        ...(env.NODE_ENV !== 'production' && { debug: { name: error.name, code: (error as any).code } }),
+        message: statusCode < 500 ? error.message : 'An internal error occurred.',
       },
     });
   });

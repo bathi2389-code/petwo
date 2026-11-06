@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
-import { getDb, COLLECTIONS } from './webhook.routes';
+import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isProvider, isAdmin } from '../../middleware/auth.middleware';
 import { PROVIDER_SUBSCRIPTION_LIMITS } from '@petwo/shared';
 import { nanoid } from 'nanoid';
@@ -82,7 +82,17 @@ export default async function serviceRoutes(app: FastifyInstance): Promise<void>
 
     const offset = (page - 1) * limit;
     const snapshot = await query.offset(offset).limit(limit).get();
-    const services = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+    const serviceDocs = snapshot.docs;
+    const providerIds = [...new Set(serviceDocs.map((doc) => doc.data().providerId as string))];
+    const providerStatuses = await Promise.all(providerIds.map(async (id) => {
+      const providerDoc = await db.collection(COLLECTIONS.PROVIDERS).doc(id).get();
+      const provider = providerDoc.data() as Provider | undefined;
+      return [id, Boolean(providerDoc.exists && provider?.verificationStatus === 'approved' && provider.isActive)] as const;
+    }));
+    const approvedProviders = new Map(providerStatuses);
+    const services = serviceDocs
+      .filter((doc) => approvedProviders.get(doc.data().providerId as string))
+      .map(doc => ({ ...doc.data(), id: doc.id }));
 
     return reply.send({
       success: true,
@@ -107,7 +117,13 @@ export default async function serviceRoutes(app: FastifyInstance): Promise<void>
       });
     }
 
-    return reply.send({ success: true, data: { ...doc.data(), id: doc.id } });
+    const service = doc.data() as Service;
+    const providerDoc = await db.collection(COLLECTIONS.PROVIDERS).doc(service.providerId).get();
+    const provider = providerDoc.data() as Provider | undefined;
+    if (!service.isActive || !providerDoc.exists || provider?.verificationStatus !== 'approved' || !provider.isActive) {
+      return reply.status(404).send({ success: false, error: { code: 'RES_001', message: 'Service not found.' } });
+    }
+    return reply.send({ success: true, data: { ...service, id: doc.id } });
   });
 
   /**
@@ -139,6 +155,12 @@ export default async function serviceRoutes(app: FastifyInstance): Promise<void>
     }
 
     const provider = providerDoc.data() as Provider;
+    if (provider.verificationStatus !== 'approved' || !provider.isActive) {
+      return reply.status(403).send({
+        success: false,
+        error: { code: 'PRV_001', message: 'Your provider account must be approved and active before publishing services.' },
+      });
+    }
 
     // Verify location belongs to this provider
     const locationDoc = await db.collection(COLLECTIONS.PROVIDER_LOCATIONS).doc(data.locationId).get();

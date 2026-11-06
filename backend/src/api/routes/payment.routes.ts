@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import Razorpay from 'razorpay';
 import * as crypto from 'crypto';
-import { getDb, COLLECTIONS } from './webhook.routes';
+import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isCustomer, isAdmin } from '../../middleware/auth.middleware';
 import { env } from '../../config/env';
 import { nanoid } from 'nanoid';

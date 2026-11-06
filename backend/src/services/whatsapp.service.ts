@@ -15,8 +15,8 @@ export class WhatsAppService {
   private phoneNumberId: string;
 
   private constructor() {
-    this.apiKey = process.env.WHATSAPP_API_KEY || 'mock_whatsapp_key';
-    this.phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID || 'mock_phone_number_id';
+    this.apiKey = env.WHATSAPP_API_KEY || '';
+    this.phoneNumberId = env.WHATSAPP_PHONE_NUMBER_ID || '';
   }
 
   public static getInstance(): WhatsAppService {
@@ -64,28 +64,27 @@ export class WhatsAppService {
       },
     };
 
-    if (process.env.NODE_ENV === 'production' && process.env.WHATSAPP_API_KEY) {
-      try {
-        const response = await axios.post(
-          `https://graph.facebook.com/v19.0/${this.phoneNumberId}/messages`,
-          messagePayload,
-          {
-            headers: {
-              Authorization: `Bearer ${this.apiKey}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-        return { messageId: response.data?.messages?.[0]?.id || 'wa_sent', status: 'sent' };
-      } catch (err: any) {
-        console.error('WhatsApp API Error:', err.response?.data || err.message);
-        return { messageId: 'wa_mock_sent', status: 'fallback_delivered' };
-      }
+    if (!this.apiKey || !this.phoneNumberId) {
+      throw new Error('WhatsApp delivery is not configured.');
     }
 
-    // Development / Local Mock
-    console.log(`[WHATSAPP-DISPATCH] To: ${params.recipientPhone} | Booking: ${params.bookingNumber}`);
-    return { messageId: `mock_wa_${Date.now()}`, status: 'mock_delivered' };
+    try {
+      const response = await axios.post(
+        `https://graph.facebook.com/v19.0/${this.phoneNumberId}/messages`,
+        messagePayload,
+        {
+          headers: {
+            Authorization: `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      const messageId = response.data?.messages?.[0]?.id;
+      if (!messageId) throw new Error('WhatsApp API did not return a message ID.');
+      return { messageId, status: 'sent' };
+    } catch {
+      throw new Error('WhatsApp provider rejected or failed to deliver the message.');
+    }
   }
 
   /**
@@ -98,9 +97,8 @@ export class WhatsAppService {
     prescriptionId: string;
     pdfDownloadURL: string;
   }): Promise<void> {
-    const text = `🩺 *Digital Prescription Ready*\n\nPrescription *#${params.prescriptionId}* for ${params.petName} by ${params.doctorName} is ready.\n\n📄 Download & View: ${params.pdfDownloadURL}\n\nYou can also show this in-app at licensed veterinary pharmacies across Hyderabad.`;
-
-    console.log(`[WHATSAPP-RX] To: ${params.recipientPhone} | Rx: ${params.prescriptionId}`);
+    void params;
+    throw new Error('Prescription WhatsApp delivery is not implemented.');
   }
 
   /**
@@ -112,7 +110,8 @@ export class WhatsAppService {
     vaccineName: string;
     dueDate: string;
   }): Promise<void> {
-    console.log(`[WHATSAPP-VACCINE-REMINDER] To: ${params.recipientPhone} | Pet: ${params.petName} | Vaccine: ${params.vaccineName}`);
+    void params;
+    throw new Error('Vaccination reminder WhatsApp delivery is not implemented.');
   }
 }
 
