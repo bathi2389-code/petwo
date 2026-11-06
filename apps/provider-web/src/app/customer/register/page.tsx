@@ -26,12 +26,13 @@ export default function CustomerRegisterPage() {
       const draft = { displayName: name.trim(), pet };
       sessionStorage.setItem('petwo:customer-registration', JSON.stringify(draft));
       const account = await createAccount(email.trim().toLowerCase(), password, name.trim());
-      await sendVerification(account); setPending(true);
+      await sendVerification(account); cooldown.start(60); setPending(true);
       setNotice(`Your PETWO account has been created. Please check your email and click the verification link to activate it.`);
     } catch (cause: any) { setError(cause?.message || 'Could not create your account.'); }
     finally { setBusy(false); }
   }
   async function resend() {
+    if (cooldown.seconds > 0) return;
     setBusy(true); setError('');
     try { await sendVerification(); cooldown.start(60); setNotice(`A new verification link was sent to ${user?.email}.`); }
     catch (cause: any) { setError(cause?.message || 'Could not resend the verification email.'); }
