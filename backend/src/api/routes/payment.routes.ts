@@ -4,17 +4,57 @@ import Razorpay from 'razorpay';
 import * as crypto from 'crypto';
 import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isCustomer, isAdmin } from '../../middleware/auth.middleware';
-import { env } from '../../config/env';
+import { env, isPaymentsEnabled } from '../../config/env';
 import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
 import type { Booking, Payment } from '@petwo/shared';
 
 // ─── Razorpay Client ─────────────────────────────────────────────────────────
 
-const razorpay = new Razorpay({
-  key_id: env.RAZORPAY_KEY_ID,
-  key_secret: env.RAZORPAY_KEY_SECRET,
-});
+let razorpayClient: Razorpay | null = null;
+
+/**
+ * Returns an initialized Razorpay instance when payments are enabled.
+ * Throws if payments are disabled or credentials are missing.
+ */
+export function getRazorpayClient(): Razorpay {
+  if (!isPaymentsEnabled()) {
+    throw new Error('Payments are disabled; cannot initialize Razorpay client');
+  }
+  if (!razorpayClient) {
+    razorpayClient = new Razorpay({
+      key_id: env.RAZORPAY_KEY_ID!,
+      key_secret: env.RAZORPAY_KEY_SECRET!,
+    });
+  }
+  return razorpayClient;
+}
+
+/**
+ * Injects a mock Razorpay client or resets the singleton for testing.
+ */
+export function setRazorpayClientForTesting(client: Razorpay | null): void {
+  razorpayClient = client;
+}
+
+/**
+ * Fastify preHandler guard: returns HTTP 503 when payments are disabled.
+ */
+export async function requirePaymentsEnabled(
+  _request: FastifyRequest,
+  reply: FastifyReply,
+): Promise<void> {
+  if (!isPaymentsEnabled()) {
+    reply.status(503).send({
+      success: false,
+      error: {
+        code: 'PAY_503',
+        message: 'Payments are temporarily disabled',
+      },
+    });
+    return;
+  }
+}
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -44,9 +84,16 @@ export default async function paymentRoutes(app: FastifyInstance): Promise<void>
    * Create a Razorpay order for a booking
    */
   app.post('/orders', {
-    preHandler: [authenticate, isCustomer],
+    preHandler: [requirePaymentsEnabled, authenticate, isCustomer],
     schema: { tags: ['Payments'], security: [{ bearerAuth: [] }] },
   }, async (request: FastifyRequest, reply: FastifyReply) => {
+    if (!isPaymentsEnabled()) {
+      return reply.status(503).send({
+        success: false,
+        error: { code: 'PAY_503', message: 'Payments are temporarily disabled' },
+      });
+    }
+
     const parsed = CreateOrderSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(422).send({
@@ -84,6 +131,7 @@ export default async function paymentRoutes(app: FastifyInstance): Promise<void>
     }
 
     // Create Razorpay order
+    const razorpay = getRazorpayClient();
     const order = await razorpay.orders.create({
       amount: booking.pricing.totalAmount, // already in paisa
       currency: 'INR',
@@ -131,7 +179,7 @@ export default async function paymentRoutes(app: FastifyInstance): Promise<void>
         orderId: order.id,
         amount: booking.pricing.totalAmount,
         currency: 'INR',
-        keyId: env.RAZORPAY_KEY_ID,
+        keyId: env.RAZORPAY_KEY_ID!,
         bookingNumber: booking.bookingNumber,
         prefill: {
           // Frontend can pre-fill customer details
@@ -146,9 +194,16 @@ export default async function paymentRoutes(app: FastifyInstance): Promise<void>
    * Verify Razorpay payment signature and capture payment
    */
   app.post('/verify', {
-    preHandler: [authenticate, isCustomer],
+    preHandler: [requirePaymentsEnabled, authenticate, isCustomer],
     schema: { tags: ['Payments'], security: [{ bearerAuth: [] }] },
   }, async (request: FastifyRequest, reply: FastifyReply) => {
+    if (!isPaymentsEnabled()) {
+      return reply.status(503).send({
+        success: false,
+        error: { code: 'PAY_503', message: 'Payments are temporarily disabled' },
+      });
+    }
+
     const parsed = VerifyPaymentSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(422).send({
@@ -161,7 +216,7 @@ export default async function paymentRoutes(app: FastifyInstance): Promise<void>
 
     // Verify signature with timing-safe comparison
     const expectedSignature = crypto
-      .createHmac('sha256', env.RAZORPAY_KEY_SECRET)
+      .createHmac('sha256', env.RAZORPAY_KEY_SECRET!)
       .update(`${razorpayOrderId}|${razorpayPaymentId}`)
       .digest('hex');
 
@@ -209,6 +264,7 @@ export default async function paymentRoutes(app: FastifyInstance): Promise<void>
     }
 
     // Fetch payment details from Razorpay to get method and other metadata
+    const razorpay = getRazorpayClient();
     const rzpPayment = await razorpay.payments.fetch(razorpayPaymentId);
     const now = new Date().toISOString();
 
@@ -282,9 +338,16 @@ export default async function paymentRoutes(app: FastifyInstance): Promise<void>
    * POST /payments/refund — Initiate a refund (Admin only)
    */
   app.post('/refund', {
-    preHandler: [authenticate, isAdmin],
+    preHandler: [requirePaymentsEnabled, authenticate, isAdmin],
     schema: { tags: ['Payments', 'Admin'], security: [{ bearerAuth: [] }] },
   }, async (request: FastifyRequest, reply: FastifyReply) => {
+    if (!isPaymentsEnabled()) {
+      return reply.status(503).send({
+        success: false,
+        error: { code: 'PAY_503', message: 'Payments are temporarily disabled' },
+      });
+    }
+
     const parsed = RefundSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(422).send({
@@ -323,6 +386,7 @@ export default async function paymentRoutes(app: FastifyInstance): Promise<void>
     const refundAmount = amount ?? payment.amount;
 
     // Create Razorpay refund
+    const razorpay = getRazorpayClient();
     const rzpRefund = await razorpay.payments.refund(payment.gatewayPaymentId, {
       amount: refundAmount,
       notes: { reason, initiatedBy: request.user!.uid },

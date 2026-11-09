@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import * as crypto from 'crypto';
 import { nanoid } from 'nanoid';
 import { getDb, COLLECTIONS } from '../../config/firebase';
-import { env } from '../../config/env';
+import { env, isPaymentsEnabled } from '../../config/env';
 import type { Payment, Booking, PaymentStatus, BookingStatus } from '@petwo/shared';
 
 export default async function webhookRoutes(app: FastifyInstance): Promise<void> {
@@ -17,6 +17,27 @@ export default async function webhookRoutes(app: FastifyInstance): Promise<void>
       summary: 'Razorpay webhook receiver',
     },
   }, async (request: FastifyRequest, reply: FastifyReply) => {
+    if (!isPaymentsEnabled()) {
+      return reply.status(503).send({
+        success: false,
+        error: {
+          code: 'PAY_503',
+          message: 'Payments are temporarily disabled',
+        },
+      });
+    }
+
+    if (!env.RAZORPAY_WEBHOOK_SECRET) {
+      request.log.error('RAZORPAY_WEBHOOK_SECRET is not configured');
+      return reply.status(503).send({
+        success: false,
+        error: {
+          code: 'PAY_503',
+          message: 'Razorpay webhook is not configured',
+        },
+      });
+    }
+
     const signature = request.headers['x-razorpay-signature'] as string;
 
     if (!signature) {

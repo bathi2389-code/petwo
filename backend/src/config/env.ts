@@ -16,9 +16,18 @@ export const envSchema = z.object({
   JWT_SECRET: z.string().min(32),
   JWT_EXPIRES_IN: z.string().default('7d'),
 
-  RAZORPAY_KEY_ID: z.string().min(1),
-  RAZORPAY_KEY_SECRET: z.string().min(1),
-  RAZORPAY_WEBHOOK_SECRET: z.string().min(1),
+  PAYMENTS_ENABLED: z.preprocess((val) => {
+    if (typeof val === 'string') {
+      const lower = val.trim().toLowerCase();
+      if (lower === 'true' || lower === '1') return true;
+      if (lower === 'false' || lower === '0' || lower === '') return false;
+    }
+    return val;
+  }, z.boolean().default(false)),
+
+  RAZORPAY_KEY_ID: z.preprocess((val) => (val === '' ? undefined : val), z.string().min(1).optional()),
+  RAZORPAY_KEY_SECRET: z.preprocess((val) => (val === '' ? undefined : val), z.string().min(1).optional()),
+  RAZORPAY_WEBHOOK_SECRET: z.preprocess((val) => (val === '' ? undefined : val), z.string().min(1).optional()),
 
   GEMINI_API_KEY: z.string().optional(),
 
@@ -51,6 +60,22 @@ export const envSchema = z.object({
       message: 'Set both WHATSAPP_API_KEY and WHATSAPP_PHONE_NUMBER_ID to enable outbound WhatsApp messages.',
     });
   }
+  if (values.PAYMENTS_ENABLED) {
+    if (!values.RAZORPAY_KEY_ID) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['RAZORPAY_KEY_ID'],
+        message: 'RAZORPAY_KEY_ID is required when PAYMENTS_ENABLED is true.',
+      });
+    }
+    if (!values.RAZORPAY_KEY_SECRET) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['RAZORPAY_KEY_SECRET'],
+        message: 'RAZORPAY_KEY_SECRET is required when PAYMENTS_ENABLED is true.',
+      });
+    }
+  }
 });
 
 // In test mode, provide safe fallback values for integration testing
@@ -60,9 +85,6 @@ const testDefaults = process.env.NODE_ENV === 'test' ? {
   FIREBASE_CLIENT_EMAIL: 'qa-tester@petwo-test.iam.gserviceaccount.com',
   FIREBASE_STORAGE_BUCKET: 'petwo-test.appspot.com',
   JWT_SECRET: 'test_jwt_secret_super_secure_32_chars_long_key_12345',
-  RAZORPAY_KEY_ID: 'rzp_test_qa12345678',
-  RAZORPAY_KEY_SECRET: 'rzp_secret_qa12345678',
-  RAZORPAY_WEBHOOK_SECRET: 'rzp_wh_secret_qa12345678',
   LOG_LEVEL: 'fatal',
 } : {};
 
@@ -76,3 +98,25 @@ if (!parsed.success) {
 
 export const env = parsed.data;
 export type Env = typeof env;
+
+let paymentsEnabledOverride: boolean | null = null;
+
+/**
+ * Allows integration tests to toggle payments enabled state in-memory.
+ * Pass `null` to reset to the environment variable value.
+ */
+export function setPaymentsEnabledForTesting(enabled: boolean | null): void {
+  paymentsEnabledOverride = enabled;
+}
+
+/**
+ * Returns true only when payments are enabled and valid credentials are present.
+ * Disabled by default for MVP.
+ */
+export function isPaymentsEnabled(config?: Partial<Env>): boolean {
+  if (paymentsEnabledOverride !== null && !config) {
+    return paymentsEnabledOverride;
+  }
+  const target = config ?? env;
+  return Boolean(target.PAYMENTS_ENABLED && target.RAZORPAY_KEY_ID && target.RAZORPAY_KEY_SECRET);
+}
