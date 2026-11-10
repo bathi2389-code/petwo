@@ -12,6 +12,7 @@ import { ADMIN_SESSION_KEY, apiClient } from '@/lib/api-client';
 
 const adminNav = [
   { href: '/overview', label: 'Platform Overview', icon: LayoutDashboard },
+  { href: '/customers', label: 'Customers', icon: PawPrint },
   { href: '/providers', label: 'Provider Verification', icon: ShieldCheck },
   { href: '/bookings', label: 'Bookings & Orders', icon: Calendar },
   { href: '/commissions', label: 'Commissions & Fees', icon: Percent },
