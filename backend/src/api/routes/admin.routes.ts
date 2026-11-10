@@ -20,6 +20,13 @@ const ProviderQuerySchema = z.object({
   limit: z.coerce.number().min(1).max(100).default(20),
 });
 
+
+const AdminCustomerQuerySchema = z.object({
+  q: z.string().trim().max(120).optional(),
+  page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(100).default(20),
+});
+
 const AdminBookingQuerySchema = z.object({
   status: z.string().optional(),
   providerId: z.string().optional(),
@@ -61,6 +68,56 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
   // Enforce admin auth on all routes in this plugin
   app.addHook('preHandler', authenticate);
   app.addHook('preHandler', isAdmin);
+
+
+  /**
+   * GET /admin/customers — Real customer registrations from the users collection.
+   * Customer signup creates both users/{uid} and customers/{uid}; users is the
+   * role-authoritative collection, so this avoids showing providers/admins here.
+   */
+  app.get('/customers', {
+    schema: { tags: ['Admin'], security: [{ bearerAuth: [] }] },
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    const query = AdminCustomerQuerySchema.parse(request.query);
+    const db = getDb();
+    const snapshot = await db.collection(COLLECTIONS.USERS)
+      .where('role', '==', 'customer')
+      .get();
+
+    const search = query.q?.toLowerCase();
+    const users = snapshot.docs
+      .map(doc => ({ ...doc.data(), id: doc.id }))
+      .filter(user => {
+        if (!search) return true;
+        return String(user.displayName ?? '').toLowerCase().includes(search)
+          || String(user.email ?? '').toLowerCase().includes(search);
+      })
+      .sort((a, b) => String(b.createdAt ?? b.updatedAt ?? '').localeCompare(String(a.createdAt ?? a.updatedAt ?? '')));
+
+    const start = (query.page - 1) * query.limit;
+    const pageUsers = users.slice(start, start + query.limit);
+    const data = await Promise.all(pageUsers.map(async user => {
+      const profile = await db.collection(COLLECTIONS.CUSTOMERS).doc(user.id).get();
+      return {
+        ...user,
+        ...(profile.exists ? profile.data() : {}),
+        id: user.id,
+        role: 'customer',
+        isActive: user.isActive !== false,
+      };
+    }));
+
+    return reply.send({
+      success: true,
+      data,
+      meta: {
+        page: query.page,
+        limit: query.limit,
+        total: users.length,
+        hasMore: start + query.limit < users.length,
+      },
+    });
+  });
 
   /**
    * GET /admin/providers — List providers with optional status filter
