@@ -84,9 +84,19 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
       .where('role', '==', 'customer')
       .get();
 
+    type AdminCustomerRecord = {
+      id: string;
+      displayName?: unknown;
+      email?: unknown;
+      createdAt?: unknown;
+      updatedAt?: unknown;
+      isActive?: unknown;
+      [key: string]: unknown;
+    };
+
     const search = query.q?.toLowerCase();
-    const users = snapshot.docs
-      .map(doc => ({ ...doc.data(), id: doc.id }))
+    const users: AdminCustomerRecord[] = snapshot.docs
+      .map(doc => ({ ...(doc.data() as Record<string, unknown>), id: doc.id }))
       .filter(user => {
         if (!search) return true;
         return String(user.displayName ?? '').toLowerCase().includes(search)
