@@ -194,6 +194,9 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
 
     if (body.status === 'approved') {
       updates.verifiedAt = now;
+      // Older provider documents may not have an isActive field. Make those
+      // approved records discoverable, while preserving an explicit admin deactivation.
+      if (before.isActive == null) updates.isActive = true;
     }
 
     await providerRef.update(updates);
