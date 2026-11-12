@@ -314,18 +314,21 @@ export default async function providerRoutes(app: FastifyInstance): Promise<void
       });
     }
 
-    // Query active & approved providers without restrictive DB-level ordering
-    // (This guarantees newly verified providers with 0 reviews are NOT dropped)
+    // Approval is the publication gate. Treat a missing legacy isActive flag as
+    // active, but never publish a provider explicitly deactivated by an admin.
+    // Avoid a strict Firestore isActive == true filter so older approved records
+    // are not silently omitted from customer discovery.
     let fsQuery = db.collection(COLLECTIONS.PROVIDERS)
-      .where('verificationStatus', '==', 'approved')
-      .where('isActive', '==', true) as FirebaseFirestore.Query;
+      .where('verificationStatus', '==', 'approved') as FirebaseFirestore.Query;
 
     if (businessType) {
       fsQuery = fsQuery.where('businessType', '==', businessType);
     }
 
     const snapshot = await fsQuery.get();
-    let providers = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Provider));
+    let providers = snapshot.docs
+      .map(doc => ({ ...doc.data(), id: doc.id } as Provider))
+      .filter(provider => provider.isActive !== false);
 
     // Calculate distance and recommendation metrics for each provider
     providers = providers.map(p => {
@@ -452,12 +455,13 @@ export default async function providerRoutes(app: FastifyInstance): Promise<void
     const db = getDb();
     const doc = await db.collection(COLLECTIONS.PROVIDERS).doc(request.params.providerId).get();
 
-    if (!doc.exists || !doc.data()!.isActive) {
+    const providerData = doc.data();
+    if (!doc.exists || !providerData || providerData.verificationStatus !== 'approved' || providerData.isActive === false) {
       return reply.status(404).send({ success: false, error: { code: 'RES_001', message: 'Provider not found.' } });
     }
 
     // Remove sensitive fields from public response
-    const data = doc.data()!;
+    const data = providerData;
     const { bankDetails, gstNumber, panNumber, ...publicData } = data;
 
     return reply.send({ success: true, data: { ...publicData, id: doc.id } });
