@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import {
   ArrowRight, CalendarCheck, HeartHandshake, PawPrint, ShieldCheck,
-  Star, Stethoscope, Scissors, Activity, Building2, Sparkles,
+  Star, Stethoscope, Scissors, Activity, Home as HomeIcon, Building2, Sparkles,
 } from 'lucide-react';
 
 const careCategories = [
