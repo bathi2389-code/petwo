@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { HeroExperience } from '@/components/home/hero-experience';
 import {
   ArrowRight, CalendarCheck, HeartHandshake, PawPrint, ShieldCheck,
   Star, Stethoscope, Scissors, Activity, Home as HomeIcon, Building2, Sparkles,
@@ -48,11 +49,11 @@ export default function HomePage() {
             <PawPrint className="h-4 w-4" /> A little more love in every visit
           </div>
           <h1 className="max-w-2xl text-5xl font-black leading-[1.04] tracking-tight text-slate-950 sm:text-6xl xl:text-[4.35rem]">
-            Better pet care.
-            <span className="block text-[#078573]">Happier every day.</span>
+            Better Care.
+            <span className="block text-[#078573]">Happier Pets.</span>
           </h1>
           <p className="mt-6 max-w-xl text-base leading-8 text-slate-600 sm:text-lg">
-            One connected place for pet parents to find trusted care teams and for providers to grow the care they deliver.
+            Everything your pet needs, from trusted veterinary care to grooming and wellness, all in one place.
           </p>
           <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold text-slate-500">
             <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-teal-700" /> Approved providers</span>
@@ -61,19 +62,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="relative mx-auto w-full max-w-xl">
-          <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-amber-100 blur-2xl" />
-          <div className="absolute -bottom-8 -left-8 h-40 w-40 rounded-full bg-teal-200/60 blur-2xl" />
-          <div className="relative overflow-hidden rounded-[2.5rem] border border-white bg-[#e5f3ed] p-5 shadow-[0_35px_90px_-35px_rgba(8,87,75,0.35)] sm:p-8">
-            <img src="/pet-care-illustration.svg" alt="A friendly dog and cat with pet-care essentials" className="mx-auto aspect-[4/3] w-full object-contain" />
-            <div className="mx-auto mt-1 max-w-sm rounded-2xl border border-white/80 bg-white/95 p-4 shadow-lg">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-100 text-amber-700"><Sparkles className="h-5 w-5" /></div>
-                <div><p className="text-sm font-extrabold text-slate-900">Every paw deserves great care</p><p className="mt-1 text-xs text-slate-500">Choose the PETWO experience that fits you</p></div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <HeroExperience />
       </section>
 
       <section id="portals" className="mx-auto max-w-7xl scroll-mt-24 px-5 pb-20 pt-8 sm:px-8">
