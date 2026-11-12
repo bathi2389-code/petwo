@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { HeroExperience } from '@/components/home/hero-experience';
 import {
   ArrowRight, CalendarCheck, HeartHandshake, PawPrint, ShieldCheck,
-  Star, Stethoscope, Scissors, Activity, Home as HomeIcon, Building2, Sparkles,
+  Star, Stethoscope, Scissors, Activity, Home as HomeIcon, Building2,
 } from 'lucide-react';
 
 const careCategories = [
