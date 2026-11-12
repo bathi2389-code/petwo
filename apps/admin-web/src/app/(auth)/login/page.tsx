@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, Lock, Mail, ArrowRight, Sparkles } from 'lucide-react';
-import { apiClient, ADMIN_SESSION_KEY } from '@/lib/api-client';
+import { apiClient, ADMIN_SESSION_KEY, ADMIN_REFRESH_TOKEN_KEY } from '@/lib/api-client';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -26,8 +26,8 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ email, password, returnSecureToken: true }),
       });
       if (!response.ok) throw new Error('Email or password is incorrect, or Firebase email/password sign-in is unavailable.');
-      const auth = await response.json() as { idToken?: string };
-      if (!auth.idToken) throw new Error('Firebase did not return an authentication token.');
+      const auth = await response.json() as { idToken?: string; refreshToken?: string };
+      if (!auth.idToken || !auth.refreshToken) throw new Error('Firebase did not return a complete authentication session.');
 
       const profile = await apiClient.get('/auth/me', {
         headers: { Authorization: `Bearer ${auth.idToken}` },
@@ -38,6 +38,7 @@ export default function AdminLoginPage() {
       }
 
       sessionStorage.setItem(ADMIN_SESSION_KEY, auth.idToken);
+      sessionStorage.setItem(ADMIN_REFRESH_TOKEN_KEY, auth.refreshToken);
       router.push('/overview');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign-in failed. Please try again.');
