@@ -8,7 +8,7 @@ import {
   ShieldCheck, Menu, X, PawPrint,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ADMIN_SESSION_KEY, apiClient } from '@/lib/api-client';
+import { ADMIN_SESSION_KEY, ADMIN_REFRESH_TOKEN_KEY, apiClient } from '@/lib/api-client';
 
 const adminNav = [
   { href: '/overview', label: 'Platform Overview', icon: LayoutDashboard },
@@ -38,6 +38,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const role = response.data?.data?.role;
         if (role !== 'admin' && role !== 'super_admin') {
           sessionStorage.removeItem(ADMIN_SESSION_KEY);
+          sessionStorage.removeItem(ADMIN_REFRESH_TOKEN_KEY);
           router.replace('/login');
           return;
         }
@@ -45,6 +46,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       })
       .catch(() => {
         sessionStorage.removeItem(ADMIN_SESSION_KEY);
+        sessionStorage.removeItem(ADMIN_REFRESH_TOKEN_KEY);
         router.replace('/login');
       });
   }, [router]);
@@ -55,6 +57,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       if (token) await apiClient.post('/logout', {}, { headers: { Authorization: `Bearer ${token}` } });
     } finally {
       sessionStorage.removeItem(ADMIN_SESSION_KEY);
+      sessionStorage.removeItem(ADMIN_REFRESH_TOKEN_KEY);
       router.replace('/login');
     }
   }
@@ -173,9 +176,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <main className="w-full flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-9">
           <div className="mx-auto w-full max-w-[1440px]">
-            <p role="status" className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">
-              Admin data panels are preview-only and are not connected to live marketplace records yet.
-            </p>
             {children}
           </div>
         </main>
