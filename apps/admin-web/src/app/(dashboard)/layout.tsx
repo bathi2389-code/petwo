@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Calendar, Percent, Ticket, Headphones, FileText,
-  ShieldCheck, Menu, X, PawPrint,
+  ShieldCheck, Menu, X, PawPrint, CreditCard,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ADMIN_SESSION_KEY, ADMIN_REFRESH_TOKEN_KEY, apiClient } from '@/lib/api-client';
@@ -15,6 +15,7 @@ const adminNav = [
   { href: '/customers', label: 'Customers', icon: PawPrint },
   { href: '/providers', label: 'Provider Verification', icon: ShieldCheck },
   { href: '/bookings', label: 'Bookings & Orders', icon: Calendar },
+  { href: '/payments', label: 'Payment Records', icon: CreditCard },
   { href: '/commissions', label: 'Commissions & Fees', icon: Percent },
   { href: '/coupons', label: 'Coupons & Promos', icon: Ticket },
   { href: '/support', label: 'Support & Disputes', icon: Headphones },
