@@ -147,7 +147,7 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
       .orderBy('createdAt', 'desc')
       .get();
     const allProviders = snapshot.docs
-      .map(doc => ({ ...doc.data(), id: doc.id }))
+      .map<Provider & { id: string }>(doc => ({ ...(doc.data() as Provider), id: doc.id }))
       .filter(provider => !query.status || provider.verificationStatus === query.status);
     const start = (query.page - 1) * query.limit;
     const paginated = allProviders.slice(start, start + query.limit);
@@ -337,7 +337,7 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
       .orderBy('createdAt', 'desc')
       .get();
     const all = snapshot.docs
-      .map(doc => ({ ...doc.data(), id: doc.id }))
+      .map<Payment & { id: string }>(doc => ({ ...(doc.data() as Payment), id: doc.id }))
       .filter(payment => !status || payment.status === status);
     const start = (page - 1) * limit;
 
