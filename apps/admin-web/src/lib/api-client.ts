@@ -28,8 +28,7 @@ apiClient.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
     const token = sessionStorage.getItem(ADMIN_SESSION_KEY);
     if (token) {
-      config.headers = config.headers ?? {};
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.set('Authorization', `Bearer ${token}`);
     }
   }
   return config;
@@ -78,8 +77,7 @@ apiClient.interceptors.response.use(
     try {
       const token = await refreshAdminToken();
       if (!token) throw new Error('Admin session expired. Please sign in again.');
-      request.headers = request.headers ?? {};
-      request.headers.Authorization = `Bearer ${token}`;
+      request.headers.set('Authorization', `Bearer ${token}`);
       return apiClient(request);
     } catch (refreshError) {
       if (typeof window !== 'undefined') {
