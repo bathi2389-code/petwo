@@ -87,7 +87,7 @@ export default async function serviceRoutes(app: FastifyInstance): Promise<void>
     const providerStatuses = await Promise.all(providerIds.map(async (id) => {
       const providerDoc = await db.collection(COLLECTIONS.PROVIDERS).doc(id).get();
       const provider = providerDoc.data() as Provider | undefined;
-      return [id, Boolean(providerDoc.exists && provider?.verificationStatus === 'approved' && provider.isActive)] as const;
+      return [id, Boolean(providerDoc.exists && provider?.verificationStatus === 'approved' && provider.isActive !== false)] as const;
     }));
     const approvedProviders = new Map(providerStatuses);
     const services = serviceDocs
@@ -120,7 +120,7 @@ export default async function serviceRoutes(app: FastifyInstance): Promise<void>
     const service = doc.data() as Service;
     const providerDoc = await db.collection(COLLECTIONS.PROVIDERS).doc(service.providerId).get();
     const provider = providerDoc.data() as Provider | undefined;
-    if (!service.isActive || !providerDoc.exists || provider?.verificationStatus !== 'approved' || !provider.isActive) {
+    if (!service.isActive || !providerDoc.exists || provider?.verificationStatus !== 'approved' || provider?.isActive === false) {
       return reply.status(404).send({ success: false, error: { code: 'RES_001', message: 'Service not found.' } });
     }
     return reply.send({ success: true, data: { ...service, id: doc.id } });
