@@ -1,93 +1,65 @@
 'use client';
 
-import React from 'react';
-import { FileText, ShieldAlert, CheckCircle2, User, Key, Database } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FileText, RefreshCw, AlertCircle, ShieldCheck } from 'lucide-react';
+import { apiClient, getApiErrorMessage } from '@/lib/api-client';
+
+type AuditRecord = {
+  id: string;
+  actorId?: string;
+  actorRole?: string;
+  action: string;
+  resourceType?: string;
+  resourceId?: string;
+  ipAddress?: string;
+  createdAt?: string;
+};
 
 export default function AdminAuditLogsPage() {
-  const logs = [
-    {
-      id: 'AUD-88210',
-      timestamp: '02 Nov 2026, 13:26:40',
-      actor: 'system (scheduler)',
-      action: 'SETTLEMENT_BATCH_EXECUTE',
-      target: '12 approved providers',
-      ip: '10.0.4.12',
-      status: 'success',
-    },
-    {
-      id: 'AUD-88209',
-      timestamp: '02 Nov 2026, 12:15:10',
-      actor: 'admin@petwo.in',
-      action: 'PROVIDER_APPROVE_KYC',
-      target: 'Dr. Rao Pet Hospital (Banjara Hills)',
-      ip: '49.205.112.44',
-      status: 'success',
-    },
-    {
-      id: 'AUD-88208',
-      timestamp: '02 Nov 2026, 11:04:22',
-      actor: 'system (security-engine)',
-      action: 'AUTH_RATE_LIMIT_BLOCKED',
-      target: '+919999999999',
-      ip: '103.21.144.90',
-      status: 'blocked',
-    },
-    {
-      id: 'AUD-88207',
-      timestamp: '02 Nov 2026, 09:30:15',
-      actor: 'admin@petwo.in',
-      action: 'COMMISSION_UPDATE',
-      target: 'Category: Veterinary Care (15% -> 15%)',
-      ip: '49.205.112.44',
-      status: 'success',
-    },
-  ];
+  const [logs, setLogs] = useState<AuditRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState('');
+
+  const loadLogs = useCallback(async (showSpinner = false) => {
+    if (showSpinner) setRefreshing(true);
+    try {
+      const response = await apiClient.get('/admin/audit-logs', { params: { page: 1, limit: 100 } });
+      setLogs(Array.isArray(response.data?.data) ? response.data.data : []);
+      setError('');
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Could not load audit records.'));
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadLogs();
+    const interval = window.setInterval(() => void loadLogs(), 30000);
+    return () => window.clearInterval(interval);
+  }, [loadLogs]);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Immutable System Audit Logs</h1>
-        <p className="text-sm text-slate-500 mt-1">DPDPA 2023 & Financial compliance audit trail of all sensitive admin actions</p>
+    <div className="mx-auto max-w-7xl space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div><h1 className="text-2xl font-bold text-slate-900">System Audit Logs</h1><p className="mt-1 text-sm text-slate-500">Recorded administrator and system actions from the PETWO audit trail.</p></div>
+        <button onClick={() => void loadLogs(true)} disabled={refreshing} className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 disabled:opacity-60"><RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />Refresh</button>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 text-xs uppercase">
-            <tr>
-              <th className="px-6 py-3.5">Log ID</th>
-              <th className="px-6 py-3.5">Timestamp</th>
-              <th className="px-6 py-3.5">Actor</th>
-              <th className="px-6 py-3.5">Action Code</th>
-              <th className="px-6 py-3.5">Target / Resource</th>
-              <th className="px-6 py-3.5">IP Address</th>
-              <th className="px-6 py-3.5">Outcome</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 font-mono text-xs">
-            {logs.map((l) => (
-              <tr key={l.id} className="hover:bg-slate-50/70">
-                <td className="px-6 py-4 font-semibold text-slate-900">{l.id}</td>
-                <td className="px-6 py-4 text-slate-500">{l.timestamp}</td>
-                <td className="px-6 py-4 font-sans font-medium text-slate-900">{l.actor}</td>
-                <td className="px-6 py-4 text-orange-600 font-semibold">{l.action}</td>
-                <td className="px-6 py-4 font-sans text-slate-700">{l.target}</td>
-                <td className="px-6 py-4 text-slate-500">{l.ip}</td>
-                <td className="px-6 py-4">
-                  {l.status === 'success' ? (
-                    <span className="inline-flex items-center gap-1 font-sans px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
-                      Success
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 font-sans px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800">
-                      Blocked
-                    </span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {error && <div role="alert" className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />{error}</div>}
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        {loading ? <div className="p-12 text-center text-sm text-slate-500">Loading audit records…</div> : logs.length === 0 ? <div className="p-12 text-center"><FileText className="mx-auto h-8 w-8 text-slate-300" /><p className="mt-3 font-semibold text-slate-700">No audit records found</p><p className="mt-1 text-sm text-slate-500">Recorded administrative actions will appear here.</p></div> : (
+          <div className="overflow-x-auto"><table className="w-full text-left text-sm">
+            <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-600"><tr><th className="px-5 py-3">Timestamp</th><th className="px-5 py-3">Actor</th><th className="px-5 py-3">Action</th><th className="px-5 py-3">Resource</th><th className="px-5 py-3">IP Address</th></tr></thead>
+            <tbody className="divide-y divide-slate-100">{logs.map(log => <tr key={log.id} className="hover:bg-slate-50/70">
+              <td className="whitespace-nowrap px-5 py-4 text-xs text-slate-500">{log.createdAt ? new Date(log.createdAt).toLocaleString('en-IN') : '—'}</td><td className="px-5 py-4"><div className="font-mono text-xs text-slate-800">{log.actorId || 'system'}</div><div className="mt-1 text-[11px] capitalize text-slate-400">{log.actorRole || '—'}</div></td><td className="px-5 py-4 font-mono text-xs font-semibold text-teal-700">{log.action}</td><td className="px-5 py-4 text-xs text-slate-600"><div>{log.resourceType || '—'}</div><div className="mt-1 font-mono text-[11px] text-slate-400">{log.resourceId || '—'}</div></td><td className="px-5 py-4 font-mono text-xs text-slate-500">{log.ipAddress || '—'}</td>
+            </tr>)}</tbody>
+          </table></div>
+        )}
       </div>
+      <p className="flex items-center gap-2 text-xs text-slate-400"><ShieldCheck className="h-4 w-4" />Read-only view. Audit entries are not editable from the admin portal.</p>
     </div>
   );
 }

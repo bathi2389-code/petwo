@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { TrendingUp, Users, Calendar, ShieldCheck, IndianRupee, AlertCircle, RefreshCw } from 'lucide-react';
-import { apiClient, ADMIN_SESSION_KEY } from '@/lib/api-client';
+import { apiClient, ADMIN_SESSION_KEY, getApiErrorMessage } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/utils';
 
 type Metrics = {
@@ -31,8 +31,8 @@ export default function AdminOverviewPage() {
       });
       setMetrics(response.data?.data?.kpis ?? null);
       setError('');
-    } catch {
-      setError('Live marketplace analytics could not be loaded. Check your backend connection.');
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Live marketplace analytics could not be loaded. Check your backend connection.'));
     } finally {
       setLoading(false);
     }

@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshCw, Search, Users, Mail, Calendar, PawPrint, AlertCircle } from 'lucide-react';
-import { apiClient, ADMIN_SESSION_KEY } from '@/lib/api-client';
+import { apiClient, ADMIN_SESSION_KEY, getApiErrorMessage } from '@/lib/api-client';
 import { formatDate } from '@/lib/utils';
 
 type Customer = {
@@ -33,8 +33,8 @@ export default function AdminCustomersPage() {
       });
       setCustomers(response.data?.data ?? []);
       setError('');
-    } catch {
-      setError('Could not load registered customers. Check the backend connection and try again.');
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Could not load registered customers. Check the backend connection and try again.'));
     } finally {
       setLoading(false);
       setRefreshing(false);

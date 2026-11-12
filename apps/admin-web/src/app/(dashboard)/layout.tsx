@@ -5,16 +5,17 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Calendar, Percent, Ticket, Headphones, FileText,
-  ShieldCheck, Menu, X, PawPrint,
+  ShieldCheck, Menu, X, PawPrint, CreditCard,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ADMIN_SESSION_KEY, apiClient } from '@/lib/api-client';
+import { ADMIN_SESSION_KEY, ADMIN_REFRESH_TOKEN_KEY, apiClient } from '@/lib/api-client';
 
 const adminNav = [
   { href: '/overview', label: 'Platform Overview', icon: LayoutDashboard },
   { href: '/customers', label: 'Customers', icon: PawPrint },
   { href: '/providers', label: 'Provider Verification', icon: ShieldCheck },
   { href: '/bookings', label: 'Bookings & Orders', icon: Calendar },
+  { href: '/payments', label: 'Payment Records', icon: CreditCard },
   { href: '/commissions', label: 'Commissions & Fees', icon: Percent },
   { href: '/coupons', label: 'Coupons & Promos', icon: Ticket },
   { href: '/support', label: 'Support & Disputes', icon: Headphones },
@@ -38,6 +39,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const role = response.data?.data?.role;
         if (role !== 'admin' && role !== 'super_admin') {
           sessionStorage.removeItem(ADMIN_SESSION_KEY);
+          sessionStorage.removeItem(ADMIN_REFRESH_TOKEN_KEY);
           router.replace('/login');
           return;
         }
@@ -45,6 +47,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       })
       .catch(() => {
         sessionStorage.removeItem(ADMIN_SESSION_KEY);
+        sessionStorage.removeItem(ADMIN_REFRESH_TOKEN_KEY);
         router.replace('/login');
       });
   }, [router]);
@@ -55,6 +58,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       if (token) await apiClient.post('/logout', {}, { headers: { Authorization: `Bearer ${token}` } });
     } finally {
       sessionStorage.removeItem(ADMIN_SESSION_KEY);
+      sessionStorage.removeItem(ADMIN_REFRESH_TOKEN_KEY);
       router.replace('/login');
     }
   }
@@ -89,7 +93,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const sidebar = (
     <div className="flex h-full flex-col bg-[#102f4d] text-slate-200">
-      <div className="flex h-[76px] items-center justify-between border-b border-white/10 px-5">
+      <div className="flex h-[72px] items-center justify-between border-b border-white/10 px-5">
         <Link href="/overview" className="inline-flex items-center rounded-xl bg-white px-3 py-2">
           <img src="/petwo-logo.svg" alt="PETWO" className="h-9 w-auto max-w-[164px] object-contain" />
         </Link>
@@ -127,7 +131,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <aside className="sticky top-0 hidden h-screen w-[268px] shrink-0 lg:block">
+      <aside className="sticky top-0 hidden h-screen w-[272px] shrink-0 lg:block">
         {sidebar}
       </aside>
 
@@ -146,7 +150,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       )}
 
       <div className="flex min-h-screen min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex h-[76px] items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 backdrop-blur-xl sm:px-6 lg:px-9">
+        <header className="sticky top-0 z-20 flex h-[72px] items-center justify-between border-b border-slate-200/80 bg-white/90 px-5 backdrop-blur-xl sm:px-6 lg:px-9">
           <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"
@@ -171,11 +175,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
 
-        <main className="w-full flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-9">
-          <div className="mx-auto w-full max-w-[1440px]">
-            <p role="status" className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">
-              Admin data panels are preview-only and are not connected to live marketplace records yet.
-            </p>
+        <main className="w-full flex-1 px-4 py-7 sm:px-7 sm:py-9 xl:px-10">
+          <div className="mx-auto w-full max-w-[1480px]">
             {children}
           </div>
         </main>

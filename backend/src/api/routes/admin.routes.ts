@@ -96,7 +96,10 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
 
     const search = query.q?.toLowerCase();
     const users: AdminCustomerRecord[] = snapshot.docs
-      .map(doc => ({ ...(doc.data() as Record<string, unknown>), id: doc.id }))
+      .map<AdminCustomerRecord>(doc => ({
+        ...(doc.data() as Record<string, unknown>),
+        id: doc.id,
+      }))
       .filter(user => {
         if (!search) return true;
         return String(user.displayName ?? '').toLowerCase().includes(search)
@@ -138,13 +141,14 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
     const query = ProviderQuerySchema.parse(request.query);
     const db = getDb();
 
-    let q = db.collection(COLLECTIONS.PROVIDERS).orderBy('createdAt', 'desc');
-    if (query.status) {
-      q = q.where('verificationStatus', '==', query.status) as typeof q;
-    }
-
-    const snapshot = await q.limit(query.limit * query.page).get();
-    const allProviders = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+    // Filter in memory after a single ordered collection read. This avoids
+    // requiring a Firestore composite index for status + createdAt.
+    const snapshot = await db.collection(COLLECTIONS.PROVIDERS)
+      .orderBy('createdAt', 'desc')
+      .get();
+    const allProviders = snapshot.docs
+      .map<Provider & { id: string }>(doc => ({ ...(doc.data() as Provider), id: doc.id }))
+      .filter(provider => !query.status || provider.verificationStatus === query.status);
     const start = (query.page - 1) * query.limit;
     const paginated = allProviders.slice(start, start + query.limit);
 
@@ -224,20 +228,16 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
     const query = AdminBookingQuerySchema.parse(request.query);
     const db = getDb();
 
-    let q = db.collection(COLLECTIONS.BOOKINGS).orderBy('createdAt', 'desc');
-
-    if (query.status) {
-      q = q.where('status', '==', query.status) as typeof q;
-    }
-    if (query.providerId) {
-      q = q.where('providerId', '==', query.providerId) as typeof q;
-    }
-    if (query.customerId) {
-      q = q.where('customerId', '==', query.customerId) as typeof q;
-    }
-
-    const snapshot = await q.limit(query.limit * query.page).get();
+    // Apply optional filters in memory to avoid composite-index-only failures
+    // on admin queries that combine status/provider/customer with createdAt.
+    const snapshot = await db.collection(COLLECTIONS.BOOKINGS)
+      .orderBy('createdAt', 'desc')
+      .get();
     let bookings = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Booking[];
+
+    if (query.status) bookings = bookings.filter(booking => booking.status === query.status);
+    if (query.providerId) bookings = bookings.filter(booking => booking.providerId === query.providerId);
+    if (query.customerId) bookings = bookings.filter(booking => booking.customerId === query.customerId);
 
     if (query.dateFrom) {
       bookings = bookings.filter(b => dayjs(b.scheduledAt).isAfter(dayjs(query.dateFrom)) || dayjs(b.scheduledAt).isSame(dayjs(query.dateFrom)));
@@ -333,13 +333,12 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
     const { status } = request.query;
 
     const db = getDb();
-    let q = db.collection(COLLECTIONS.PAYMENTS).orderBy('createdAt', 'desc');
-    if (status) {
-      q = q.where('status', '==', status) as typeof q;
-    }
-
-    const snapshot = await q.limit(limit * page).get();
-    const all = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+    const snapshot = await db.collection(COLLECTIONS.PAYMENTS)
+      .orderBy('createdAt', 'desc')
+      .get();
+    const all = snapshot.docs
+      .map<Payment & { id: string }>(doc => ({ ...(doc.data() as Payment), id: doc.id }))
+      .filter(payment => !status || payment.status === status);
     const start = (page - 1) * limit;
 
     return reply.send({

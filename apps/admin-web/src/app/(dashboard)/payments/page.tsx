@@ -1,104 +1,73 @@
 'use client';
 
-import React from 'react';
-import { CreditCard, IndianRupee, ArrowUpRight, ArrowDownLeft, CheckCircle2 } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { CreditCard, RefreshCw, AlertCircle, IndianRupee } from 'lucide-react';
+import { apiClient, getApiErrorMessage } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/utils';
 
+type PaymentRecord = {
+  id: string;
+  bookingId?: string;
+  customerId?: string;
+  providerId?: string;
+  gatewayPaymentId?: string;
+  amount?: number;
+  currency?: string;
+  method?: string;
+  status: string;
+  createdAt?: string;
+};
+
 export default function AdminPaymentsPage() {
-  const transactions = [
-    {
-      id: 'pay_HyD99812A',
-      bookingId: 'PTC-20241102-8812',
-      customer: 'Priya Sharma',
-      amount: 85000,
-      platformFee: 12750,
-      providerPayout: 72250,
-      method: 'UPI (Google Pay)',
-      date: '02 Nov 2026, 11:28 AM',
-      status: 'captured',
-    },
-    {
-      id: 'pay_HyD77123B',
-      bookingId: 'PTC-20241102-7741',
-      customer: 'Rahul Varma',
-      amount: 149900,
-      platformFee: 22485,
-      providerPayout: 127415,
-      method: 'Credit Card (Visa)',
-      date: '02 Nov 2026, 01:54 PM',
-      status: 'captured',
-    },
-    {
-      id: 'pay_HyD33100C',
-      bookingId: 'PTC-20241101-3390',
-      customer: 'Ananya Reddy',
-      amount: 320000,
-      platformFee: 48000,
-      providerPayout: 272000,
-      method: 'Netbanking (HDFC)',
-      date: '01 Nov 2026, 10:12 AM',
-      status: 'settled',
-    },
-  ];
+  const [payments, setPayments] = useState<PaymentRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState('');
+
+  const loadPayments = useCallback(async (showSpinner = false) => {
+    if (showSpinner) setRefreshing(true);
+    try {
+      const response = await apiClient.get('/admin/payments', { params: { page: 1, limit: 100 } });
+      setPayments(Array.isArray(response.data?.data) ? response.data.data : []);
+      setError('');
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Could not load payment records.'));
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadPayments();
+    const interval = window.setInterval(() => void loadPayments(), 30000);
+    return () => window.clearInterval(interval);
+  }, [loadPayments]);
+
+  const totalRecorded = payments.reduce((sum, payment) => sum + (payment.amount ?? 0), 0);
+  const capturedCount = payments.filter(payment => payment.status === 'captured').length;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Payments & Gateway Settlements</h1>
-        <p className="text-sm text-slate-500 mt-1">Razorpay transaction monitoring, automated marketplace splits, and payout reconciliation</p>
+    <div className="mx-auto max-w-7xl space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div><h1 className="text-2xl font-bold text-slate-900">Payment Records</h1><p className="mt-1 text-sm text-slate-500">Historical payment records retrieved from PETWO Firestore.</p></div>
+        <button onClick={() => void loadPayments(true)} disabled={refreshing} className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 disabled:opacity-60"><RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />Refresh</button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <div className="text-xs uppercase font-semibold text-slate-500">24h Gross Volume</div>
-          <div className="text-2xl font-bold text-slate-900 mt-2">{formatCurrency(554900)}</div>
-          <div className="text-xs text-emerald-600 font-medium mt-1">100% gateway capture success rate</div>
-        </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <div className="text-xs uppercase font-semibold text-slate-500">Platform Take-Rate Retained</div>
-          <div className="text-2xl font-bold text-orange-600 mt-2">{formatCurrency(83235)}</div>
-          <div className="text-xs text-slate-500 font-medium mt-1">15% net commission + GST deducted</div>
-        </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <div className="text-xs uppercase font-semibold text-slate-500">Provider Payouts Due</div>
-          <div className="text-2xl font-bold text-emerald-600 mt-2">{formatCurrency(471665)}</div>
-          <div className="text-xs text-slate-500 font-medium mt-1">Scheduled for T+2 banking settlement</div>
-        </div>
-      </div>
+      <div role="note" className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">Payment collection and Razorpay checkout remain disabled for the MVP. This page is read-only and displays only payment documents already stored in Firestore.</div>
+      {error && <div role="alert" className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />{error}</div>}
 
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 text-xs uppercase">
-            <tr>
-              <th className="px-6 py-3.5">Gateway Payment ID</th>
-              <th className="px-6 py-3.5">Booking ID</th>
-              <th className="px-6 py-3.5">Customer</th>
-              <th className="px-6 py-3.5">Payment Method</th>
-              <th className="px-6 py-3.5">Order Amount</th>
-              <th className="px-6 py-3.5">Platform Fee</th>
-              <th className="px-6 py-3.5">Provider Net</th>
-              <th className="px-6 py-3.5">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {transactions.map((t) => (
-              <tr key={t.id} className="hover:bg-slate-50/70 font-mono text-xs">
-                <td className="px-6 py-4 font-semibold text-slate-900">{t.id}</td>
-                <td className="px-6 py-4 text-orange-600">{t.bookingId}</td>
-                <td className="px-6 py-4 font-sans text-slate-800">{t.customer}</td>
-                <td className="px-6 py-4 font-sans text-slate-600">{t.method}</td>
-                <td className="px-6 py-4 font-sans font-bold text-slate-900">{formatCurrency(t.amount)}</td>
-                <td className="px-6 py-4 font-sans font-semibold text-orange-600">{formatCurrency(t.platformFee)}</td>
-                <td className="px-6 py-4 font-sans font-semibold text-emerald-600">{formatCurrency(t.providerPayout)}</td>
-                <td className="px-6 py-4 font-sans">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
-                    <CheckCircle2 className="w-3 h-3" /> {t.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {!loading && !error && <div className="grid gap-4 sm:grid-cols-2"><article className="rounded-xl border border-slate-200 bg-white p-5"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Records loaded</p><p className="mt-2 text-2xl font-bold text-slate-900">{payments.length.toLocaleString('en-IN')}</p></article><article className="rounded-xl border border-slate-200 bg-white p-5"><p className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-slate-500"><IndianRupee className="h-3.5 w-3.5" /> Recorded amount (loaded records)</p><p className="mt-2 text-2xl font-bold text-slate-900">{formatCurrency(totalRecorded)}</p><p className="mt-1 text-xs text-slate-500">{capturedCount} captured records</p></article></div>}
+
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        {loading ? <div className="p-12 text-center text-sm text-slate-500">Loading payment records…</div> : payments.length === 0 ? <div className="p-12 text-center"><CreditCard className="mx-auto h-8 w-8 text-slate-300" /><p className="mt-3 font-semibold text-slate-700">No payment records found</p><p className="mt-1 text-sm text-slate-500">This is expected while payment collection is disabled.</p></div> : (
+          <div className="overflow-x-auto"><table className="w-full text-left text-sm">
+            <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-600"><tr><th className="px-5 py-3">Payment ID</th><th className="px-5 py-3">Booking ID</th><th className="px-5 py-3">Customer ID</th><th className="px-5 py-3">Method</th><th className="px-5 py-3">Amount</th><th className="px-5 py-3">Status</th><th className="px-5 py-3">Created</th></tr></thead>
+            <tbody className="divide-y divide-slate-100">{payments.map(payment => <tr key={payment.id} className="hover:bg-slate-50/70">
+              <td className="px-5 py-4 font-mono text-xs font-semibold text-slate-900">{payment.gatewayPaymentId || payment.id}</td><td className="px-5 py-4 font-mono text-xs text-slate-600">{payment.bookingId || '—'}</td><td className="px-5 py-4 font-mono text-xs text-slate-600">{payment.customerId || '—'}</td><td className="px-5 py-4 text-xs capitalize text-slate-600">{payment.method || '—'}</td><td className="px-5 py-4 font-semibold text-slate-900">{formatCurrency(payment.amount ?? 0)}</td><td className="px-5 py-4"><span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold capitalize text-slate-700">{payment.status.replace(/_/g, ' ')}</span></td><td className="px-5 py-4 text-xs text-slate-500">{payment.createdAt ? new Date(payment.createdAt).toLocaleString('en-IN') : '—'}</td>
+            </tr>)}</tbody>
+          </table></div>
+        )}
       </div>
     </div>
   );
