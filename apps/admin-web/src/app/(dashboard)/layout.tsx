@@ -93,7 +93,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const sidebar = (
     <div className="flex h-full flex-col bg-[#102f4d] text-slate-200">
-      <div className="flex h-[76px] items-center justify-between border-b border-white/10 px-5">
+      <div className="flex h-[72px] items-center justify-between border-b border-white/10 px-5">
         <Link href="/overview" className="inline-flex items-center rounded-xl bg-white px-3 py-2">
           <img src="/petwo-logo.svg" alt="PETWO" className="h-9 w-auto max-w-[164px] object-contain" />
         </Link>
@@ -131,7 +131,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <aside className="sticky top-0 hidden h-screen w-[268px] shrink-0 lg:block">
+      <aside className="sticky top-0 hidden h-screen w-[272px] shrink-0 lg:block">
         {sidebar}
       </aside>
 
@@ -150,7 +150,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       )}
 
       <div className="flex min-h-screen min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex h-[76px] items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 backdrop-blur-xl sm:px-6 lg:px-9">
+        <header className="sticky top-0 z-20 flex h-[72px] items-center justify-between border-b border-slate-200/80 bg-white/90 px-5 backdrop-blur-xl sm:px-6 lg:px-9">
           <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"
@@ -175,8 +175,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
 
-        <main className="w-full flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-9">
-          <div className="mx-auto w-full max-w-[1440px]">
+        <main className="w-full flex-1 px-4 py-7 sm:px-7 sm:py-9 xl:px-10">
+          <div className="mx-auto w-full max-w-[1480px]">
             {children}
           </div>
         </main>
