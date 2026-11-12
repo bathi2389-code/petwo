@@ -96,7 +96,10 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
 
     const search = query.q?.toLowerCase();
     const users: AdminCustomerRecord[] = snapshot.docs
-      .map(doc => ({ ...(doc.data() as Record<string, unknown>), id: doc.id }))
+      .map<AdminCustomerRecord>(doc => ({
+        ...(doc.data() as Record<string, unknown>),
+        id: doc.id,
+      }))
       .filter(user => {
         if (!search) return true;
         return String(user.displayName ?? '').toLowerCase().includes(search)
