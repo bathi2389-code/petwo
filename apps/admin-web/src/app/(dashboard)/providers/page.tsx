@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { ShieldCheck, Check, X, Phone, Mail, RefreshCw, AlertCircle } from 'lucide-react';
-import { apiClient, ADMIN_SESSION_KEY } from '@/lib/api-client';
+import { apiClient, ADMIN_SESSION_KEY, getApiErrorMessage } from '@/lib/api-client';
 import { formatDate } from '@/lib/utils';
 
 type Provider = {
@@ -35,8 +35,8 @@ export default function ProvidersAdminPage() {
       });
       setProviders(response.data?.data ?? []);
       setError('');
-    } catch {
-      setError('Could not load provider applications. Check the backend connection and try again.');
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Could not load provider applications. Check the backend connection and try again.'));
     } finally {
       setLoading(false);
       setRefreshing(false);
