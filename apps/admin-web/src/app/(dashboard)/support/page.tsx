@@ -1,119 +1,176 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Headphones, MessageSquare, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Headphones, RefreshCw, AlertCircle, Clock, CheckCircle, MessageSquare, ShieldCheck } from 'lucide-react';
+import { apiClient, getApiErrorMessage } from '@/lib/api-client';
+import { formatDate } from '@/lib/utils';
+
+type TicketStatus = 'open' | 'in_progress' | 'waiting_user' | 'resolved' | 'closed';
+type SupportTicket = {
+  id: string;
+  ticketNumber?: string;
+  userId: string;
+  userRole?: string;
+  category: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: TicketStatus;
+  subject: string;
+  description: string;
+  bookingId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  messages?: Array<{ id: string; authorId: string; authorRole?: string; body: string; createdAt?: string }>;
+};
+
+const statuses: Array<'all' | TicketStatus> = ['all', 'open', 'in_progress', 'waiting_user', 'resolved', 'closed'];
+
+const statusStyles: Record<TicketStatus, string> = {
+  open: 'bg-rose-50 text-rose-700',
+  in_progress: 'bg-amber-50 text-amber-700',
+  waiting_user: 'bg-sky-50 text-sky-700',
+  resolved: 'bg-emerald-50 text-emerald-700',
+  closed: 'bg-slate-100 text-slate-600',
+};
 
 export default function AdminSupportPage() {
-  const tickets = [
-    {
-      id: 'TKT-20241102-001',
-      customer: 'Suresh Varma',
-      phone: '+91 94401 23456',
-      subject: 'Refund request for cancelled vet consultation',
-      bookingId: 'PTC-20241101-1102',
-      priority: 'high',
-      status: 'open',
-      createdAt: 'Today, 10:15 AM',
-    },
-    {
-      id: 'TKT-20241101-098',
-      customer: 'Kavita Nair',
-      phone: '+91 98840 98765',
-      subject: 'Groomer arrived 30 minutes late for home service',
-      bookingId: 'PTC-20241031-4421',
-      priority: 'medium',
-      status: 'in_progress',
-      createdAt: 'Yesterday, 03:40 PM',
-    },
-    {
-      id: 'TKT-20241030-045',
-      customer: 'Mahesh Babu',
-      phone: '+91 97000 11223',
-      subject: 'Vaccination certificate digital passport sync issue',
-      bookingId: 'PTC-20241029-9912',
-      priority: 'low',
-      status: 'resolved',
-      createdAt: '30 Oct 2026',
-    },
-  ];
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
+  const [filter, setFilter] = useState<'all' | TicketStatus>('all');
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [busyId, setBusyId] = useState('');
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+
+  const loadTickets = useCallback(async (showSpinner = false) => {
+    if (showSpinner) setRefreshing(true);
+    try {
+      const response = await apiClient.get('/support/tickets', {
+        params: { page: 1, limit: 100, status: filter === 'all' ? undefined : filter },
+      });
+      setTickets(Array.isArray(response.data?.data) ? response.data.data : []);
+      setError('');
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Could not load support tickets. Check your admin session and backend connection.'));
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [filter]);
+
+  useEffect(() => {
+    void loadTickets();
+    const interval = window.setInterval(() => void loadTickets(), 30000);
+    return () => window.clearInterval(interval);
+  }, [loadTickets]);
+
+  async function updateStatus(ticketId: string, status: TicketStatus) {
+    setBusyId(ticketId);
+    setError('');
+    setNotice('');
+    try {
+      await apiClient.put(`/support/tickets/${ticketId}/status`, { status });
+      setNotice('Support ticket status updated.');
+      await loadTickets();
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'The ticket status could not be updated.'));
+    } finally {
+      setBusyId('');
+    }
+  }
+
+  const counts = statuses.slice(1).reduce((result, status) => {
+    result[status] = tickets.filter(ticket => ticket.status === status).length;
+    return result;
+  }, {} as Record<TicketStatus, number>);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Support & Dispute Resolution</h1>
-        <p className="text-sm text-slate-500 mt-1">Manage customer grievances, refund disputes, and provider complaints</p>
+    <div className="mx-auto max-w-7xl space-y-6">
+      <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-teal-700">Customer care</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Support & dispute resolution</h1>
+          <p className="mt-2 text-sm text-slate-500">Live support tickets stored in Firebase. This list refreshes automatically every 30 seconds.</p>
+        </div>
+        <button type="button" onClick={() => void loadTickets(true)} disabled={refreshing} className="inline-flex w-fit items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60">
+          <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} /> Refresh
+        </button>
+      </section>
+
+      {!loading && !error && (
+        <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5" aria-label="Ticket counts">
+          {(['open', 'in_progress', 'waiting_user', 'resolved', 'closed'] as TicketStatus[]).map(status => (
+            <article key={status} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p className="text-xs font-semibold capitalize text-slate-500">{status.replace(/_/g, ' ')}</p>
+              <p className="mt-2 text-2xl font-bold tabular-nums text-slate-950">{counts[status] ?? 0}</p>
+            </article>
+          ))}
+        </section>
+      )}
+
+      <div className="flex flex-wrap gap-2" aria-label="Filter support tickets">
+        {statuses.map(status => (
+          <button key={status} type="button" onClick={() => setFilter(status)} aria-pressed={filter === status}
+            className={`rounded-full px-4 py-2 text-xs font-semibold capitalize transition ${filter === status ? 'bg-teal-700 text-white shadow-sm' : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'}`}>
+            {status === 'all' ? 'All tickets' : status.replace(/_/g, ' ')}
+          </button>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <div className="text-xs uppercase font-semibold text-slate-500">Open Tickets</div>
-          <div className="text-2xl font-bold text-rose-600 mt-2">1</div>
-          <div className="text-xs text-rose-600 font-medium mt-1">Requires immediate attention</div>
-        </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <div className="text-xs uppercase font-semibold text-slate-500">In Progress</div>
-          <div className="text-2xl font-bold text-amber-600 mt-2">1</div>
-          <div className="text-xs text-amber-600 font-medium mt-1">Assigned to support executive</div>
-        </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <div className="text-xs uppercase font-semibold text-slate-500">Resolved Today</div>
-          <div className="text-2xl font-bold text-emerald-600 mt-2">8</div>
-          <div className="text-xs text-emerald-600 font-medium mt-1">Avg turnaround: 28 mins</div>
-        </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <div className="text-xs uppercase font-semibold text-slate-500">CSAT Score</div>
-          <div className="text-2xl font-bold text-slate-900 mt-2">4.8 / 5.0</div>
-          <div className="text-xs text-slate-500 font-medium mt-1">Based on 340 ratings</div>
-        </div>
-      </div>
+      {error && <div role="alert" className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />{error}</div>}
+      {notice && <div role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</div>}
 
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 text-xs uppercase">
-            <tr>
-              <th className="px-6 py-3.5">Ticket ID</th>
-              <th className="px-6 py-3.5">Customer & Phone</th>
-              <th className="px-6 py-3.5">Subject & Booking</th>
-              <th className="px-6 py-3.5">Priority</th>
-              <th className="px-6 py-3.5">Created At</th>
-              <th className="px-6 py-3.5">Status</th>
-              <th className="px-6 py-3.5 text-right">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {tickets.map((t) => (
-              <tr key={t.id} className="hover:bg-slate-50/70">
-                <td className="px-6 py-4 font-mono font-semibold text-slate-900 text-xs">{t.id}</td>
-                <td className="px-6 py-4">
-                  <div className="font-medium text-slate-900">{t.customer}</div>
-                  <div className="text-xs text-slate-500">{t.phone}</div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="text-slate-800 font-medium text-xs">{t.subject}</div>
-                  <div className="text-[11px] font-mono text-orange-600">{t.bookingId}</div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-0.5 rounded text-[11px] font-semibold uppercase ${
-                    t.priority === 'high' ? 'bg-rose-100 text-rose-800' :
-                    t.priority === 'medium' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700'
-                  }`}>
-                    {t.priority}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-xs text-slate-500">{t.createdAt}</td>
-                <td className="px-6 py-4">
-                  {t.status === 'open' && <span className="inline-flex items-center gap-1 text-xs text-rose-700 bg-rose-50 px-2 py-0.5 rounded font-medium"><Clock className="w-3 h-3" /> Open</span>}
-                  {t.status === 'in_progress' && <span className="inline-flex items-center gap-1 text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-medium"><AlertTriangle className="w-3 h-3" /> In Progress</span>}
-                  {t.status === 'resolved' && <span className="inline-flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium"><CheckCircle className="w-3 h-3" /> Resolved</span>}
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <button className="text-xs text-orange-600 hover:text-orange-700 font-semibold">View Details</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <section className="space-y-3">
+        {loading ? (
+          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-sm text-slate-500">Loading live support tickets…</div>
+        ) : tickets.length === 0 ? (
+          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center">
+            <Headphones className="mx-auto h-9 w-9 text-slate-300" />
+            <p className="mt-3 font-semibold text-slate-800">No support tickets found</p>
+            <p className="mt-1 text-sm text-slate-500">Real customer and provider support requests will appear here when submitted.</p>
+          </div>
+        ) : tickets.map(ticket => (
+          <article key={ticket.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="font-semibold text-slate-950">{ticket.subject}</h2>
+                  <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold capitalize ${statusStyles[ticket.status]}`}>{ticket.status.replace(/_/g, ' ')}</span>
+                  <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase ${ticket.priority === 'urgent' || ticket.priority === 'high' ? 'bg-rose-50 text-rose-700' : ticket.priority === 'medium' ? 'bg-amber-50 text-700' : 'bg-slate-100 text-slate-600'}`}>{ticket.priority}</span>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                  <span className="font-mono">{ticket.ticketNumber || ticket.id}</span>
+                  <span className="capitalize">{ticket.category.replace(/_/g, ' ')}</span>
+                  <span>From {ticket.userRole || 'user'} · {ticket.userId}</span>
+                  <span>{ticket.createdAt ? formatDate(ticket.createdAt) : 'Date unavailable'}</span>
+                  {ticket.bookingId && <span>Booking: {ticket.bookingId}</span>}
+                </div>
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-600">{ticket.description}</p>
+                {ticket.messages && ticket.messages.length > 0 && (
+                  <details className="mt-4 rounded-xl bg-slate-50 p-3">
+                    <summary className="flex cursor-pointer list-none items-center gap-2 text-xs font-semibold text-slate-700"><MessageSquare className="h-4 w-4" /> Conversation ({ticket.messages.length} messages)</summary>
+                    <div className="mt-3 space-y-3">
+                      {ticket.messages.map(message => <div key={message.id} className="border-l-2 border-teal-200 pl-3">
+                        <p className="text-[11px] font-semibold capitalize text-slate-500">{message.authorRole || 'user'} · {message.createdAt ? formatDate(message.createdAt) : 'Time unavailable'}</p>
+                        <p className="mt-1 whitespace-pre-wrap text-sm text-slate-700">{message.body}</p>
+                      </div>)}
+                    </div>
+                  </details>
+                )}
+              </div>
+              <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:w-52 lg:flex-col">
+                <label htmlFor={`ticket-status-${ticket.id}`} className="text-xs font-semibold text-slate-600">Update status</label>
+                <select id={`ticket-status-${ticket.id}`} value={ticket.status} disabled={busyId === ticket.id}
+                  onChange={event => void updateStatus(ticket.id, event.target.value as TicketStatus)}
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 disabled:opacity-60">
+                  {statuses.slice(1).map(status => <option key={status} value={status}>{status.replace(/_/g, ' ')}</option>)}
+                </select>
+                {busyId === ticket.id && <span className="text-xs text-slate-500">Saving status…</span>}
+              </div>
+            </div>
+          </article>
+        ))}
+      </section>
+      <p className="flex items-center gap-2 text-xs text-slate-400"><ShieldCheck className="h-4 w-4" />Ticket details and status changes use the authenticated support API.</p>
     </div>
   );
 }
