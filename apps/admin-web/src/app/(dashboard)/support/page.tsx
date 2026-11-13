@@ -135,7 +135,7 @@ export default function AdminSupportPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   <h2 className="font-semibold text-slate-950">{ticket.subject}</h2>
                   <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold capitalize ${statusStyles[ticket.status]}`}>{ticket.status.replace(/_/g, ' ')}</span>
-                  <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase ${ticket.priority === 'urgent' || ticket.priority === 'high' ? 'bg-rose-50 text-rose-700' : ticket.priority === 'medium' ? 'bg-amber-50 text-700' : 'bg-slate-100 text-slate-600'}`}>{ticket.priority}</span>
+                  <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase ${ticket.priority === 'urgent' || ticket.priority === 'high' ? 'bg-rose-50 text-rose-700' : ticket.priority === 'medium' ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>{ticket.priority}</span>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
                   <span className="font-mono">{ticket.ticketNumber || ticket.id}</span>
