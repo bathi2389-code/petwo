@@ -64,7 +64,7 @@ export default function AdminCustomersPage() {
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by customer name or email..." className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-4 text-sm outline-none focus:ring-2 focus:ring-teal-500" />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by customer name, email or phone..." className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-4 text-sm outline-none focus:ring-2 focus:ring-teal-500" />
         </div>
         <div className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">
           <Users className="h-4 w-4" /> {visibleCustomers.length} customers loaded
