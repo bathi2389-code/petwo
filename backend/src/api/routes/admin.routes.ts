@@ -88,6 +88,7 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
       id: string;
       displayName?: unknown;
       email?: unknown;
+      phone?: unknown;
       createdAt?: unknown;
       updatedAt?: unknown;
       isActive?: unknown;
@@ -103,7 +104,8 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
       .filter(user => {
         if (!search) return true;
         return String(user.displayName ?? '').toLowerCase().includes(search)
-          || String(user.email ?? '').toLowerCase().includes(search);
+          || String(user.email ?? '').toLowerCase().includes(search)
+          || String(user.phone ?? '').toLowerCase().includes(search);
       })
       .sort((a, b) => String(b.createdAt ?? b.updatedAt ?? '').localeCompare(String(a.createdAt ?? a.updatedAt ?? '')));
 
