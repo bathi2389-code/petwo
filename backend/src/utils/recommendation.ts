@@ -213,7 +213,7 @@ export function calculateRecommendationScore(params: {
 
   return {
     recommendationScore: finalScore,
-    weightedRating,
+    weightedRating: calculatedBayesianRating,
     reliabilityScore: reliability,
     isNewProvider: isNew,
   };
