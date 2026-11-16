@@ -37,6 +37,70 @@ const ReviewQuerySchema = z.object({
 
 export default async function reviewRoutes(app: FastifyInstance): Promise<void> {
 
+  // Provider-only review feed: never return marketplace-wide reviews to a provider.
+  app.get('/me', {
+    preHandler: [authenticate, isProvider],
+    schema: { tags: ['Reviews'], security: [{ bearerAuth: [] }] },
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    const db = getDb();
+    const providerId = request.user!.uid;
+    const snapshot = await db.collection(COLLECTIONS.REVIEWS)
+      .where('providerId', '==', providerId)
+      .where('status', '==', 'published')
+      .orderBy('createdAt', 'desc')
+      .limit(100)
+      .get();
+    const reviews = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+    const distribution: Record<string, number> = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
+    for (const review of reviews) distribution[String((review as any).rating)] += 1;
+    const count = reviews.length;
+    const average = count
+      ? Math.round(reviews.reduce((sum, review) => sum + Number((review as any).rating || 0), 0) / count * 10) / 10
+      : null;
+    return reply.send({ success: true, data: { reviews, rating: { average, count, distribution } } });
+  });
+
+  // AI-generated reputation insights from published reviews only. If Gemini is
+  // not configured or fails, return an explicit unavailable state, never invented feedback.
+  app.get('/me/insights', {
+    preHandler: [authenticate, isProvider],
+    schema: { tags: ['Reviews', 'AI'], security: [{ bearerAuth: [] }] },
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    const db = getDb();
+    const snapshot = await db.collection(COLLECTIONS.REVIEWS)
+      .where('providerId', '==', request.user!.uid)
+      .where('status', '==', 'published')
+      .orderBy('createdAt', 'desc')
+      .limit(100)
+      .get();
+    const reviews = snapshot.docs.map(doc => doc.data() as Review).filter(review => !!review.body?.trim());
+    if (reviews.length < 3) {
+      return reply.send({ success: true, data: { available: false, reason: 'At least three written published reviews are required for a useful summary.' } });
+    }
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return reply.send({ success: true, data: { available: false, reason: 'AI insights are not configured. Customer ratings and reviews remain available.' } });
+    }
+    try {
+      const axios = (await import('axios')).default;
+      const feedback = reviews.slice(0, 60).map(review => ({ rating: review.rating, feedback: review.body }));
+      const response = await axios.post(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`,
+        {
+          contents: [{ parts: [{ text: 'Analyze only this genuine customer review data. Do not invent facts. Return JSON with keys positiveThemes (array of strings), improvementAreas (array of strings), recommendations (array of strings). If evidence is insufficient, return empty arrays. Reviews: ' + JSON.stringify(feedback) }] }],
+          generationConfig: { responseMimeType: 'application/json', temperature: 0.2 },
+        },
+        { timeout: 15000 },
+      );
+      const raw = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      const insights = JSON.parse(raw);
+      return reply.send({ success: true, data: { available: true, generatedAt: new Date().toISOString(), sourceReviewCount: reviews.length, insights } });
+    } catch (error) {
+      request.log.warn({ err: error }, 'Provider review insights unavailable');
+      return reply.send({ success: true, data: { available: false, reason: 'AI insights are temporarily unavailable. Your published reviews and rating are unaffected.' } });
+    }
+  });
+
   /**
    * GET /reviews — Public listing of published reviews, filtered by providerId or serviceId
    */
