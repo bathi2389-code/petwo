@@ -44,6 +44,7 @@ class ApiService {
   Future<Response> getProviderServices(String providerId) => dio.get('/services', queryParameters: {'providerId': providerId});
   Future<Response> createBooking(Map<String, dynamic> data) => dio.post('/bookings', data: data);
   Future<Response> getMyBookings() => dio.get('/bookings/my');
+  Future<Response> submitReview({required String bookingId, required int rating, String? body}) => dio.post('/reviews', data: {'bookingId': bookingId, 'rating': rating, if (body != null && body.trim().isNotEmpty) 'body': body.trim()});
 
   // Existing payment integration remains unchanged.
   Future<Response> createPaymentOrder(String bookingId) => dio.post('/payments/orders', data: {'bookingId': bookingId});
