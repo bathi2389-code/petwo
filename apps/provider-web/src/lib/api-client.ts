@@ -53,8 +53,8 @@ export const earningsApi = {
 };
 
 export const reviewApi = {
-  getReviews: (params?: { page?: number; limit?: number }) =>
-    apiClient.get('/reviews', { params }),
+  getReviews: () => apiClient.get('/reviews/me'),
+  getInsights: () => apiClient.get('/reviews/me/insights'),
   respondToReview: (id: string, response: string) =>
     apiClient.put(`/reviews/${id}/response`, { response }),
 };
