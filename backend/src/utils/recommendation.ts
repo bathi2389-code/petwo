@@ -165,12 +165,19 @@ export function calculateRecommendationScore(params: {
 } {
   const cfg = { ...DEFAULT_RECOMMENDATION_CONFIG, ...params.config };
 
-  const weightedRating = calculateBayesianRating(
-    params.averageRating,
-    params.reviewCount,
-    cfg.platformAverageRating,
-    cfg.minReviewsThreshold,
-  );
+  // A platform prior is useful for ranking cold-start providers, but it is not
+  // a customer rating. Keep the published/display rating at zero until a real
+  // eligible review exists.
+  const hasReviews = params.reviewCount > 0;
+  const calculatedBayesianRating = hasReviews
+    ? calculateBayesianRating(
+        params.averageRating,
+        params.reviewCount,
+        cfg.platformAverageRating,
+        cfg.minReviewsThreshold,
+      )
+    : 0;
+  const rankingRating = hasReviews ? calculatedBayesianRating : cfg.platformAverageRating;
 
   // Reviews are not booking-completion evidence. Use a neutral score until
   // verified booking reliability metrics are available.
@@ -190,7 +197,7 @@ export function calculateRecommendationScore(params: {
   );
 
   // Normalized score components [0, 1]
-  const ratingNorm = weightedRating / 5.0;
+  const ratingNorm = rankingRating / 5.0;
   const reliabilityNorm = reliability / 100.0;
   const newBoost = isNew ? cfg.newProviderBoost : 0;
 
