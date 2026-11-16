@@ -62,36 +62,36 @@ export default function ReviewsPage() {
       {/* Ratings Aggregate Banner */}
       <div className="bg-white rounded-xl border shadow-sm p-6 flex flex-col md:flex-row items-center gap-8">
         <div className="text-center md:text-left md:border-r md:pr-8">
-          <div className="text-4xl font-extrabold text-gray-900">4.9</div>
+          <div className="text-4xl font-extrabold text-gray-900">{reviewCount ? average.toFixed(1) : "—"}</div>
           <div className="flex items-center gap-1 mt-1 justify-center md:justify-start">
             {[1, 2, 3, 4, 5].map(i => (
               <Star key={i} className="h-4 w-4 text-amber-400 fill-amber-400" />
             ))}
           </div>
-          <p className="text-xs text-gray-500 mt-1">Based on 142 verified bookings</p>
+          <p className="text-xs text-gray-500 mt-1">{reviewCount} published customer reviews</p>
         </div>
 
         <div className="flex-1 w-full space-y-1.5 text-xs text-gray-600">
           <div className="flex items-center gap-2">
             <span className="w-6">5 ★</span>
             <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div className="bg-amber-400 h-full w-[88%]" />
+              <div className="bg-amber-400 h-full" style={{ width: `${reviewCount ? reviews.filter(r => r.rating === 5).length / reviewCount * 100 : 0}%` }} />
             </div>
-            <span className="w-8 text-right">88%</span>
+            <span className="w-8 text-right">{reviewCount ? Math.round(reviews.filter(r => r.rating === 5).length / reviewCount * 100) : 0}%</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-6">4 ★</span>
             <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div className="bg-amber-400 h-full w-[10%]" />
+              <div className="bg-amber-400 h-full" style={{ width: `${reviewCount ? reviews.filter(r => r.rating === 4).length / reviewCount * 100 : 0}%` }} />
             </div>
-            <span className="w-8 text-right">10%</span>
+            <span className="w-8 text-right">{reviewCount ? Math.round(reviews.filter(r => r.rating === 4).length / reviewCount * 100) : 0}%</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-6">3 ★</span>
             <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div className="bg-amber-400 h-full w-[2%]" />
+              <div className="bg-amber-400 h-full" style={{ width: `${reviewCount ? reviews.filter(r => r.rating === 3).length / reviewCount * 100 : 0}%` }} />
             </div>
-            <span className="w-8 text-right">2%</span>
+            <span className="w-8 text-right">{reviewCount ? Math.round(reviews.filter(r => r.rating === 3).length / reviewCount * 100) : 0}%</span>
           </div>
         </div>
       </div>
@@ -103,9 +103,9 @@ export default function ReviewsPage() {
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <h4 className="font-semibold text-gray-900 text-sm">{rev.customerName}</h4>
+                  <h4 className="font-semibold text-gray-900 text-sm">Verified PETWO customer</h4>
                   <span className="text-xs text-gray-400">•</span>
-                  <span className="text-xs font-medium text-gray-600">{rev.petName}</span>
+                  <span className="text-xs font-medium text-gray-600">Booking {rev.bookingId}</span>
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <div className="flex items-center">
@@ -113,8 +113,8 @@ export default function ReviewsPage() {
                       <Star key={i} className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
                     ))}
                   </div>
-                  <span className="text-xs text-gray-400">{formatDate(rev.date)}</span>
-                  {rev.verifiedBooking && (
+                  <span className="text-xs text-gray-400">{formatDate(rev.createdAt)}</span>
+                  {rev.isVerified && (
                     <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">
                       <CheckCircle2 className="h-3 w-3" />
                       Verified Visit
@@ -124,7 +124,7 @@ export default function ReviewsPage() {
               </div>
             </div>
 
-            <p className="text-sm text-gray-700 leading-relaxed">{rev.body}</p>
+            <p className="text-sm text-gray-700 leading-relaxed">{rev.body || rev.title || "Customer left a star rating without written feedback."}</p>
 
             {/* Provider Public Response */}
             {rev.providerResponse ? (
