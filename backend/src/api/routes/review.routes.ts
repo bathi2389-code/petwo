@@ -11,6 +11,9 @@ import { calculateBayesianRating, calculateReliabilityScore } from '../../utils/
 const CreateReviewSchema = z.object({
   bookingId: z.string().min(1),
   rating: z.number().int().min(1).max(5),
+  serviceQualityRating: z.number().int().min(1).max(5).optional(),
+  staffBehaviourRating: z.number().int().min(1).max(5).optional(),
+  cleanlinessRating: z.number().int().min(1).max(5).optional(),
   title: z.string().max(150).optional(),
   body: z.string().max(2000).optional(),
   photoURLs: z.array(z.string().url()).max(5).optional(),
@@ -227,51 +230,55 @@ export default async function reviewRoutes(app: FastifyInstance): Promise<void> 
       });
     }
 
-    // One review per booking: check for existing review
+    // Preserve compatibility with older random-ID review records, then use a
+    // deterministic booking-based ID inside a transaction to prevent concurrent duplicates.
     const existingSnap = await db.collection(COLLECTIONS.REVIEWS)
       .where('bookingId', '==', data.bookingId)
       .limit(1)
       .get();
-
-    if (!existingSnap.empty) {
-      return reply.status(409).send({
-        success: false,
-        error: { code: 'RES_002', message: 'A review for this booking already exists.' },
-      });
-    }
-
-    const id = nanoid();
+    const id = data.bookingId;
+    const reviewRef = db.collection(COLLECTIONS.REVIEWS).doc(id);
+    const bookingRef = db.collection(COLLECTIONS.BOOKINGS).doc(data.bookingId);
     const now = new Date().toISOString();
-
-    const review: Review = {
+    const review: Review & Record<string, unknown> = {
       id,
       bookingId: data.bookingId,
       customerId: userId,
       providerId: booking.providerId,
       serviceId: booking.serviceId,
       rating: data.rating,
+      serviceQualityRating: data.serviceQualityRating,
+      staffBehaviourRating: data.staffBehaviourRating,
+      cleanlinessRating: data.cleanlinessRating,
       title: data.title,
       body: data.body,
       photoURLs: data.photoURLs,
-      status: 'pending', // Requires admin publish
-      isVerified: true,  // Linked to actual completed booking
+      status: 'pending',
+      isVerified: true,
       helpfulCount: 0,
       createdAt: now,
       updatedAt: now,
     };
 
-    await db.collection(COLLECTIONS.REVIEWS).doc(id).set(review);
-
-    // Update booking with rating snapshot
-    await db.collection(COLLECTIONS.BOOKINGS).doc(data.bookingId).update({
-      rating: {
-        score: data.rating,
-        review: data.body,
-        ratedAt: now,
-        isPublic: true,
-      },
-      updatedAt: now,
+    const created = await db.runTransaction(async transaction => {
+      const currentReview = await transaction.get(reviewRef);
+      const currentBooking = await transaction.get(bookingRef);
+      if (!currentBooking.exists || (currentBooking.data() as Booking).status !== 'completed') return 'booking-not-completed' as const;
+      if (currentReview.exists || !existingSnap.empty) return 'duplicate' as const;
+      transaction.create(reviewRef, review);
+      transaction.update(bookingRef, {
+        rating: { score: data.rating, review: data.body, ratedAt: now, isPublic: false },
+        updatedAt: now,
+      });
+      return 'created' as const;
     });
+
+    if (created === 'duplicate') {
+      return reply.status(409).send({ success: false, error: { code: 'RES_002', message: 'A review for this booking already exists.' } });
+    }
+    if (created !== 'created') {
+      return reply.status(400).send({ success: false, error: { code: 'RES_003', message: 'Reviews can only be submitted for completed bookings.' } });
+    }
 
     return reply.status(201).send({ success: true, data: review });
   });
