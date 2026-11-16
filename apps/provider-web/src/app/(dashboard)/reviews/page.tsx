@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Star, MessageSquare, CheckCircle2, CornerDownRight } from 'lucide-react';
+import { Star, CheckCircle2, CornerDownRight } from 'lucide-react';
 import { reviewApi } from '@/lib/api-client';
 import { formatDate } from '@/lib/utils';
 
