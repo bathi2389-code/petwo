@@ -343,7 +343,7 @@ export default async function providerRoutes(app: FastifyInstance): Promise<void
       // Compute multi-factor recommendation score & Bayesian rating
       const hasPublishedRating = typeof p.rating === 'number' && Number.isFinite(p.rating);
       const rec = calculateRecommendationScore({
-        averageRating: hasPublishedRating ? p.rating! : 4.0,
+        averageRating: hasPublishedRating ? p.rating! : 0,
         reviewCount: hasPublishedRating && typeof p.reviewCount === 'number' ? p.reviewCount : 0,
         verificationStatus: p.verificationStatus,
         reliabilityScore: p.reliabilityScore,
@@ -452,7 +452,7 @@ export default async function providerRoutes(app: FastifyInstance): Promise<void
     const db = getDb();
     const doc = await db.collection(COLLECTIONS.PROVIDERS).doc(request.params.providerId).get();
 
-    if (!doc.exists || !doc.data()!.isActive) {
+    if (!doc.exists || doc.data()!.verificationStatus !== 'approved' || doc.data()!.isActive !== true) {
       return reply.status(404).send({ success: false, error: { code: 'RES_001', message: 'Provider not found.' } });
     }
 
