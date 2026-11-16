@@ -190,6 +190,7 @@ export type Provider = {
   verificationStatus: VerificationStatus;
   verificationNotes?: string;
   verifiedAt?: string;
+  bookingAvailabilityStatus?: 'not_accepting' | 'accepting' | 'fully_booked';
   documents: ProviderDocument[];
   registrationNo?: string; // GST / PAN / clinic registration
   panNumber?: string;
@@ -571,6 +572,9 @@ export type Review = {
   providerId: string;
   serviceId: string;
   rating: number; // 1–5
+  serviceQualityRating?: number;
+  staffBehaviourRating?: number;
+  cleanlinessRating?: number;
   title?: string;
   body?: string;
   photoURLs?: string[];
