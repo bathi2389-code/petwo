@@ -99,8 +99,9 @@ export default function ReviewsPage() {
       </div>
 
       {/* Reviews List */}
+      {error && <p role="alert" className="rounded-lg bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}
       <div className="space-y-4">
-        {reviews.map(rev => (
+        {loading ? <p className="rounded-xl border bg-white p-8 text-center text-sm text-gray-500">Loading published reviews…</p> : reviews.length === 0 ? <p className="rounded-xl border bg-white p-8 text-center text-sm text-gray-500">No published customer reviews yet. Reviews appear here after completed bookings and admin publication.</p> : reviews.map(rev => (
           <div key={rev.id} className="bg-white rounded-xl border shadow-sm p-6 space-y-4">
             <div className="flex items-start justify-between">
               <div>
