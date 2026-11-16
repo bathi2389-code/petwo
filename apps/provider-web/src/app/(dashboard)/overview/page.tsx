@@ -57,7 +57,7 @@ export default function OverviewPage() {
             <ShieldCheck className="h-5 w-5 text-emerald-600 flex-shrink-0" />
             <div>
               <span className="font-semibold text-emerald-900 text-sm">Verified PETWO Partner</span>
-              <p className="text-xs text-emerald-700">Your profile is public and accepting bookings in Hyderabad.</p>
+              <p className="text-xs text-emerald-700">Your provider verification is approved. Booking availability is managed separately in your schedule.</p>
             </div>
           </div>
           <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
@@ -122,12 +122,12 @@ export default function OverviewPage() {
             <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-gray-900">{provider?.rating?.toFixed(1) || '4.9'}</span>
-            <span className="text-xs text-gray-500">({provider?.reviewCount || 142} reviews)</span>
+            <span className="text-2xl font-bold text-gray-900">{typeof provider?.rating === 'number' && (provider.reviewCount ?? 0) > 0 ? provider.rating.toFixed(1) : '—'}</span>
+            <span className="text-xs text-gray-500">({provider?.reviewCount ?? 0} reviews)</span>
           </div>
           <div className="mt-2 text-xs text-emerald-600 flex items-center gap-1">
             <TrendingUp className="h-3 w-3" />
-            <span>98% positive sentiment</span>
+            <span>{(provider?.reviewCount ?? 0) > 0 ? 'Based on published customer reviews' : 'No published reviews yet'}</span>
           </div>
         </div>
 
@@ -138,13 +138,13 @@ export default function OverviewPage() {
           </div>
           <div className="mt-3">
             <span className="text-2xl font-bold text-gray-900 capitalize">
-              {provider?.subscription?.tier || 'Pro'}
+              {provider?.subscription?.tier || '—'}
             </span>
             <span className="text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full ml-2 font-medium">
               Active
             </span>
           </div>
-          <p className="mt-2 text-xs text-gray-500">Next settlement: Every Monday</p>
+          <p className="mt-2 text-xs text-gray-500">Subscription plan</p>
         </div>
       </div>
 
