@@ -27,6 +27,10 @@ const ProviderResponseSchema = z.object({
 const AdminStatusSchema = z.object({
   status: z.enum(['published', 'flagged', 'removed']),
   adminNote: z.string().max(500).optional(),
+}).superRefine((value, context) => {
+  if (value.status !== 'published' && !value.adminNote?.trim()) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ['adminNote'], message: 'A moderation note is required when flagging or removing a review.' });
+  }
 });
 
 const ReviewQuerySchema = z.object({
@@ -281,6 +285,17 @@ export default async function reviewRoutes(app: FastifyInstance): Promise<void> 
       return reply.status(400).send({ success: false, error: { code: 'RES_003', message: 'Reviews can only be submitted for completed bookings.' } });
     }
 
+    await db.collection(COLLECTIONS.NOTIFICATIONS).doc(nanoid()).set({
+      id: nanoid(),
+      userId,
+      type: 'review_received',
+      title: 'Review submitted',
+      body: 'Thank you for sharing feedback. Your review is awaiting moderation before it appears publicly.',
+      data: { bookingId: data.bookingId, providerId: booking.providerId },
+      isRead: false,
+      createdAt: now,
+    });
+
     return reply.status(201).send({ success: true, data: review });
   });
 
@@ -365,6 +380,9 @@ export default async function reviewRoutes(app: FastifyInstance): Promise<void> 
 
     const now = new Date().toISOString();
     const review = doc.data() as Review;
+    if (parsed.data.status === 'published' && review.isVerified !== true) {
+      return reply.status(400).send({ success: false, error: { code: 'REV_002', message: 'Only reviews linked to a completed booking can be published.' } });
+    }
     await reviewRef.update({
       status: parsed.data.status,
       adminNote: parsed.data.adminNote,
@@ -386,6 +404,19 @@ export default async function reviewRoutes(app: FastifyInstance): Promise<void> 
     });
 
     await recomputeProviderRating(review.providerId, db);
+    if (parsed.data.status === 'published') {
+      const notificationId = nanoid();
+      await db.collection(COLLECTIONS.NOTIFICATIONS).doc(notificationId).set({
+        id: notificationId,
+        userId: review.providerId,
+        type: 'review_received',
+        title: 'New customer review published',
+        body: 'A verified customer review has been published on your PETWO profile.',
+        data: { reviewId: request.params.reviewId },
+        isRead: false,
+        createdAt: now,
+      });
+    }
 
     return reply.send({
       success: true,
