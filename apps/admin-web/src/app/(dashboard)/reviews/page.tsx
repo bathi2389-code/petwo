@@ -88,7 +88,7 @@ export default function AdminReviewsPage() {
           {status !== 'removed' && <div className="mt-4 flex flex-wrap gap-2">
             {status !== 'published' && <button disabled={busyId === review.id} onClick={() => void moderate(review, 'published')} className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"><ShieldCheck className="mr-1 inline h-3.5 w-3.5" />Publish</button>}
             {status !== 'flagged' && <button disabled={busyId === review.id} onClick={() => void moderate(review, 'flagged')} className="rounded-lg border border-amber-200 px-3 py-2 text-xs font-semibold text-amber-700 disabled:opacity-50">Flag for review</button>}
-            {status !== 'removed' && <button disabled={busyId === review.id} onClick={() => void moderate(review, 'removed')} className="rounded-lg border border-rose-200 px-3 py-2 text-xs font-semibold text-rose-700 disabled:opacity-50"><XCircle className="mr-1 inline h-3.5 w-3.5" />Remove</button>}
+            {review.status !== 'removed' && <button disabled={busyId === review.id} onClick={() => void moderate(review, 'removed')} className="rounded-lg border border-rose-200 px-3 py-2 text-xs font-semibold text-rose-700 disabled:opacity-50"><XCircle className="mr-1 inline h-3.5 w-3.5" />Remove</button>}
           </div>}
         </article>)}
       </div>}
