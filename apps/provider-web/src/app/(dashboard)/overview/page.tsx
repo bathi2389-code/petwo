@@ -61,7 +61,7 @@ export default function OverviewPage() {
             </div>
           </div>
           <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
-            Active Listing
+            Verified
           </span>
         </div>
       )}
