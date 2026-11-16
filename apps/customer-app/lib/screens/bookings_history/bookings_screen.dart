@@ -38,6 +38,54 @@ class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProvid
     }
   }
 
+  Future<void> _showReviewDialog(BookingModel booking) async {
+    var rating = 5;
+    final feedbackController = TextEditingController();
+    final submitted = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Rate your PETWO visit'),
+          content: SingleChildScrollView(child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Your review must be based on this completed appointment.'),
+              const SizedBox(height: 14),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(5, (index) => IconButton(
+                onPressed: () => setDialogState(() => rating = index + 1),
+                icon: Icon(Icons.star, color: index < rating ? Colors.amber : Colors.grey.shade300, size: 30),
+              ))),
+              TextField(
+                controller: feedbackController,
+                maxLines: 4,
+                maxLength: 2000,
+                decoration: const InputDecoration(hintText: 'Share your experience (optional)', border: OutlineInputBorder()),
+              ),
+            ],
+          )),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancel')),
+            FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Submit review')),
+          ],
+        ),
+      ),
+    );
+    if (submitted == true && mounted) {
+      try {
+        await ApiService().submitReview(bookingId: booking.id, rating: rating, body: feedbackController.text);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Review submitted. It will appear after moderation.')));
+      } catch (error) {
+        if (!mounted) return;
+        final message = error is DioException
+            ? (error.response?.data is Map ? (error.response?.data['error']?['message'] ?? 'This visit may already have a review.') : 'Could not submit your review.')
+            : 'Could not submit your review. Please try again.';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message.toString())));
+      }
+    }
+    feedbackController.dispose();
+  }
+
   bool _isUpcoming(BookingModel booking) {
     final date = DateTime.tryParse(booking.scheduledAt);
     return date != null && date.isAfter(DateTime.now()) && !['completed', 'cancelled', 'rejected'].contains(booking.status);
@@ -87,6 +135,14 @@ class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProvid
                 Text('₹${(booking.totalAmount / 100).toStringAsFixed(0)}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                 Text(upcoming ? 'Appointment request' : 'Visit record', style: const TextStyle(fontSize: 11, color: PetwoTheme.textSecondary)),
               ]),
+              if (booking.status == 'completed') ...[
+                const SizedBox(height: 8),
+                Align(alignment: Alignment.centerRight, child: TextButton.icon(
+                  onPressed: () => _showReviewDialog(booking),
+                  icon: const Icon(Icons.star_outline, size: 18),
+                  label: const Text('Rate your visit'),
+                )),
+              ],
             ])),
           );
         },
