@@ -14,6 +14,10 @@ type Provider = {
   panNumber?: string;
   gstNumber?: string;
   verificationStatus: string;
+  rating?: number;
+  reviewCount?: number;
+  completedBookings?: number;
+  bookingAvailabilityStatus?: 'not_accepting' | 'accepting' | 'fully_booked';
   createdAt?: string;
 };
 
@@ -126,7 +130,7 @@ export default function ProvidersAdminPage() {
                   {provider.panNumber && <span className="rounded border border-slate-200 bg-slate-50 px-2.5 py-1 font-mono text-slate-700">PAN: {provider.panNumber}</span>}
                   {provider.gstNumber && <span className="rounded border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-mono text-emerald-700">GSTIN: {provider.gstNumber}</span>}
                 </div>
-                <p className="font-mono text-[11px] text-slate-400">Firebase UID: {provider.id}</p>
+                <div className="flex flex-wrap items-center gap-3 text-xs"><span className="font-semibold text-amber-700">★ {typeof provider.rating === 'number' && (provider.reviewCount ?? 0) > 0 ? provider.rating.toFixed(1) : 'No reviews yet'}</span><span className="text-slate-500">{provider.reviewCount ?? 0} reviews</span><span className="text-slate-500">{provider.completedBookings ?? 0} completed bookings</span><span className="rounded-full bg-slate-100 px-2 py-1 text-slate-600">{provider.bookingAvailabilityStatus === 'accepting' ? 'Accepting bookings' : provider.bookingAvailabilityStatus === 'fully_booked' ? 'Fully booked' : 'Not accepting bookings yet'}</span></div><p className="font-mono text-[11px] text-slate-400">Firebase UID: {provider.id}</p>
               </div>
               {activeTab === 'pending' && (
                 <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
