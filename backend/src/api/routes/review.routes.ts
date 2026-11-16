@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isProvider, isAdmin } from '../../middleware/auth.middleware';
+import { createAuditLog } from '../../middleware/audit.middleware';
 import { nanoid } from 'nanoid';
 import type { Review, Booking } from '@petwo/shared';
 import { calculateBayesianRating, calculateReliabilityScore } from '../../utils/recommendation';
@@ -363,17 +364,28 @@ export default async function reviewRoutes(app: FastifyInstance): Promise<void> 
     }
 
     const now = new Date().toISOString();
+    const review = doc.data() as Review;
     await reviewRef.update({
       status: parsed.data.status,
       adminNote: parsed.data.adminNote,
+      moderatedBy: request.user!.uid,
+      moderatedAt: now,
       updatedAt: now,
     });
 
-    // Recompute provider's average and Bayesian rating upon review moderation
-    const review = doc.data() as Review;
-    recomputeProviderRating(review.providerId, db).catch((err) => {
-      request.log.warn({ err }, 'Failed to recompute provider rating');
+    await createAuditLog({
+      actorId: request.user!.uid,
+      actorRole: request.user!.role,
+      action: `REVIEW_${parsed.data.status.toUpperCase()}`,
+      resourceType: 'review',
+      resourceId: request.params.reviewId,
+      before: { status: review.status },
+      after: { status: parsed.data.status, adminNote: parsed.data.adminNote ?? null },
+      ipAddress: request.ip,
+      userAgent: request.headers['user-agent'],
     });
+
+    await recomputeProviderRating(review.providerId, db);
 
     return reply.send({
       success: true,
