@@ -11,13 +11,15 @@ export default function ReviewsPage() {
   const [submitting, setSubmitting] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [insights, setInsights] = useState<any>(null);
 
   async function loadReviews() {
     setLoading(true);
     setError('');
     try {
-      const response = await reviewApi.getReviews({ page: 1, limit: 100 });
-      setReviews(response.data?.data ?? []);
+      const [response, insightResponse] = await Promise.all([reviewApi.getReviews(), reviewApi.getInsights().catch(() => null)]);
+      setReviews(response.data?.data?.reviews ?? []);
+      setInsights(insightResponse?.data?.data ?? null);
     } catch (err: any) {
       setError(err?.message || 'Could not load published reviews.');
     } finally {
