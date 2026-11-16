@@ -178,7 +178,9 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
       limit: z.coerce.number().min(1).max(100).default(50),
     }).parse(request.query);
     const snapshot = await getDb().collection(COLLECTIONS.REVIEWS).orderBy('createdAt', 'desc').get();
-    const all = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))
+    type AdminReviewRecord = { id: string; status?: string; [key: string]: unknown };
+    const all = snapshot.docs
+      .map<AdminReviewRecord>(doc => ({ ...(doc.data() as Record<string, unknown>), id: doc.id }))
       .filter(review => !query.status || review.status === query.status);
     const start = (query.page - 1) * query.limit;
     return reply.send({
