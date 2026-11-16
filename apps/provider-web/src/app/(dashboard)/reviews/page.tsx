@@ -6,48 +6,45 @@ import { reviewApi } from '@/lib/api-client';
 import { formatDate } from '@/lib/utils';
 
 export default function ReviewsPage() {
-  const [reviews, setReviews] = useState([
-    {
-      id: 'rev-01',
-      customerName: 'Ananya Sharma',
-      petName: 'Rocky (Golden Retriever)',
-      rating: 5,
-      date: '2024-10-28T14:30:00.000Z',
-      body: 'Dr. Srinivas and the team at TailBlazers Banjara Hills were phenomenal with Rocky! He had severe ear inflammation and they handled him with utmost care and gentleness. Highly recommended for all pet parents in Hyderabad!',
-      verifiedBooking: true,
-      providerResponse: 'Thank you so much Ananya! Rocky was such a brave boy during the exam. Please do give him the ear drops as prescribed and feel free to reach out on WhatsApp if you need any follow-up guidance.',
-    },
-    {
-      id: 'rev-02',
-      customerName: 'Vikram Reddy',
-      petName: 'Milo (Persian Cat)',
-      rating: 4,
-      date: '2024-10-24T11:00:00.000Z',
-      body: 'Great grooming session. Milo looks super fluffy and clean. Waiting time was about 15 minutes past the slot, but the groomers did a thorough job.',
-      verifiedBooking: true,
-      providerResponse: null,
-    },
-  ]);
-
+  const [reviews, setReviews] = useState<any[]>([]);
   const [replyText, setReplyText] = useState<{ [key: string]: string }>({});
   const [submitting, setSubmitting] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  async function loadReviews() {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await reviewApi.getReviews({ page: 1, limit: 100 });
+      setReviews(response.data?.data ?? []);
+    } catch (err: any) {
+      setError(err?.message || 'Could not load published reviews.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  React.useEffect(() => { void loadReviews(); }, []);
+
+  const reviewCount = reviews.length;
+  const average = reviewCount
+    ? reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) / reviewCount
+    : 0;
 
   async function handleSendReply(reviewId: string) {
-    const text = replyText[reviewId];
-    if (!text || text.trim().length === 0) return;
-
+    const text = replyText[reviewId]?.trim();
+    if (!text) return;
     setSubmitting(reviewId);
+    setError('');
     try {
       await reviewApi.respondToReview(reviewId, text);
-      setReviews(prev =>
-        prev.map(r => (r.id === reviewId ? { ...r, providerResponse: text } : r))
-      );
+      setReviews(prev => prev.map(r => r.id === reviewId
+        ? { ...r, providerResponse: text, providerRespondedAt: new Date().toISOString() }
+        : r));
       setReplyText(prev => ({ ...prev, [reviewId]: '' }));
-    } catch (err) {
-      // Optimistic update for UI demo
-      setReviews(prev =>
-        prev.map(r => (r.id === reviewId ? { ...r, providerResponse: text } : r))
-      );
+    } catch (err: any) {
+      setError(err?.message || 'Your response could not be saved. Please try again.');
     } finally {
       setSubmitting(null);
     }
