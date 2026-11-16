@@ -285,8 +285,9 @@ export default async function reviewRoutes(app: FastifyInstance): Promise<void> 
       return reply.status(400).send({ success: false, error: { code: 'RES_003', message: 'Reviews can only be submitted for completed bookings.' } });
     }
 
-    await db.collection(COLLECTIONS.NOTIFICATIONS).doc(nanoid()).set({
-      id: nanoid(),
+    const customerNotificationId = nanoid();
+    await db.collection(COLLECTIONS.NOTIFICATIONS).doc(customerNotificationId).set({
+      id: customerNotificationId,
       userId,
       type: 'review_received',
       title: 'Review submitted',
