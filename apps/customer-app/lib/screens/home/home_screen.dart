@@ -235,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
         width: double.infinity,
         padding: const EdgeInsets.fromLTRB(20, 22, 16, 20),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(colors: [Color(0xFF172D45), Color(0xFF244A61)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+          gradient: const LinearGradient(colors: [Color(0xFF155B36), Color(0xFF25834D)], begin: Alignment.topLeft, end: Alignment.bottomRight),
           borderRadius: BorderRadius.circular(24),
         ),
         child: Row(children: [
