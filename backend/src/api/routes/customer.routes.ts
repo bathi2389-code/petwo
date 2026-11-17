@@ -190,7 +190,7 @@ export default async function customerRoutes(app: FastifyInstance): Promise<void
     schema: { tags: ['Customers'], security: [{ bearerAuth: [] }] },
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     const db = getDb();
-    const { getAuth } = await import('../../config/firebase');
+    const { getAuth } = await import('../../config/firebase.js');
     const now = new Date().toISOString();
 
     const batch = db.batch();
