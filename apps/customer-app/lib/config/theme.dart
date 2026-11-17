@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 class PetwoTheme {
   // Brand Colors
-  static const Color primary = Color(0xFF087F70); // PETWO brand teal
-  static const Color primaryDark = Color(0xFF066B60);
-  static const Color primaryLight = Color(0xFFE5F7F3);
+  static const Color primary = Color(0xFF16834A); // PETWO green
+  static const Color primaryDark = Color(0xFF105C35);
+  static const Color primaryLight = Color(0xFFE7F4EA);
 
-  static const Color background = Color(0xFFFAFAFA);
+  static const Color background = Color(0xFFF7FAF7);
   static const Color surface = Colors.white;
   static const Color textPrimary = Color(0xFF1E293B);
   static const Color textSecondary = Color(0xFF64748B);
