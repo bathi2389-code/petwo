@@ -19,7 +19,7 @@ Future<void> main() async {
   var configured = _apiKey.isNotEmpty && _appId.isNotEmpty && _senderId.isNotEmpty && _projectId.isNotEmpty;
   if (configured) {
     try {
-      await Firebase.initializeApp(options: const FirebaseOptions(apiKey: _apiKey, appId: _appId, authDomain: _authDomain.isEmpty ? null : _authDomain, messagingSenderId: _senderId, projectId: _projectId));
+      await Firebase.initializeApp(options: const FirebaseOptions(apiKey: _apiKey, appId: _appId, authDomain: _authDomain, messagingSenderId: _senderId, projectId: _projectId));
     } catch (_) { configured = false; }
   }
   runApp(PetwoApp(firebaseConfigured: configured));
