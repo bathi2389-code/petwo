@@ -10,6 +10,7 @@ import 'package:petwo_customer/services/api_service.dart';
 
 const _apiKey = String.fromEnvironment('PETWO_FIREBASE_API_KEY');
 const _appId = String.fromEnvironment('PETWO_FIREBASE_APP_ID');
+const _authDomain = String.fromEnvironment('PETWO_FIREBASE_AUTH_DOMAIN');
 const _senderId = String.fromEnvironment('PETWO_FIREBASE_MESSAGING_SENDER_ID');
 const _projectId = String.fromEnvironment('PETWO_FIREBASE_PROJECT_ID');
 
@@ -18,7 +19,7 @@ Future<void> main() async {
   var configured = _apiKey.isNotEmpty && _appId.isNotEmpty && _senderId.isNotEmpty && _projectId.isNotEmpty;
   if (configured) {
     try {
-      await Firebase.initializeApp(options: const FirebaseOptions(apiKey: _apiKey, appId: _appId, messagingSenderId: _senderId, projectId: _projectId));
+      await Firebase.initializeApp(options: const FirebaseOptions(apiKey: _apiKey, appId: _appId, authDomain: _authDomain.isEmpty ? null : _authDomain, messagingSenderId: _senderId, projectId: _projectId));
     } catch (_) { configured = false; }
   }
   runApp(PetwoApp(firebaseConfigured: configured));
