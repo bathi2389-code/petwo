@@ -129,7 +129,7 @@ class LandingScreen extends StatelessWidget {
       const Text('PETWO is building a simpler connection between pet parents and the people who care for their furry family — from veterinary visits to everyday wellbeing.', style: TextStyle(fontSize: 16, height: 1.75, color: Color(0xFF61736D))),
       const SizedBox(height: 27),
       Wrap(spacing: 12, runSpacing: 12, children: [
-        FilledButton.icon(onPressed: () => _scroll(context, 'care'), icon: const Icon(Icons.pets_rounded, size: 18), label: const Text('Explore pet care'), style: FilledButton.styleFrom(backgroundColor: PetwoTheme.primary, padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 17), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
+        FilledButton.icon(onPressed: () => _signIn(context), icon: const Icon(Icons.pets_rounded, size: 18), label: const Text('Find and book pet care'), style: FilledButton.styleFrom(backgroundColor: PetwoTheme.primary, padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 17), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
         OutlinedButton(onPressed: () => _signIn(context), style: OutlinedButton.styleFrom(foregroundColor: PetwoTheme.primary, side: const BorderSide(color: PetwoTheme.primary), padding: const EdgeInsets.symmetric(horizontal: 21, vertical: 17), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Create a pet-parent account')),
       ]),
       const SizedBox(height: 28),
