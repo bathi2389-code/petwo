@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
+    "module": "Node16",
     "lib": [
       "ES2022"
     ],
@@ -22,7 +22,8 @@
       "@petwo/constants": [
         "../shared/dist/constants/index.d.ts"
       ]
-    }
+    },
+    "moduleResolution": "Node16"
   },
   "include": [
     "src/**/*"
