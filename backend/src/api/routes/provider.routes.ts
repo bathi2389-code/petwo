@@ -112,7 +112,7 @@ export default async function providerRoutes(app: FastifyInstance): Promise<void
     }
 
     const db = getDb();
-    const { getAuth } = await import('../../config/firebase');
+    const { getAuth } = await import('../../config/firebase.js');
     const identity = request.firebaseIdentity!;
     const userId = identity.uid;
     if (parsed.data.contact.email.trim().toLowerCase() !== identity.email) {
