@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:petwo_customer/config/theme.dart';
 import 'package:petwo_customer/screens/auth/login_screen.dart';
+import 'package:petwo_customer/screens/landing/landing_screen.dart';
 import 'package:petwo_customer/screens/home/home_screen.dart';
 import 'package:petwo_customer/screens/bookings_history/bookings_screen.dart';
 import 'package:petwo_customer/screens/pets/pets_list_screen.dart';
@@ -36,11 +37,11 @@ class PetwoApp extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) return const Scaffold(body: Center(child: CircularProgressIndicator()));
         final user = snapshot.data;
-        if (user == null) return const CustomerLoginScreen();
+        if (user == null) return const LandingScreen();
         if (!user.emailVerified) return const CustomerLoginScreen(verificationPending: true);
         return CustomerProfileGate(key: ValueKey(user.uid), user: user);
       },
-    ) : const FirebaseSetupScreen(),
+    ) : const LandingScreen(),
   );
 }
 
