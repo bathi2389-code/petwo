@@ -47,7 +47,7 @@ class LandingScreen extends StatelessWidget {
   Widget _nav(BuildContext context, bool wide, double pad) {
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.symmetric(horizontal: pad.clamp(22, 90), vertical: 17),
+      padding: EdgeInsets.symmetric(horizontal: pad.clamp(22.0, 90.0).toDouble(), vertical: 17),
       child: Row(children: [
         const _Brand(),
         const Spacer(),
@@ -97,7 +97,7 @@ class LandingScreen extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: const Color(0xFFF1F7F3),
-      padding: EdgeInsets.fromLTRB(pad.clamp(22, 90), wide ? 76 : 48, pad.clamp(22, 90), wide ? 78 : 48),
+      padding: EdgeInsets.fromLTRB(pad.clamp(22.0, 90.0).toDouble(), wide ? 76 : 48, pad.clamp(22.0, 90.0).toDouble(), wide ? 78 : 48),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1160),
@@ -142,7 +142,7 @@ class LandingScreen extends StatelessWidget {
 
   Widget _intro(bool wide, double pad) => Padding(
     key: const ValueKey('intro'),
-    padding: EdgeInsets.fromLTRB(pad.clamp(22, 90), 76, pad.clamp(22, 90), 30),
+    padding: EdgeInsets.fromLTRB(pad.clamp(22.0, 90.0).toDouble(), 76, pad.clamp(22.0, 90.0).toDouble(), 30),
     child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 1160), child: Column(children: [
       const _Eyebrow('CARE STARTS WITH CONNECTION'),
       const SizedBox(height: 13),
@@ -159,7 +159,7 @@ class LandingScreen extends StatelessWidget {
   Widget _careCards(bool wide, double pad) => Container(
     key: _careKey,
     width: double.infinity,
-    padding: EdgeInsets.fromLTRB(pad.clamp(22, 90), 28, pad.clamp(22, 90), 76),
+    padding: EdgeInsets.fromLTRB(pad.clamp(22.0, 90.0).toDouble(), 28, pad.clamp(22.0, 90.0).toDouble(), 76),
     child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 1160), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       const _Eyebrow('EXPLORE PETWO'),
       const SizedBox(height: 18),
@@ -183,7 +183,7 @@ class LandingScreen extends StatelessWidget {
     key: _howKey,
     width: double.infinity,
     color: const Color(0xFFF1F7F3),
-    padding: EdgeInsets.fromLTRB(pad.clamp(22, 90), 70, pad.clamp(22, 90), 76),
+    padding: EdgeInsets.fromLTRB(pad.clamp(22.0, 90.0).toDouble(), 70, pad.clamp(22.0, 90.0).toDouble(), 76),
     child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 1160), child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
       const _Eyebrow('SIMPLE BY DESIGN'),
       const SizedBox(height: 14),
@@ -201,7 +201,7 @@ class LandingScreen extends StatelessWidget {
   Widget _providerBanner(BuildContext context, bool wide, double pad) => Container(
     key: _providersKey,
     width: double.infinity,
-    padding: EdgeInsets.fromLTRB(pad.clamp(22, 90), 68, pad.clamp(22, 90), 68),
+    padding: EdgeInsets.fromLTRB(pad.clamp(22.0, 90.0).toDouble(), 68, pad.clamp(22.0, 90.0).toDouble(), 68),
     child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 1160), child: Container(
       width: double.infinity,
       padding: EdgeInsets.all(wide ? 42 : 26),
@@ -221,7 +221,7 @@ class LandingScreen extends StatelessWidget {
   Widget _footer(double pad) => Container(
     width: double.infinity,
     color: Colors.white,
-    padding: EdgeInsets.symmetric(horizontal: pad.clamp(22, 90), vertical: 25),
+    padding: EdgeInsets.symmetric(horizontal: pad.clamp(22.0, 90.0).toDouble(), vertical: 25),
     child: const Center(child: Text('© 2026 PETWO. Made for every paw.', style: TextStyle(color: Color(0xFF7A8983), fontSize: 13))),
   );
 
