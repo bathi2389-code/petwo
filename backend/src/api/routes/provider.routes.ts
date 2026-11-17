@@ -625,68 +625,92 @@ export default async function providerRoutes(app: FastifyInstance): Promise<void
   app.get('/:providerId/availability', {
     schema: { tags: ['Providers'] },
   }, async (request: any, reply: FastifyReply) => {
-    const { date, serviceId } = request.query;
+    const { date, serviceId, locationId } = request.query;
     const { providerId } = request.params;
     const db = getDb();
-
-    const targetDate = date ? new Date(date) : new Date();
+    const formatIst = (value: Date) => new Date(value.getTime() + 330 * 60 * 1000).toISOString();
+    const dateStr = typeof date === 'string' && /^\\d{4}-\\d{2}-\\d{2}$/.test(date)
+      ? date
+      : formatIst(new Date()).slice(0, 10);
+    const dayIndex = new Date(dateStr + 'T00:00:00Z').getUTCDay();
     const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    const dayName = dayNames[targetDate.getDay()];
+    const dayName = dayNames[dayIndex];
 
-    // Get provider's primary location schedule
-    const locationSnapshot = await db.collection(COLLECTIONS.PROVIDER_LOCATIONS)
-      .where('providerId', '==', providerId)
-      .where('isPrimary', '==', true)
-      .where('isActive', '==', true)
-      .limit(1)
-      .get();
-
-    if (locationSnapshot.empty) {
-      return reply.send({ success: true, data: { slots: [], date, message: 'No primary location found.' } });
+    let selectedLocationId = typeof locationId === 'string' ? locationId : '';
+    let durationMinutes = 30;
+    if (typeof serviceId === 'string' && serviceId) {
+      const serviceDoc = await db.collection(COLLECTIONS.SERVICES).doc(serviceId).get();
+      if (!serviceDoc.exists || !serviceDoc.data()?.isActive || serviceDoc.data()?.providerId !== providerId) {
+        return reply.status(404).send({ success: false, error: { code: 'RES_001', message: 'Service not found or inactive.' } });
+      }
+      const service = serviceDoc.data()!;
+      durationMinutes = Math.max(15, Number(service.duration) || 30);
+      if (selectedLocationId && service.locationId !== selectedLocationId) {
+        return reply.status(400).send({ success: false, error: { code: 'BKG_005', message: 'Service is not offered at this location.' } });
+      }
+      selectedLocationId = service.locationId;
     }
 
-    const location = locationSnapshot.docs[0].data();
+    let locationDoc;
+    if (selectedLocationId) {
+      locationDoc = await db.collection(COLLECTIONS.PROVIDER_LOCATIONS).doc(selectedLocationId).get();
+      if (!locationDoc.exists || locationDoc.data()?.providerId !== providerId || locationDoc.data()?.isActive === false) {
+        return reply.status(404).send({ success: false, error: { code: 'RES_001', message: 'Provider location not found.' } });
+      }
+    } else {
+      const locationSnapshot = await db.collection(COLLECTIONS.PROVIDER_LOCATIONS)
+        .where('providerId', '==', providerId)
+        .where('isPrimary', '==', true)
+        .where('isActive', '==', true)
+        .limit(1)
+        .get();
+      if (locationSnapshot.empty) {
+        return reply.send({ success: true, data: { slots: [], date: dateStr, durationMinutes, message: 'No primary location found.' } });
+      }
+      locationDoc = locationSnapshot.docs[0];
+      selectedLocationId = locationDoc.id;
+    }
+
+    const location = locationDoc.data()!;
     const daySchedule = location.operatingHours?.find((s: { day: string }) => s.day === dayName);
-
     if (!daySchedule?.isOpen) {
-      return reply.send({ success: true, data: { slots: [], date, message: 'Closed on this day.' } });
+      return reply.send({ success: true, data: { slots: [], date: dateStr, durationMinutes, locationId: selectedLocationId, message: 'Closed on this day.' } });
     }
 
-    // Get existing bookings for this date
-    const dateStr = targetDate.toISOString().split('T')[0];
     const bookingSnapshot = await db.collection(COLLECTIONS.BOOKINGS)
       .where('providerId', '==', providerId)
+      .where('locationId', '==', selectedLocationId)
       .where('status', 'in', ['confirmed', 'in_progress', 'pending_confirmation'])
       .get();
-
     const existingBookings = bookingSnapshot.docs
-      .filter(doc => doc.data().scheduledAt.startsWith(dateStr))
-      .map(doc => doc.data());
+      .map(doc => doc.data())
+      .filter(booking => {
+        if (!booking.scheduledAt) return false;
+        return formatIst(new Date(booking.scheduledAt)).slice(0, 10) === dateStr;
+      })
+      .map(booking => ({
+        start: (() => { const t = formatIst(new Date(booking.scheduledAt)); return Number(t.slice(11, 13)) * 60 + Number(t.slice(14, 16)); })(),
+        end: (() => { const t = formatIst(new Date(booking.scheduledEnd)); return Number(t.slice(11, 13)) * 60 + Number(t.slice(14, 16)); })(),
+      }));
 
-    // Generate 30-min slots from operating hours
-    const slots = [];
-    for (const slot of daySchedule.slots) {
-      const [startH, startM] = slot.start.split(':').map(Number);
-      const [endH, endM] = slot.end.split(':').map(Number);
+    const slots: Array<{ startTime: string; endTime: string; isBooked: boolean; date: string; durationMinutes: number }> = [];
+    for (const window of daySchedule.slots || []) {
+      const [startH, startM] = window.start.split(':').map(Number);
+      const [endH, endM] = window.end.split(':').map(Number);
       let current = startH * 60 + startM;
-      const end = endH * 60 + endM;
-
-      while (current + 30 <= end) {
-        const slotStart = `${String(Math.floor(current / 60)).padStart(2, '0')}:${String(current % 60).padStart(2, '0')}`;
-        const slotEnd = `${String(Math.floor((current + 30) / 60)).padStart(2, '0')}:${String((current + 30) % 60).padStart(2, '0')}`;
-
-        const isBooked = existingBookings.some(b => {
-          const bStart = new Date(b.scheduledAt).getHours() * 60 + new Date(b.scheduledAt).getMinutes();
-          const bEnd = new Date(b.scheduledEnd).getHours() * 60 + new Date(b.scheduledEnd).getMinutes();
-          return current < bEnd && (current + 30) > bStart;
-        });
-
-        slots.push({ startTime: slotStart, endTime: slotEnd, isBooked, date: dateStr });
+      const windowEnd = endH * 60 + endM;
+      while (current + durationMinutes <= windowEnd) {
+        const end = current + durationMinutes;
+        const startTime = `${String(Math.floor(current / 60)).padStart(2, '0')}:${String(current % 60).padStart(2, '0')}`;
+        const endTime = `${String(Math.floor(end / 60)).padStart(2, '0')}:${String(end % 60).padStart(2, '0')}`;
+        const isBooked = existingBookings.some(booking => current < booking.end && end > booking.start);
+        const slotInstant = new Date(`${dateStr}T${startTime}:00+05:30`);
+        slots.push({ startTime, endTime, isBooked: isBooked || slotInstant.getTime() <= Date.now(), date: dateStr, durationMinutes });
         current += 30;
       }
     }
 
-    return reply.send({ success: true, data: { slots, date: dateStr } });
+    return reply.send({ success: true, data: { slots, date: dateStr, durationMinutes, locationId: selectedLocationId } });
   });
 }
 
