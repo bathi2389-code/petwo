@@ -42,6 +42,7 @@ class ApiService {
   Future<Response> searchProviders({String? category, String? businessType, String? query, double? lat, double? lng}) => dio.get('/providers/search', queryParameters: {if (category != null) 'category': category, if (businessType != null) 'businessType': businessType, if (query != null && query.trim().isNotEmpty) 'query': query.trim(), if (lat != null) 'lat': lat, if (lng != null) 'lng': lng, 'sortBy': 'recommended', 'limit': 20});
   Future<Response> getProviderDetails(String providerId) => dio.get('/providers/$providerId');
   Future<Response> getProviderServices(String providerId) => dio.get('/services', queryParameters: {'providerId': providerId});
+  Future<Response> getProviderAvailability(String providerId, {required String date, required String serviceId}) => dio.get('/providers/$providerId/availability', queryParameters: {'date': date, 'serviceId': serviceId});
   Future<Response> createBooking(Map<String, dynamic> data) => dio.post('/bookings', data: data);
   Future<Response> getMyBookings() => dio.get('/bookings/my');
   Future<Response> submitReview({required String bookingId, required int rating, String? body}) => dio.post('/reviews', data: {'bookingId': bookingId, 'rating': rating, if (body != null && body.trim().isNotEmpty) 'body': body.trim()});
