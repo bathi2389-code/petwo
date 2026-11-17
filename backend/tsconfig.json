@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
-    "lib": ["ES2022"],
+    "module": "Node16",
+    "lib": [
+      "ES2022"
+    ],
     "outDir": "./dist",
     "rootDir": "./src",
     "declaration": true,
@@ -13,12 +15,22 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node",
     "paths": {
-      "@petwo/shared": ["../shared/dist/index.d.ts"],
-      "@petwo/constants": ["../shared/dist/constants/index.d.ts"]
-    }
+      "@petwo/shared": [
+        "../shared/dist/index.d.ts"
+      ],
+      "@petwo/constants": [
+        "../shared/dist/constants/index.d.ts"
+      ]
+    },
+    "moduleResolution": "Node16"
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts"
+  ]
 }

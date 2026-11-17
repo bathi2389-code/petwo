@@ -122,6 +122,26 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
       });
     }
 
+    // Enforce the provider's published operating hours on the server (India Standard Time).
+    const locationData = locationDoc.data()!;
+    const istScheduledAt = new Date(new Date(data.scheduledAt).getTime() + 330 * 60 * 1000);
+    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const dayName = dayNames[istScheduledAt.getUTCDay()];
+    const startMinute = istScheduledAt.getUTCHours() * 60 + istScheduledAt.getUTCMinutes();
+    const endMinute = startMinute + (service.duration || 60);
+    const daySchedule = locationData.operatingHours?.find((entry: { day: string }) => entry.day === dayName);
+    const withinPublishedHours = Boolean(daySchedule?.isOpen && daySchedule.slots?.some((window: { start: string; end: string }) => {
+      const [startHour, startMin] = window.start.split(':').map(Number);
+      const [endHour, endMin] = window.end.split(':').map(Number);
+      return startMinute >= startHour * 60 + startMin && endMinute <= endHour * 60 + endMin;
+    }));
+    if (!withinPublishedHours) {
+      return reply.status(409).send({
+        success: false,
+        error: { code: 'BKG_001', message: 'The selected time is outside this provider’s published availability.' },
+      });
+    }
+
     if (data.staffId && service.staffIds?.length && !service.staffIds.includes(data.staffId)) {
       return reply.status(400).send({
         success: false,
@@ -223,7 +243,7 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
       locationId: data.locationId,
       serviceId: data.serviceId,
       staffId: data.staffId,
-      status: 'pending_confirmation',
+      status: 'confirmed',
       scheduledAt: scheduledAt.toISOString(),
       scheduledEnd: scheduledEnd.toISOString(),
       checkOutAt: data.checkOutAt,
@@ -233,7 +253,7 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
       pricing,
       commission,
       history: [{
-        status: 'pending_confirmation',
+        status: 'confirmed',
         timestamp: now,
         actor: customerId,
       }],
@@ -292,8 +312,8 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
           staffId: data.staffId || null,
           scheduledAt: scheduledAt.toISOString(),
           scheduledEnd: scheduledEnd.toISOString(),
-          status: 'held',
-          expiresAt: dayjs().add(15, 'minute').toISOString(),
+          status: 'confirmed',
+          expiresAt: dayjs().add(365, 'day').toISOString(),
           createdAt: now,
         });
 
@@ -323,7 +343,7 @@ export default async function bookingRoutes(app: FastifyInstance): Promise<void>
         });
     }
 
-    return reply.status(201).send({ success: true, data: booking });
+    return reply.status(201).send({ success: true, data: booking, message: 'Appointment confirmed.' });
   });
 
   /**

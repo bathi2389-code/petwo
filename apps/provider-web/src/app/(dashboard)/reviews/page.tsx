@@ -1,53 +1,52 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Star, MessageSquare, CheckCircle2, CornerDownRight } from 'lucide-react';
+import { Star, CheckCircle2, CornerDownRight } from 'lucide-react';
 import { reviewApi } from '@/lib/api-client';
 import { formatDate } from '@/lib/utils';
 
 export default function ReviewsPage() {
-  const [reviews, setReviews] = useState([
-    {
-      id: 'rev-01',
-      customerName: 'Ananya Sharma',
-      petName: 'Rocky (Golden Retriever)',
-      rating: 5,
-      date: '2024-10-28T14:30:00.000Z',
-      body: 'Dr. Srinivas and the team at TailBlazers Banjara Hills were phenomenal with Rocky! He had severe ear inflammation and they handled him with utmost care and gentleness. Highly recommended for all pet parents in Hyderabad!',
-      verifiedBooking: true,
-      providerResponse: 'Thank you so much Ananya! Rocky was such a brave boy during the exam. Please do give him the ear drops as prescribed and feel free to reach out on WhatsApp if you need any follow-up guidance.',
-    },
-    {
-      id: 'rev-02',
-      customerName: 'Vikram Reddy',
-      petName: 'Milo (Persian Cat)',
-      rating: 4,
-      date: '2024-10-24T11:00:00.000Z',
-      body: 'Great grooming session. Milo looks super fluffy and clean. Waiting time was about 15 minutes past the slot, but the groomers did a thorough job.',
-      verifiedBooking: true,
-      providerResponse: null,
-    },
-  ]);
-
+  const [reviews, setReviews] = useState<any[]>([]);
   const [replyText, setReplyText] = useState<{ [key: string]: string }>({});
   const [submitting, setSubmitting] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [insights, setInsights] = useState<any>(null);
+
+  async function loadReviews() {
+    setLoading(true);
+    setError('');
+    try {
+      const [response, insightResponse] = await Promise.all([reviewApi.getReviews(), reviewApi.getInsights().catch(() => null)]);
+      setReviews(response.data?.data?.reviews ?? []);
+      setInsights(insightResponse?.data?.data ?? null);
+    } catch (err: any) {
+      setError(err?.message || 'Could not load published reviews.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  React.useEffect(() => { void loadReviews(); }, []);
+
+  const reviewCount = reviews.length;
+  const average = reviewCount
+    ? reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) / reviewCount
+    : 0;
 
   async function handleSendReply(reviewId: string) {
-    const text = replyText[reviewId];
-    if (!text || text.trim().length === 0) return;
-
+    const text = replyText[reviewId]?.trim();
+    if (!text) return;
     setSubmitting(reviewId);
+    setError('');
     try {
       await reviewApi.respondToReview(reviewId, text);
-      setReviews(prev =>
-        prev.map(r => (r.id === reviewId ? { ...r, providerResponse: text } : r))
-      );
+      setReviews(prev => prev.map(r => r.id === reviewId
+        ? { ...r, providerResponse: text, providerRespondedAt: new Date().toISOString() }
+        : r));
       setReplyText(prev => ({ ...prev, [reviewId]: '' }));
-    } catch (err) {
-      // Optimistic update for UI demo
-      setReviews(prev =>
-        prev.map(r => (r.id === reviewId ? { ...r, providerResponse: text } : r))
-      );
+    } catch (err: any) {
+      setError(err?.message || 'Your response could not be saved. Please try again.');
     } finally {
       setSubmitting(null);
     }
@@ -65,50 +64,51 @@ export default function ReviewsPage() {
       {/* Ratings Aggregate Banner */}
       <div className="bg-white rounded-xl border shadow-sm p-6 flex flex-col md:flex-row items-center gap-8">
         <div className="text-center md:text-left md:border-r md:pr-8">
-          <div className="text-4xl font-extrabold text-gray-900">4.9</div>
+          <div className="text-4xl font-extrabold text-gray-900">{reviewCount ? average.toFixed(1) : "—"}</div>
           <div className="flex items-center gap-1 mt-1 justify-center md:justify-start">
             {[1, 2, 3, 4, 5].map(i => (
               <Star key={i} className="h-4 w-4 text-amber-400 fill-amber-400" />
             ))}
           </div>
-          <p className="text-xs text-gray-500 mt-1">Based on 142 verified bookings</p>
+          <p className="text-xs text-gray-500 mt-1">{reviewCount} published customer reviews</p>
         </div>
 
         <div className="flex-1 w-full space-y-1.5 text-xs text-gray-600">
           <div className="flex items-center gap-2">
             <span className="w-6">5 ★</span>
             <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div className="bg-amber-400 h-full w-[88%]" />
+              <div className="bg-amber-400 h-full" style={{ width: `${reviewCount ? reviews.filter(r => r.rating === 5).length / reviewCount * 100 : 0}%` }} />
             </div>
-            <span className="w-8 text-right">88%</span>
+            <span className="w-8 text-right">{reviewCount ? Math.round(reviews.filter(r => r.rating === 5).length / reviewCount * 100) : 0}%</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-6">4 ★</span>
             <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div className="bg-amber-400 h-full w-[10%]" />
+              <div className="bg-amber-400 h-full" style={{ width: `${reviewCount ? reviews.filter(r => r.rating === 4).length / reviewCount * 100 : 0}%` }} />
             </div>
-            <span className="w-8 text-right">10%</span>
+            <span className="w-8 text-right">{reviewCount ? Math.round(reviews.filter(r => r.rating === 4).length / reviewCount * 100) : 0}%</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-6">3 ★</span>
             <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div className="bg-amber-400 h-full w-[2%]" />
+              <div className="bg-amber-400 h-full" style={{ width: `${reviewCount ? reviews.filter(r => r.rating === 3).length / reviewCount * 100 : 0}%` }} />
             </div>
-            <span className="w-8 text-right">2%</span>
+            <span className="w-8 text-right">{reviewCount ? Math.round(reviews.filter(r => r.rating === 3).length / reviewCount * 100) : 0}%</span>
           </div>
         </div>
       </div>
 
       {/* Reviews List */}
+      {error && <p role="alert" className="rounded-lg bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}
       <div className="space-y-4">
-        {reviews.map(rev => (
+        {loading ? <p className="rounded-xl border bg-white p-8 text-center text-sm text-gray-500">Loading published reviews…</p> : reviews.length === 0 ? <p className="rounded-xl border bg-white p-8 text-center text-sm text-gray-500">No published customer reviews yet. Reviews appear here after completed bookings and admin publication.</p> : reviews.map(rev => (
           <div key={rev.id} className="bg-white rounded-xl border shadow-sm p-6 space-y-4">
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <h4 className="font-semibold text-gray-900 text-sm">{rev.customerName}</h4>
+                  <h4 className="font-semibold text-gray-900 text-sm">Verified PETWO customer</h4>
                   <span className="text-xs text-gray-400">•</span>
-                  <span className="text-xs font-medium text-gray-600">{rev.petName}</span>
+                  <span className="text-xs font-medium text-gray-600">Booking {rev.bookingId}</span>
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <div className="flex items-center">
@@ -116,8 +116,8 @@ export default function ReviewsPage() {
                       <Star key={i} className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
                     ))}
                   </div>
-                  <span className="text-xs text-gray-400">{formatDate(rev.date)}</span>
-                  {rev.verifiedBooking && (
+                  <span className="text-xs text-gray-400">{formatDate(rev.createdAt)}</span>
+                  {rev.isVerified && (
                     <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">
                       <CheckCircle2 className="h-3 w-3" />
                       Verified Visit
@@ -127,7 +127,7 @@ export default function ReviewsPage() {
               </div>
             </div>
 
-            <p className="text-sm text-gray-700 leading-relaxed">{rev.body}</p>
+            <p className="text-sm text-gray-700 leading-relaxed">{rev.body || rev.title || "Customer left a star rating without written feedback."}</p>
 
             {/* Provider Public Response */}
             {rev.providerResponse ? (

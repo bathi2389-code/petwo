@@ -167,6 +167,30 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
   });
 
   /**
+   * GET /admin/reviews — Review moderation queue from genuine booking reviews.
+   */
+  app.get('/reviews', {
+    schema: { tags: ['Admin', 'Reviews'], security: [{ bearerAuth: [] }] },
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    const query = z.object({
+      status: z.enum(['pending', 'published', 'flagged', 'removed']).optional(),
+      page: z.coerce.number().min(1).default(1),
+      limit: z.coerce.number().min(1).max(100).default(50),
+    }).parse(request.query);
+    const snapshot = await getDb().collection(COLLECTIONS.REVIEWS).orderBy('createdAt', 'desc').get();
+    type AdminReviewRecord = { id: string; status?: string; [key: string]: unknown };
+    const all = snapshot.docs
+      .map<AdminReviewRecord>(doc => ({ ...(doc.data() as Record<string, unknown>), id: doc.id }))
+      .filter(review => !query.status || review.status === query.status);
+    const start = (query.page - 1) * query.limit;
+    return reply.send({
+      success: true,
+      data: all.slice(start, start + query.limit),
+      meta: { page: query.page, limit: query.limit, total: all.length, hasMore: start + query.limit < all.length },
+    });
+  });
+
+  /**
    * PUT /admin/providers/:id/verify — Approve or reject provider verification
    */
   app.put('/providers/:id/verify', {

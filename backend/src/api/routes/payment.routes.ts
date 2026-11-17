@@ -297,7 +297,7 @@ export default async function paymentRoutes(app: FastifyInstance): Promise<void>
 
     // ── Dispatch Instant WhatsApp Alert to Doctor & Customer (Non-blocking) ──
     try {
-      const { WhatsAppService } = await import('../../services/whatsapp.service');
+      const { WhatsAppService } = await import('../../services/whatsapp.service.js');
       const providerDoc = await db.collection(COLLECTIONS.PROVIDERS).doc(booking.providerId).get();
       const customerDoc = await db.collection(COLLECTIONS.CUSTOMERS).doc(booking.customerId).get();
       const petDoc = await db.collection(COLLECTIONS.PETS).doc(booking.petId).get();
@@ -316,7 +316,7 @@ export default async function paymentRoutes(app: FastifyInstance): Promise<void>
           providerName: providerData?.businessName || 'Your Clinic',
           appointmentDate: dayjs(booking.scheduledAt).format('DD MMM YYYY'),
           appointmentTime: dayjs(booking.scheduledAt).format('hh:mm A'),
-        }).catch((err) => request.log.warn({ err }, 'WhatsApp alert to doctor failed'));
+        }).catch((err: unknown) => request.log.warn({ err }, 'WhatsApp alert to doctor failed'));
       }
     } catch (notifyErr) {
       request.log.warn({ notifyErr }, 'Non-blocking doctor notification error');

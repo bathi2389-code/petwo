@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { getDb, COLLECTIONS } from '../../config/firebase';
 import { authenticate, isProvider, isAdmin } from '../../middleware/auth.middleware';
+import { createAuditLog } from '../../middleware/audit.middleware';
 import { nanoid } from 'nanoid';
 import type { Review, Booking } from '@petwo/shared';
 import { calculateBayesianRating, calculateReliabilityScore } from '../../utils/recommendation';
@@ -11,6 +12,9 @@ import { calculateBayesianRating, calculateReliabilityScore } from '../../utils/
 const CreateReviewSchema = z.object({
   bookingId: z.string().min(1),
   rating: z.number().int().min(1).max(5),
+  serviceQualityRating: z.number().int().min(1).max(5).optional(),
+  staffBehaviourRating: z.number().int().min(1).max(5).optional(),
+  cleanlinessRating: z.number().int().min(1).max(5).optional(),
   title: z.string().max(150).optional(),
   body: z.string().max(2000).optional(),
   photoURLs: z.array(z.string().url()).max(5).optional(),
@@ -23,6 +27,10 @@ const ProviderResponseSchema = z.object({
 const AdminStatusSchema = z.object({
   status: z.enum(['published', 'flagged', 'removed']),
   adminNote: z.string().max(500).optional(),
+}).superRefine((value, context) => {
+  if (value.status !== 'published' && !value.adminNote?.trim()) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ['adminNote'], message: 'A moderation note is required when flagging or removing a review.' });
+  }
 });
 
 const ReviewQuerySchema = z.object({
@@ -36,6 +44,70 @@ const ReviewQuerySchema = z.object({
 // ─── Route Plugin ─────────────────────────────────────────────────────────────
 
 export default async function reviewRoutes(app: FastifyInstance): Promise<void> {
+
+  // Provider-only review feed: never return marketplace-wide reviews to a provider.
+  app.get('/me', {
+    preHandler: [authenticate, isProvider],
+    schema: { tags: ['Reviews'], security: [{ bearerAuth: [] }] },
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    const db = getDb();
+    const providerId = request.user!.uid;
+    const snapshot = await db.collection(COLLECTIONS.REVIEWS)
+      .where('providerId', '==', providerId)
+      .where('status', '==', 'published')
+      .orderBy('createdAt', 'desc')
+      .limit(100)
+      .get();
+    const reviews = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+    const distribution: Record<string, number> = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
+    for (const review of reviews) distribution[String((review as any).rating)] += 1;
+    const count = reviews.length;
+    const average = count
+      ? Math.round(reviews.reduce((sum, review) => sum + Number((review as any).rating || 0), 0) / count * 10) / 10
+      : null;
+    return reply.send({ success: true, data: { reviews, rating: { average, count, distribution } } });
+  });
+
+  // AI-generated reputation insights from published reviews only. If Gemini is
+  // not configured or fails, return an explicit unavailable state, never invented feedback.
+  app.get('/me/insights', {
+    preHandler: [authenticate, isProvider],
+    schema: { tags: ['Reviews', 'AI'], security: [{ bearerAuth: [] }] },
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    const db = getDb();
+    const snapshot = await db.collection(COLLECTIONS.REVIEWS)
+      .where('providerId', '==', request.user!.uid)
+      .where('status', '==', 'published')
+      .orderBy('createdAt', 'desc')
+      .limit(100)
+      .get();
+    const reviews = snapshot.docs.map(doc => doc.data() as Review).filter(review => !!review.body?.trim());
+    if (reviews.length < 3) {
+      return reply.send({ success: true, data: { available: false, reason: 'At least three written published reviews are required for a useful summary.' } });
+    }
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return reply.send({ success: true, data: { available: false, reason: 'AI insights are not configured. Customer ratings and reviews remain available.' } });
+    }
+    try {
+      const axios = (await import('axios')).default;
+      const feedback = reviews.slice(0, 60).map(review => ({ rating: review.rating, feedback: review.body }));
+      const response = await axios.post(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`,
+        {
+          contents: [{ parts: [{ text: 'Analyze only this genuine customer review data. Do not invent facts. Return JSON with keys positiveThemes (array of strings), improvementAreas (array of strings), recommendations (array of strings). If evidence is insufficient, return empty arrays. Reviews: ' + JSON.stringify(feedback) }] }],
+          generationConfig: { responseMimeType: 'application/json', temperature: 0.2 },
+        },
+        { timeout: 15000 },
+      );
+      const raw = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      const insights = JSON.parse(raw);
+      return reply.send({ success: true, data: { available: true, generatedAt: new Date().toISOString(), sourceReviewCount: reviews.length, insights } });
+    } catch (error) {
+      request.log.warn({ err: error }, 'Provider review insights unavailable');
+      return reply.send({ success: true, data: { available: false, reason: 'AI insights are temporarily unavailable. Your published reviews and rating are unaffected.' } });
+    }
+  });
 
   /**
    * GET /reviews — Public listing of published reviews, filtered by providerId or serviceId
@@ -163,50 +235,66 @@ export default async function reviewRoutes(app: FastifyInstance): Promise<void> 
       });
     }
 
-    // One review per booking: check for existing review
+    // Preserve compatibility with older random-ID review records, then use a
+    // deterministic booking-based ID inside a transaction to prevent concurrent duplicates.
     const existingSnap = await db.collection(COLLECTIONS.REVIEWS)
       .where('bookingId', '==', data.bookingId)
       .limit(1)
       .get();
-
-    if (!existingSnap.empty) {
-      return reply.status(409).send({
-        success: false,
-        error: { code: 'RES_002', message: 'A review for this booking already exists.' },
-      });
-    }
-
-    const id = nanoid();
+    const id = data.bookingId;
+    const reviewRef = db.collection(COLLECTIONS.REVIEWS).doc(id);
+    const bookingRef = db.collection(COLLECTIONS.BOOKINGS).doc(data.bookingId);
     const now = new Date().toISOString();
-
-    const review: Review = {
+    const review: Review & Record<string, unknown> = {
       id,
       bookingId: data.bookingId,
       customerId: userId,
       providerId: booking.providerId,
       serviceId: booking.serviceId,
       rating: data.rating,
+      serviceQualityRating: data.serviceQualityRating,
+      staffBehaviourRating: data.staffBehaviourRating,
+      cleanlinessRating: data.cleanlinessRating,
       title: data.title,
       body: data.body,
       photoURLs: data.photoURLs,
-      status: 'pending', // Requires admin publish
-      isVerified: true,  // Linked to actual completed booking
+      status: 'pending',
+      isVerified: true,
       helpfulCount: 0,
       createdAt: now,
       updatedAt: now,
     };
 
-    await db.collection(COLLECTIONS.REVIEWS).doc(id).set(review);
+    const created = await db.runTransaction(async transaction => {
+      const currentReview = await transaction.get(reviewRef);
+      const currentBooking = await transaction.get(bookingRef);
+      if (!currentBooking.exists || (currentBooking.data() as Booking).status !== 'completed') return 'booking-not-completed' as const;
+      if (currentReview.exists || !existingSnap.empty) return 'duplicate' as const;
+      transaction.create(reviewRef, review);
+      transaction.update(bookingRef, {
+        rating: { score: data.rating, review: data.body, ratedAt: now, isPublic: false },
+        updatedAt: now,
+      });
+      return 'created' as const;
+    });
 
-    // Update booking with rating snapshot
-    await db.collection(COLLECTIONS.BOOKINGS).doc(data.bookingId).update({
-      rating: {
-        score: data.rating,
-        review: data.body,
-        ratedAt: now,
-        isPublic: true,
-      },
-      updatedAt: now,
+    if (created === 'duplicate') {
+      return reply.status(409).send({ success: false, error: { code: 'RES_002', message: 'A review for this booking already exists.' } });
+    }
+    if (created !== 'created') {
+      return reply.status(400).send({ success: false, error: { code: 'RES_003', message: 'Reviews can only be submitted for completed bookings.' } });
+    }
+
+    const customerNotificationId = nanoid();
+    await db.collection(COLLECTIONS.NOTIFICATIONS).doc(customerNotificationId).set({
+      id: customerNotificationId,
+      userId,
+      type: 'review_received',
+      title: 'Review submitted',
+      body: 'Thank you for sharing feedback. Your review is awaiting moderation before it appears publicly.',
+      data: { bookingId: data.bookingId, providerId: booking.providerId },
+      isRead: false,
+      createdAt: now,
     });
 
     return reply.status(201).send({ success: true, data: review });
@@ -292,17 +380,44 @@ export default async function reviewRoutes(app: FastifyInstance): Promise<void> 
     }
 
     const now = new Date().toISOString();
+    const review = doc.data() as Review;
+    if (parsed.data.status === 'published' && review.isVerified !== true) {
+      return reply.status(400).send({ success: false, error: { code: 'REV_002', message: 'Only reviews linked to a completed booking can be published.' } });
+    }
     await reviewRef.update({
       status: parsed.data.status,
       adminNote: parsed.data.adminNote,
+      moderatedBy: request.user!.uid,
+      moderatedAt: now,
       updatedAt: now,
     });
 
-    // Recompute provider's average and Bayesian rating upon review moderation
-    const review = doc.data() as Review;
-    recomputeProviderRating(review.providerId, db).catch((err) => {
-      request.log.warn({ err }, 'Failed to recompute provider rating');
+    await createAuditLog({
+      actorId: request.user!.uid,
+      actorRole: request.user!.role,
+      action: `REVIEW_${parsed.data.status.toUpperCase()}`,
+      resourceType: 'review',
+      resourceId: request.params.reviewId,
+      before: { status: review.status },
+      after: { status: parsed.data.status, adminNote: parsed.data.adminNote ?? null },
+      ipAddress: request.ip,
+      userAgent: request.headers['user-agent'],
     });
+
+    await recomputeProviderRating(review.providerId, db);
+    if (parsed.data.status === 'published') {
+      const notificationId = nanoid();
+      await db.collection(COLLECTIONS.NOTIFICATIONS).doc(notificationId).set({
+        id: notificationId,
+        userId: review.providerId,
+        type: 'review_received',
+        title: 'New customer review published',
+        body: 'A verified customer review has been published on your PETWO profile.',
+        data: { reviewId: request.params.reviewId },
+        isRead: false,
+        createdAt: now,
+      });
+    }
 
     return reply.send({
       success: true,
