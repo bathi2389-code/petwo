@@ -6,6 +6,9 @@ import 'package:url_launcher/url_launcher.dart';
 class LandingScreen extends StatelessWidget {
   const LandingScreen({super.key});
 
+  static final GlobalKey _careKey = GlobalKey();
+  static final GlobalKey _howKey = GlobalKey();
+  static final GlobalKey _providersKey = GlobalKey();
   static const _providerUrl = 'https://petwo-provider-av04vuus7-dragon-4898.vercel.app';
 
   void _signIn(BuildContext context) {
@@ -154,7 +157,7 @@ class LandingScreen extends StatelessWidget {
   );
 
   Widget _careCards(bool wide, double pad) => Container(
-    key: const ValueKey('care'),
+    key: _careKey,
     width: double.infinity,
     padding: EdgeInsets.fromLTRB(pad.clamp(22, 90), 28, pad.clamp(22, 90), 76),
     child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 1160), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -177,7 +180,7 @@ class LandingScreen extends StatelessWidget {
   );
 
   Widget _howItWorks(bool wide, double pad) => Container(
-    key: const ValueKey('how'),
+    key: _howKey,
     width: double.infinity,
     color: const Color(0xFFF1F7F3),
     padding: EdgeInsets.fromLTRB(pad.clamp(22, 90), 70, pad.clamp(22, 90), 76),
@@ -196,7 +199,7 @@ class LandingScreen extends StatelessWidget {
   );
 
   Widget _providerBanner(BuildContext context, bool wide, double pad) => Container(
-    key: const ValueKey('providers'),
+    key: _providersKey,
     width: double.infinity,
     padding: EdgeInsets.fromLTRB(pad.clamp(22, 90), 68, pad.clamp(22, 90), 68),
     child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 1160), child: Container(
@@ -225,10 +228,10 @@ class LandingScreen extends StatelessWidget {
   void _scroll(BuildContext context, String section) {
     // Scroll navigation is handled by the landing page's section positions below.
     final key = switch (section) {
-      'care' => const ValueKey('care'),
-      'how' => const ValueKey('how'),
-      'providers' => const ValueKey('providers'),
-      _ => const ValueKey('intro'),
+      'care' => _careKey,
+      'how' => _howKey,
+      'providers' => _providersKey,
+      _ => _careKey,
     };
     Scrollable.ensureVisible(
       _sectionContext(context, key) ?? context,
@@ -238,7 +241,12 @@ class LandingScreen extends StatelessWidget {
     );
   }
 
-  BuildContext? _sectionContext(BuildContext context, Key key) => null;
+  BuildContext? _sectionContext(BuildContext context, Key key) {
+    if (identical(key, _careKey)) return _careKey.currentContext;
+    if (identical(key, _howKey)) return _howKey.currentContext;
+    if (identical(key, _providersKey)) return _providersKey.currentContext;
+    return null;
+  }
 }
 
 class _Brand extends StatelessWidget {
